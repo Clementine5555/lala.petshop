@@ -1,0 +1,198 @@
+-- -- ERD-derived SQL schema for Petshop
+-- -- Created: 2025-11-09
+-- -- Engine: InnoDB, charset: utf8mb4
+
+-- SET FOREIGN_KEY_CHECKS = 0;
+
+-- CREATE TABLE `users` (
+--   `user_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+--   `name` VARCHAR(150) NOT NULL,
+--   `email` VARCHAR(150) NOT NULL UNIQUE,
+--   `password` VARCHAR(255) NOT NULL,
+--   `phone_number` VARCHAR(50) NULL,
+--   `role` ENUM('superadmin','admin','courier','customer') NOT NULL DEFAULT 'customer',
+--   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+--   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--   PRIMARY KEY (`user_id`)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- CREATE TABLE `suppliers` (
+--   `supplier_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+--   `name` VARCHAR(200) NOT NULL,
+--   `address` TEXT NULL,
+--   `email` VARCHAR(150) NULL,
+--   `phone_number` VARCHAR(50) NULL,
+--   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+--   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--   PRIMARY KEY (`supplier_id`)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- CREATE TABLE `products` (
+--   `product_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+--   `supplier_id` BIGINT UNSIGNED NULL,
+--   `name` VARCHAR(200) NOT NULL,
+--   `category` VARCHAR(100) NULL,
+--   `description` TEXT NULL,
+--   `price` DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+--   `stock` INT NOT NULL DEFAULT 0,
+--   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+--   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--   PRIMARY KEY (`product_id`),
+--   INDEX (`supplier_id`),
+--   CONSTRAINT `fk_products_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers`(`supplier_id`) ON DELETE SET NULL ON UPDATE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- CREATE TABLE `pets` (
+--   `pet_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+--   `user_id` BIGINT UNSIGNED NOT NULL,
+--   `name` VARCHAR(150) NOT NULL,
+--   `type` VARCHAR(100) NULL,
+--   `race` VARCHAR(100) NULL,
+--   `gender` ENUM('male','female') NULL,
+--   `age` INT NULL,
+--   `weight` DECIMAL(8,2) NULL,
+--   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+--   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--   PRIMARY KEY (`pet_id`),
+--   INDEX (`user_id`),
+--   CONSTRAINT `fk_pets_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- CREATE TABLE `services` (
+--   `service_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+--   `service_name` VARCHAR(200) NOT NULL,
+--   `description` TEXT NULL,
+--   `price` DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+--   `duration_minutes` INT NULL,
+--   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+--   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--   PRIMARY KEY (`service_id`)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- CREATE TABLE `appointments` (
+--   `appointment_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+--   `payment_id` BIGINT UNSIGNED NULL,
+--   `appointment_date` DATETIME NULL,
+--   `status` VARCHAR(50) NULL,
+--   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+--   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--   PRIMARY KEY (`appointment_id`),
+--   INDEX (`payment_id`)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- CREATE TABLE `appointment_details` (
+--   `appointment_detail_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+--   `appointment_id` BIGINT UNSIGNED NOT NULL,
+--   `service_id` BIGINT UNSIGNED NOT NULL,
+--   `pet_id` BIGINT UNSIGNED NOT NULL,
+--   `date` DATE NULL,
+--   `time` TIME NULL,
+--   `note` TEXT NULL,
+--   PRIMARY KEY (`appointment_detail_id`),
+--   INDEX (`appointment_id`),
+--   INDEX (`service_id`),
+--   INDEX (`pet_id`),
+--   CONSTRAINT `fk_appdetail_appointment` FOREIGN KEY (`appointment_id`) REFERENCES `appointments`(`appointment_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+--   CONSTRAINT `fk_appdetail_service` FOREIGN KEY (`service_id`) REFERENCES `services`(`service_id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+--   CONSTRAINT `fk_appdetail_pet` FOREIGN KEY (`pet_id`) REFERENCES `pets`(`pet_id`) ON DELETE CASCADE ON UPDATE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- CREATE TABLE `payments` (
+--   `payment_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+--   `method` VARCHAR(100) NULL,
+--   `evidence` VARCHAR(255) NULL,
+--   `status` VARCHAR(50) NULL,
+--   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+--   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--   PRIMARY KEY (`payment_id`)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -- Link appointment.payment_id -> payments.payment_id
+-- ALTER TABLE `appointments`
+--   ADD CONSTRAINT `fk_appointments_payment` FOREIGN KEY (`payment_id`) REFERENCES `payments`(`payment_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- CREATE TABLE `transactions` (
+--   `transaction_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+--   `user_id` BIGINT UNSIGNED NOT NULL,
+--   `payment_id` BIGINT UNSIGNED NULL,
+--   `transaction_date` DATETIME NULL,
+--   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+--   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--   PRIMARY KEY (`transaction_id`),
+--   INDEX (`user_id`),
+--   INDEX (`payment_id`),
+--   CONSTRAINT `fk_transactions_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE SET NULL ON UPDATE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ALTER TABLE `transactions` ADD CONSTRAINT `fk_transactions_payment` FOREIGN KEY (`payment_id`) REFERENCES `payments`(`payment_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- CREATE TABLE `transaction_details` (
+--   `transaction_detail_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+--   `transaction_id` BIGINT UNSIGNED NOT NULL,
+--   `product_id` BIGINT UNSIGNED NOT NULL,
+--   `quantity` INT NOT NULL DEFAULT 1,
+--   `price_at_purchase` DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+--   PRIMARY KEY (`transaction_detail_id`),
+--   INDEX (`transaction_id`),
+--   INDEX (`product_id`),
+--   CONSTRAINT `fk_trdetail_transaction` FOREIGN KEY (`transaction_id`) REFERENCES `transactions`(`transaction_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+--   CONSTRAINT `fk_trdetail_product` FOREIGN KEY (`product_id`) REFERENCES `products`(`product_id`) ON DELETE RESTRICT ON UPDATE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- CREATE TABLE `deliveries` (
+--   `delivery_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+--   `courier_id` BIGINT UNSIGNED NULL,
+--   `transaction_id` BIGINT UNSIGNED NULL,
+--   `address` TEXT NULL,
+--   `status` VARCHAR(50) NULL,
+--   `description` TEXT NULL,
+--   `delivery_date` DATETIME NULL,
+--   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+--   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--   PRIMARY KEY (`delivery_id`),
+--   INDEX (`courier_id`),
+--   INDEX (`transaction_id`),
+--   CONSTRAINT `fk_deliveries_courier` FOREIGN KEY (`courier_id`) REFERENCES `users`(`user_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+--   CONSTRAINT `fk_deliveries_transaction` FOREIGN KEY (`transaction_id`) REFERENCES `transactions`(`transaction_id`) ON DELETE SET NULL ON UPDATE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- CREATE TABLE `reviews` (
+--   `review_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+--   `user_id` BIGINT UNSIGNED NOT NULL,
+--   `product_id` BIGINT UNSIGNED NOT NULL,
+--   `rate` TINYINT UNSIGNED NOT NULL DEFAULT 5,
+--   `comment` TEXT NULL,
+--   `date` DATETIME NULL,
+--   PRIMARY KEY (`review_id`),
+--   INDEX (`user_id`),
+--   INDEX (`product_id`),
+--   CONSTRAINT `fk_reviews_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+--   CONSTRAINT `fk_reviews_product` FOREIGN KEY (`product_id`) REFERENCES `products`(`product_id`) ON DELETE CASCADE ON UPDATE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- CREATE TABLE `refund_headers` (
+--   `refund_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+--   `transaction_id` BIGINT UNSIGNED NOT NULL,
+--   `date` DATETIME NULL,
+--   `reason` TEXT NULL,
+--   `status_refund` VARCHAR(50) NULL,
+--   PRIMARY KEY (`refund_id`),
+--   INDEX (`transaction_id`),
+--   CONSTRAINT `fk_refund_transaction` FOREIGN KEY (`transaction_id`) REFERENCES `transactions`(`transaction_id`) ON DELETE CASCADE ON UPDATE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- CREATE TABLE `refund_details` (
+--   `refund_detail_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+--   `refund_id` BIGINT UNSIGNED NOT NULL,
+--   `transaction_detail_id` BIGINT UNSIGNED NOT NULL,
+--   `quantity` INT NOT NULL DEFAULT 1,
+--   PRIMARY KEY (`refund_detail_id`),
+--   INDEX (`refund_id`),
+--   INDEX (`transaction_detail_id`),
+--   CONSTRAINT `fk_refunddetail_header` FOREIGN KEY (`refund_id`) REFERENCES `refund_headers`(`refund_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+--   CONSTRAINT `fk_refunddetail_trdetail` FOREIGN KEY (`transaction_detail_id`) REFERENCES `transaction_details`(`transaction_detail_id`) ON DELETE RESTRICT ON UPDATE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- SET FOREIGN_KEY_CHECKS = 1;
+
+-- -- End of schema
