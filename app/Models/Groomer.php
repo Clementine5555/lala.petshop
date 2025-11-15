@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\AppointmentDetail;
+
+class Groomer extends Model
+{
+    use HasFactory;
+
+    // Menentukan Primary Key
+    protected $primaryKey = 'groomer_id';
+
+    // Mengizinkan mass assignment
+    protected $fillable = [
+        'user_id',
+        'total_appointments_completed',
+        'total_minutes_worked', 
+    ];
+
+    /**
+     * Relasi: Groomer dimiliki oleh satu User (FK user_id).
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Relasi: Groomer memiliki banyak AppointmentDetails
+     */
+    public function appointmentDetails(): HasMany
+    {
+        return $this->hasMany(AppointmentDetail::class, 'groomer_id', 'groomer_id');
+    }
+}
