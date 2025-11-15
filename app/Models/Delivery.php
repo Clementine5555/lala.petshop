@@ -3,23 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Delivery extends Model
+class Delivery extends BaseModel
 {
     use HasFactory, SoftDeletes;
 
     protected $primaryKey = 'delivery_id';
-    protected $fillable = [
-        'courier_id',
-        'transaction_id',
-        'address',
-        'status', // pending, shipped, delivered, returned
-        'description',
-        'delivery_date',
-    ];
+    // protected $fillable = [
+    //     'courier_id',
+    //     'transaction_id',
+    //     'address',
+    //     'status', // pending, shipped, delivered, returned
+    //     'description',
+    //     'delivery_date',
+    // ];
 
     public function courier(): BelongsTo
     {

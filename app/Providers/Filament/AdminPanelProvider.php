@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Admin\Resources\Users\UserResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -24,19 +25,24 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
             ->id('admin')
+            ->default()
+            ->sidebarCollapsibleOnDesktop()
+            ->brandLogo(fn () => view('filament.admin.logo'))
+            ->favicon('img/logo.png')
             ->path('admin')
-            ->login()
-            ->colors([
-                'primary' => Color::Amber,
+            ->resources([
+                UserResource::class,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
+            ->colors([
+                'primary' => Color::Pink,
+            ])
+            ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\Filament\Admin\Resources')
+            ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\Filament\Admin\Pages')
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\Filament\Admin\Widgets')
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,

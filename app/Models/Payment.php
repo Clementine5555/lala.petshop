@@ -3,20 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Payment extends Model
+class Payment extends BaseModel
 {
     use HasFactory, SoftDeletes;
     
     protected $primaryKey = 'payment_id';
-    protected $fillable = [
-        'method',
-        'status_payment',
-        'evidence',
-    ];
+    // protected $fillable = [
+    //     'method',
+    //     'status_payment',
+    //     'evidence',
+    // ];
     
     // Relasi One-to-One dengan Transaction
     public function transaction(): HasOne

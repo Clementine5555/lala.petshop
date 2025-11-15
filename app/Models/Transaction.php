@@ -3,23 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Transaction extends Model
+class Transaction extends BaseModel
 {
     use HasFactory, SoftDeletes;
     
     protected $primaryKey = 'transaction_id';
-    protected $fillable = [
-        'user_id',
-        'payment_id',
-        'delivery_method', // pickup, delivery
-        'status', // pending, waiting_for_payment, Ready_for_pickup, completed, cancelled
-    ];
+    // protected $fillable = [
+    //     'user_id',
+    //     'payment_id',
+    //     'delivery_method', // pickup, delivery
+    //     'status', // pending, waiting_for_payment, Ready_for_pickup, completed, cancelled
+    // ];
 
     public function user(): BelongsTo
     {

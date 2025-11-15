@@ -3,22 +3,21 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Cart extends Model
+class Cart extends BaseModel
 {
     use HasFactory, SoftDeletes;
     
     protected $primaryKey = 'cart_id';
-    protected $fillable = [
-        'user_id',
-        'product_id',
-        'quantity',
-        'status', // active, converted
-    ];
+    // protected $fillable = [
+    //     'user_id',
+    //     'product_id',
+    //     'quantity',
+    //     'status', // active, converted
+    // ];
 
     public function user(): BelongsTo
     {
@@ -30,9 +29,4 @@ class Cart extends Model
         return $this->belongsTo(Product::class, 'product_id', 'product_id');
     }
 
-    public function transactionDetails(): HasMany
-    {
-        // Hubungan ini menghubungkan Cart dengan TransactionDetail yang menggunakan cart_id ini
-        return $this->hasMany(TransactionDetail::class, 'cart_id', 'cart_id');
-    }
 }

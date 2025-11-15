@@ -3,20 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class RefundDetail extends Model
+class RefundDetail extends BaseModel
 {
     use HasFactory, SoftDeletes;
     
     protected $primaryKey = 'refund_detail_id';
-    protected $fillable = [
-        'refund_id',
-        'transaction_detail_id',
-        'quantity',
-    ];
+    // protected $fillable = [
+    //     'refund_id',
+    //     'transaction_detail_id',
+    //     'quantity',
+    // ];
 
     public function refundHeader(): BelongsTo
     {

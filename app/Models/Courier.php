@@ -3,21 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Courier extends Model
+class Courier extends BaseModel
 {
     use HasFactory, SoftDeletes;
 
     protected $primaryKey = 'courier_id';
-    protected $fillable = [
-        'user_id',
-        'total_deliveries_completed',
-        'total_distance_km',
-    ];
+    // protected $fillable = [
+    //     'user_id',
+    //     'total_deliveries_completed',
+    //     'total_distance_km',
+    // ];
 
     public function user(): BelongsTo
     {

@@ -3,25 +3,24 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Pet extends Model
+class Pet extends BaseModel
 {
     use HasFactory, SoftDeletes;
     
     protected $primaryKey = 'pet_id';
-    protected $fillable = [
-        'user_id',
-        'name',
-        'type',
-        'race',
-        'gender',
-        'age',
-        'weight',
-    ];
+    // protected $fillable = [
+    //     'user_id',
+    //     'name',
+    //     'type',
+    //     'race',
+    //     'gender',
+    //     'age',
+    //     'weight',
+    // ];
 
     public function user(): BelongsTo
     {

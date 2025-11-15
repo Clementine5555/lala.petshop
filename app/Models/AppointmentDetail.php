@@ -3,24 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class AppointmentDetail extends Model
+class AppointmentDetail extends BaseModel
 {
     use HasFactory, SoftDeletes;
 
     protected $primaryKey = 'appointment_detail_id';
-    protected $fillable = [
-        'appointment_id',
-        'groomer_id',
-        'service_id',
-        'pet_id',
-        'date',
-        'time',
-        'note',
-    ];
+    // protected $fillable = [
+    //     'appointment_id',
+    //     'groomer_id',
+    //     'service_id',
+    //     'pet_id',
+    //     'date',
+    //     'time',
+    //     'note',
+    // ];
 
     public function appointment(): BelongsTo
     {

@@ -3,16 +3,17 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Traits\LogsAllActivity;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes, LogsAllActivity;
 
     protected $primaryKey = 'user_id';
 
@@ -21,13 +22,13 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'phone_number',
-        'role'
-    ];
+    // protected $fillable = [
+    //     'name',
+    //     'email',
+    //     'password',
+    //     'phone_number',
+    //     'role'
+    // ];
 
     /**
      * The attributes that should be hidden for serialization.
