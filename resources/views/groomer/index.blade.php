@@ -3,380 +3,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Groomer Dashboard - Pet Care</title>
+    <title>Groomer Dashboard - Pet Care Pro</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 100%);
+            font-family: 'Poppins', sans-serif;
+            background: #FF8C42;
             min-height: 100vh;
             padding: 20px;
         }
-
-        .navbar {
-            background: white;
-            padding: 15px 50px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-radius: 15px;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 50px;
-        }
-
-        .logo {
-            display: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 40px;
-            list-style: none;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-
-        .nav-links a.active {
-            color: #FF8C42;
-        }
-
-        .user-info {
+        .logout-btn {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background: rgba(255,255,255,0.95);
+            padding: 12px 28px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            color: #F57C00;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            z-index: 1000;
             display: flex;
             align-items: center;
             gap: 10px;
+            transition: all 0.3s;
         }
-
+        .logout-btn:hover {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            color: white;
+            transform: translateY(-3px);
+        }
+        .container { max-width: 1400px; margin: 80px auto 0; }
+        .header {
+            background: rgba(255,255,255,0.95);
+            padding: 45px;
+            border-radius: 30px;
+            margin-bottom: 35px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        }
+        .header-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .header-left h1 {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header-left p { color: #666; font-size: 1.2em; }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 30px 12px 12px;
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            border-radius: 50px;
+            color: white;
+        }
         .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: #FF8C42;
+            width: 55px;
+            height: 55px;
+            background: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: #F57C00;
             font-weight: 700;
+            font-size: 1.4em;
         }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .header {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-
-        .header h1 {
-            color: #FF8C42;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            color: #666;
-            font-size: 1.1em;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; margin-bottom: 35px; }
         .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.95);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
             transition: transform 0.3s;
         }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #FF9800, #F57C00);
         }
-
-        .stat-card h3 {
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
-
+        .stat-card:hover { transform: translateY(-10px); }
+        .stat-card h3 { color: #888; font-size: 0.9em; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
         .stat-card .number {
-            font-size: 2.5em;
-            font-weight: 700;
-            color: #FF8C42;
+            font-size: 3em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-
+        .stat-card .icon { position: absolute; right: 20px; bottom: 20px; font-size: 3em; opacity: 0.1; }
         .appointments-section {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.95);
+            padding: 45px;
+            border-radius: 30px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
         }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .section-header h2 {
-            color: #333;
-            font-size: 1.8em;
-        }
-
-        .filter-tabs {
-            display: flex;
-            gap: 10px;
-        }
-
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; flex-wrap: wrap; gap: 20px; }
+        .section-header h2 { color: #333; font-size: 2em; }
+        .filter-tabs { display: flex; gap: 10px; background: #f5f5f5; padding: 6px; border-radius: 50px; flex-wrap: wrap; }
         .filter-tab {
-            padding: 10px 20px;
-            background: #f5f5f5;
+            padding: 12px 24px;
+            background: transparent;
             border: none;
-            border-radius: 25px;
+            border-radius: 50px;
             cursor: pointer;
             font-weight: 600;
+            color: #666;
             transition: all 0.3s;
         }
-
         .filter-tab.active {
-            background: #FF8C42;
+            background: linear-gradient(135deg, #FF9800, #F57C00);
             color: white;
         }
-
-        .appointments-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
+        .appointments-list { display: flex; flex-direction: column; gap: 20px; }
         .appointment-card {
-            background: #FFF5EB;
-            padding: 20px;
-            border-radius: 15px;
-            border-left: 5px solid #FF8C42;
+            background: linear-gradient(135deg, #fff, #fff8f0);
+            padding: 25px;
+            border-radius: 20px;
+            border-left: 6px solid;
             display: grid;
             grid-template-columns: 1fr 1fr 1fr auto;
-            gap: 20px;
+            gap: 25px;
             align-items: center;
             transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
         }
-
-        .appointment-card:hover {
-            box-shadow: 0 5px 15px rgba(255, 140, 66, 0.2);
-        }
-
-        .appointment-card.completed {
-            opacity: 0.7;
-            border-left-color: #4CAF50;
-        }
-
-        .appointment-info h4 {
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .appointment-info p {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .pet-details {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .pet-tag {
-            display: inline-block;
-            padding: 3px 10px;
-            background: white;
-            border-radius: 12px;
-            font-size: 0.85em;
-            color: #666;
-            width: fit-content;
-        }
-
-        .service-list {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .service-item {
-            font-size: 0.9em;
-            color: #666;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
+        .appointment-card:hover { transform: translateX(10px); box-shadow: 0 12px 35px rgba(255,152,0,0.25); }
+        .appointment-card[data-status="pending"] { border-left-color: #FFA726; }
+        .appointment-card[data-status="inprogress"] { border-left-color: #42A5F5; }
+        .appointment-card[data-status="completed"] { border-left-color: #66BB6A; opacity: 0.8; }
+        .appointment-card.hidden { display: none; }
+        .appointment-info h4 { color: #333; margin-bottom: 8px; font-size: 1.2em; }
+        .appointment-info p { color: #666; font-size: 0.95em; margin-bottom: 4px; }
+        .pet-details h4 { color: #333; margin-bottom: 10px; font-size: 1.1em; }
+        .pet-tag { display: inline-block; padding: 6px 14px; background: white; border-radius: 20px; font-size: 0.85em; color: #666; margin: 4px 4px 4px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .service-item { font-size: 0.95em; color: #666; margin-bottom: 5px; }
+        .action-buttons { display: flex; flex-direction: column; gap: 10px; }
         .btn {
-            padding: 10px 20px;
+            padding: 12px 22px;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
+            font-size: 0.9em;
         }
-
-        .btn-complete {
-            background: #4CAF50;
-            color: white;
+        .btn-start { background: linear-gradient(135deg, #FF9800, #F57C00); color: white; }
+        .btn-complete { background: linear-gradient(135deg, #66BB6A, #43A047); color: white; }
+        .btn-view { background: linear-gradient(135deg, #42A5F5, #1E88E5); color: white; }
+        .btn:hover { transform: translateY(-2px); }
+        .status-badge { padding: 10px 18px; border-radius: 25px; font-size: 0.8em; font-weight: 700; text-transform: uppercase; text-align: center; }
+        .status-pending { background: linear-gradient(135deg, #FFE082, #FFD54F); color: #F57F17; }
+        .status-inprogress { background: linear-gradient(135deg, #81D4FA, #4FC3F7); color: #01579B; }
+        .status-completed { background: linear-gradient(135deg, #A5D6A7, #81C784); color: #1B5E20; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
         }
-
-        .btn-complete:hover {
-            background: #45a049;
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
         }
-
-        .btn-view {
-            background: #2196F3;
-            color: white;
+        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
+        .modal-header h2 {
+            font-size: 1.6em;
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-
-        .btn-view:hover {
-            background: #0b7dda;
+        .close-modal {
+            background: #f5f5f5;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3em;
+            transition: all 0.3s;
         }
-
-        .status-badge {
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 700;
-            text-transform: uppercase;
+        .close-modal:hover { background: #FF9800; color: white; transform: rotate(90deg); }
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        .info-label { font-weight: 600; color: #666; }
+        .info-value { font-weight: 700; color: #333; }
+        .checklist { margin: 20px 0; }
+        .checklist h3 { color: #333; margin-bottom: 15px; font-size: 1.2em; }
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #fff8f0;
+            border-radius: 12px;
+            margin-bottom: 10px;
         }
-
-        .status-pending {
-            background: #FFF3CD;
-            color: #856404;
-        }
-
-        .status-inprogress {
-            background: #D1ECF1;
-            color: #0C5460;
-        }
-
-        .status-completed {
-            background: #D4EDDA;
-            color: #155724;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-        }
-
-        .empty-state svg {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-
+        .checklist-item input { width: 22px; height: 22px; accent-color: #FF9800; cursor: pointer; }
+        .checklist-item label { flex: 1; cursor: pointer; }
+        .modal-footer { display: flex; gap: 12px; justify-content: flex-end; margin-top: 25px; }
+        .btn-modal { padding: 14px 30px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-cancel { background: #f5f5f5; color: #666; }
+        .btn-finish { background: linear-gradient(135deg, #66BB6A, #43A047); color: white; }
+        .btn-finish:hover { transform: translateY(-2px); }
+        .progress-section { margin: 20px 0; }
+        .progress-bar { width: 100%; height: 10px; background: #e0e0e0; border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #FF9800, #F57C00); transition: width 0.3s; }
+        .timer { text-align: center; font-size: 2em; font-weight: 700; color: #FF9800; margin: 15px 0; }
         @media (max-width: 1024px) {
-            .appointment-card {
-                grid-template-columns: 1fr;
-            }
-
-            .action-buttons {
-                justify-content: flex-start;
-            }
+            .appointment-card { grid-template-columns: 1fr; }
+            .action-buttons { flex-direction: row; flex-wrap: wrap; }
         }
-
         @media (max-width: 768px) {
-            .navbar {
-                padding: 15px 20px;
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .nav-left {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .header h1 {
-                font-size: 1.8em;
-            }
-
-            .filter-tabs {
-                flex-wrap: wrap;
-            }
+            .logout-btn { top: 15px; left: 15px; padding: 10px 20px; font-size: 0.85em; }
+            .container { margin-top: 70px; }
+            .header { padding: 25px; }
+            .header-left h1 { font-size: 1.8em; }
+            .appointments-section { padding: 25px; }
+            .modal-footer { flex-direction: column; }
+            .btn-modal { width: 100%; }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-left">
-            <div class="logo"></div>
-            <ul class="nav-links">
-                <li><a href="/" class="active">Dashboard</a></li>
-                <li><a href="/schedule">Schedule</a></li>
-                <li><a href="/history">History</a></li>
-            </ul>
-        </div>
-        <div class="user-info">
-            <div class="user-avatar">G</div>
-            <span style="font-weight: 600; color: #333;">Groomer Name</span>
-        </div>
-    </nav>
-
+    <button class="logout-btn" onclick="logout()">
+        <span>🚪</span>
+        <span>Logout</span>
+    </button>
     <div class="container">
         <div class="header">
-            <h1>Welcome Back, Groomer!</h1>
-            <p>Here's your schedule for today</p>
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>Welcome Back! 👋</h1>
+                    <p>Ready to make some pets look amazing today?</p>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">G</div>
+                    <span class="user-name">Groomer Pro</span>
+                </div>
+            </div>
         </div>
-
         <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Today's Appointments</h3>
-                <div class="number">5</div>
-            </div>
-            <div class="stat-card">
-                <h3>Pending</h3>
-                <div class="number">3</div>
-            </div>
-            <div class="stat-card">
-                <h3>In Progress</h3>
-                <div class="number">1</div>
-            </div>
-            <div class="stat-card">
-                <h3>Completed</h3>
-                <div class="number">1</div>
-            </div>
+            <div class="stat-card"><h3>Today's Appointments</h3><div class="number" id="totalCount">5</div><div class="icon">📅</div></div>
+            <div class="stat-card"><h3>Pending</h3><div class="number" id="pendingCount">3</div><div class="icon">⏳</div></div>
+            <div class="stat-card"><h3>In Progress</h3><div class="number" id="progressCount">1</div><div class="icon">🔄</div></div>
+            <div class="stat-card"><h3>Completed</h3><div class="number" id="completedCount">1</div><div class="icon">✅</div></div>
         </div>
-
         <div class="appointments-section">
             <div class="section-header">
-                <h2>Today's Appointments</h2>
+                <h2>📋 Today's Schedule</h2>
                 <div class="filter-tabs">
                     <button class="filter-tab active" onclick="filterAppointments('all')">All</button>
                     <button class="filter-tab" onclick="filterAppointments('pending')">Pending</button>
@@ -384,177 +283,145 @@
                     <button class="filter-tab" onclick="filterAppointments('completed')">Completed</button>
                 </div>
             </div>
-
-            <div class="appointments-list" id="appointmentsList">
-                <!-- Appointment 1 -->
-                <div class="appointment-card" data-status="pending">
-                    <div class="appointment-info">
-                        <h4>09:00 AM</h4>
-                        <p>Customer: John Doe</p>
-                        <p style="color: #FF8C42; font-weight: 600;">Payment: Cash</p>
-                    </div>
-                    <div class="pet-details">
-                        <h4 style="color: #333;">Max</h4>
-                        <div class="pet-tag">🐕 Dog - Golden Retriever</div>
-                        <div class="pet-tag">⚖️ 25 kg - Male</div>
-                    </div>
-                    <div class="service-list">
-                        <div class="service-item">✓ Full Grooming</div>
-                        <div class="service-item" style="color: #999; font-style: italic;">Note: Sensitive to loud noises</div>
-                    </div>
-                    <div class="action-buttons">
-                        <span class="status-badge status-pending">Pending</span>
-                        <button class="btn btn-complete" onclick="markComplete(this)">Start</button>
-                    </div>
-                </div>
-
-                <!-- Appointment 2 -->
-                <div class="appointment-card" data-status="inprogress">
-                    <div class="appointment-info">
-                        <h4>10:30 AM</h4>
-                        <p>Customer: Sarah Smith</p>
-                        <p style="color: #FF8C42; font-weight: 600;">Payment: Bank Transfer (Paid)</p>
-                    </div>
-                    <div class="pet-details">
-                        <h4 style="color: #333;">Luna</h4>
-                        <div class="pet-tag">🐱 Cat - Persian</div>
-                        <div class="pet-tag">⚖️ 4 kg - Female</div>
-                    </div>
-                    <div class="service-list">
-                        <div class="service-item">✓ Bath Only</div>
-                    </div>
-                    <div class="action-buttons">
-                        <span class="status-badge status-inprogress">In Progress</span>
-                        <button class="btn btn-complete" onclick="markComplete(this)">Complete</button>
-                    </div>
-                </div>
-
-                <!-- Appointment 3 -->
-                <div class="appointment-card completed" data-status="completed">
-                    <div class="appointment-info">
-                        <h4>08:00 AM</h4>
-                        <p>Customer: Mike Johnson</p>
-                        <p style="color: #FF8C42; font-weight: 600;">Payment: GoPay (Paid)</p>
-                    </div>
-                    <div class="pet-details">
-                        <h4 style="color: #333;">Buddy</h4>
-                        <div class="pet-tag">🐕 Dog - Beagle</div>
-                        <div class="pet-tag">⚖️ 12 kg - Male</div>
-                    </div>
-                    <div class="service-list">
-                        <div class="service-item">✓ Full Grooming</div>
-                    </div>
-                    <div class="action-buttons">
-                        <span class="status-badge status-completed">Completed</span>
-                        <button class="btn btn-view" onclick="viewDetails(this)">View</button>
-                    </div>
-                </div>
-
-                <!-- Appointment 4 -->
-                <div class="appointment-card" data-status="pending">
-                    <div class="appointment-info">
-                        <h4>01:00 PM</h4>
-                        <p>Customer: Emily Brown</p>
-                        <p style="color: #FF8C42; font-weight: 600;">Payment: Cash</p>
-                    </div>
-                    <div class="pet-details">
-                        <h4 style="color: #333;">Bella</h4>
-                        <div class="pet-tag">🐕 Dog - Poodle</div>
-                        <div class="pet-tag">⚖️ 8 kg - Female</div>
-                    </div>
-                    <div class="service-list">
-                        <div class="service-item">✓ Bath Only</div>
-                        <div class="service-item" style="color: #999; font-style: italic;">Note: Use warm water</div>
-                    </div>
-                    <div class="action-buttons">
-                        <span class="status-badge status-pending">Pending</span>
-                        <button class="btn btn-complete" onclick="markComplete(this)">Start</button>
-                    </div>
-                </div>
-
-                <!-- Appointment 5 -->
-                <div class="appointment-card" data-status="pending">
-                    <div class="appointment-info">
-                        <h4>03:00 PM</h4>
-                        <p>Customer: David Lee</p>
-                        <p style="color: #FF8C42; font-weight: 600;">Payment: Bank Transfer (Paid)</p>
-                    </div>
-                    <div class="pet-details">
-                        <h4 style="color: #333;">Charlie</h4>
-                        <div class="pet-tag">🐱 Cat - Siamese</div>
-                        <div class="pet-tag">⚖️ 5 kg - Male</div>
-                    </div>
-                    <div class="service-list">
-                        <div class="service-item">✓ Full Grooming</div>
-                    </div>
-                    <div class="action-buttons">
-                        <span class="status-badge status-pending">Pending</span>
-                        <button class="btn btn-complete" onclick="markComplete(this)">Start</button>
-                    </div>
-                </div>
+            <div class="appointments-list" id="appointmentsList"></div>
+        </div>
+    </div>
+    <div class="modal" id="progressModal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>🐾 Grooming in Progress</h2><button class="close-modal" onclick="closeModal('progressModal')">×</button></div>
+            <div class="modal-body">
+                <div class="info-row"><span class="info-label">Pet Name</span><span class="info-value" id="progPetName">-</span></div>
+                <div class="info-row"><span class="info-label">Service</span><span class="info-value" id="progService">-</span></div>
+                <div class="progress-section"><h3>Progress</h3><div class="timer" id="timerDisplay">00:00</div><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div></div>
+                <div class="checklist"><h3>✅ Checklist</h3><div id="checklistItems"></div></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal btn-cancel" onclick="closeModal('progressModal')">Cancel</button>
+                <button class="btn-modal btn-finish" onclick="finishGrooming()">✓ Complete Grooming</button>
             </div>
         </div>
     </div>
-
-    <script>
-        function filterAppointments(status) {
-            const tabs = document.querySelectorAll('.filter-tab');
-            tabs.forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
-
-            const appointments = document.querySelectorAll('.appointment-card');
-            
-            appointments.forEach(card => {
-                if (status === 'all') {
-                    card.style.display = 'grid';
-                } else {
-                    if (card.dataset.status === status) {
-                        card.style.display = 'grid';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                }
-            });
-        }
-
-        function markComplete(button) {
-            const card = button.closest('.appointment-card');
-            const statusBadge = card.querySelector('.status-badge');
-            
-            if (statusBadge.textContent === 'Pending') {
-                // Change to In Progress
-                statusBadge.textContent = 'In Progress';
-                statusBadge.className = 'status-badge status-inprogress';
-                button.textContent = 'Complete';
-                card.dataset.status = 'inprogress';
-            } else if (statusBadge.textContent === 'In Progress') {
-                // Change to Completed
-                statusBadge.textContent = 'Completed';
-                statusBadge.className = 'status-badge status-completed';
-                button.textContent = 'View';
-                button.className = 'btn btn-view';
-                button.onclick = function() { viewDetails(this); };
-                card.classList.add('completed');
-                card.dataset.status = 'completed';
-                
-                // Update stats
-                updateStats();
-            }
-        }
-
-        function viewDetails(button) {
-            alert('View appointment details (functionality to be implemented)');
-        }
-
-        function updateStats() {
-            const pending = document.querySelectorAll('[data-status="pending"]').length;
-            const inprogress = document.querySelectorAll('[data-status="inprogress"]').length;
-            const completed = document.querySelectorAll('[data-status="completed"]').length;
-            
-            document.querySelectorAll('.stat-card')[1].querySelector('.number').textContent = pending;
-            document.querySelectorAll('.stat-card')[2].querySelector('.number').textContent = inprogress;
-            document.querySelectorAll('.stat-card')[3].querySelector('.number').textContent = completed;
-        }
-    </script>
+    <div class="modal" id="viewModal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>📋 Appointment Details</h2><button class="close-modal" onclick="closeModal('viewModal')">×</button></div>
+            <div class="modal-body" id="viewDetails"></div>
+            <div class="modal-footer"><button class="btn-modal btn-cancel" onclick="closeModal('viewModal')">Close</button></div>
+        </div>
+    </div>
+<script>
+const appointments = [
+    {id:1,time:"09:00 AM",customer:"John Doe",payment:"Cash",petName:"Max",petType:"Golden Retriever",weight:"25 kg",gender:"Male",petIcon:"🐕",service:"Full Grooming",notes:"Sensitive to loud noises",status:"pending"},
+    {id:2,time:"10:30 AM",customer:"Sarah Smith",payment:"Bank Transfer (Paid)",petName:"Luna",petType:"Persian Cat",weight:"4 kg",gender:"Female",petIcon:"🐱",service:"Bath Only",notes:"",status:"inprogress"},
+    {id:3,time:"08:00 AM",customer:"Mike Johnson",payment:"GoPay (Paid)",petName:"Buddy",petType:"Beagle",weight:"12 kg",gender:"Male",petIcon:"🐕",service:"Full Grooming",notes:"",status:"completed",completedAt:"08:45 AM"},
+    {id:4,time:"01:00 PM",customer:"Emily Brown",payment:"Cash",petName:"Bella",petType:"Poodle",weight:"8 kg",gender:"Female",petIcon:"🐕",service:"Bath Only",notes:"Use warm water",status:"pending"},
+    {id:5,time:"03:00 PM",customer:"David Lee",payment:"Bank Transfer",petName:"Charlie",petType:"Shih Tzu",weight:"6 kg",gender:"Male",petIcon:"🐕",service:"Full Grooming",notes:"Extra fluffy style",status:"pending"}
+];
+let currentAppointment = null, timerInterval = null, seconds = 0;
+const checklists = {
+    "Full Grooming": ["Brushing","Bathing","Drying","Hair Cutting","Nail Trimming","Ear Cleaning","Perfume"],
+    "Bath Only": ["Brushing","Bathing","Drying","Perfume"]
+};
+function renderAppointments() {
+    const list = document.getElementById('appointmentsList');
+    list.innerHTML = appointments.map(a => `
+        <div class="appointment-card" data-status="${a.status}" data-id="${a.id}">
+            <div class="appointment-info">
+                <h4>🕐 ${a.time}</h4>
+                <p>👤 ${a.customer}</p>
+                <p style="color:#F57C00;font-weight:600">💰 ${a.payment}</p>
+            </div>
+            <div class="pet-details">
+                <h4>${a.petName} ${a.petIcon}</h4>
+                <div class="pet-tag">${a.petType}</div>
+                <div class="pet-tag">⚖️ ${a.weight}</div>
+                <div class="pet-tag">${a.gender === 'Male' ? '♂️' : '♀️'} ${a.gender}</div>
+            </div>
+            <div class="service-list">
+                <div class="service-item">✨ ${a.service}</div>
+                ${a.notes ? `<div class="service-item" style="color:#999;font-style:italic">📝 ${a.notes}</div>` : ''}
+            </div>
+            <div class="action-buttons">
+                <span class="status-badge status-${a.status}">${a.status === 'inprogress' ? 'In Progress' : a.status.charAt(0).toUpperCase() + a.status.slice(1)}</span>
+                ${a.status === 'pending' ? `<button class="btn btn-start" onclick="startGrooming(${a.id})">▶️ Start</button>` : ''}
+                ${a.status === 'inprogress' ? `<button class="btn btn-complete" onclick="openProgressModal(${a.id})">✓ Complete</button>` : ''}
+                ${a.status === 'completed' ? `<button class="btn btn-view" onclick="viewDetails(${a.id})">👁️ View</button>` : ''}
+            </div>
+        </div>
+    `).join('');
+    updateStats();
+}
+function updateStats() {
+    document.getElementById('totalCount').textContent = appointments.length;
+    document.getElementById('pendingCount').textContent = appointments.filter(a => a.status === 'pending').length;
+    document.getElementById('progressCount').textContent = appointments.filter(a => a.status === 'inprogress').length;
+    document.getElementById('completedCount').textContent = appointments.filter(a => a.status === 'completed').length;
+}
+function filterAppointments(filter) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    document.querySelectorAll('.appointment-card').forEach(c => {
+        c.classList.toggle('hidden', filter !== 'all' && c.dataset.status !== filter);
+    });
+}
+function startGrooming(id) {
+    const a = appointments.find(x => x.id === id);
+    if (a) { a.status = 'inprogress'; renderAppointments(); openProgressModal(id); }
+}
+function openProgressModal(id) {
+    currentAppointment = appointments.find(a => a.id === id);
+    if (!currentAppointment) return;
+    document.getElementById('progPetName').textContent = currentAppointment.petName;
+    document.getElementById('progService').textContent = currentAppointment.service;
+    const items = checklists[currentAppointment.service] || checklists["Bath Only"];
+    document.getElementById('checklistItems').innerHTML = items.map((item, i) => `
+        <div class="checklist-item"><input type="checkbox" id="check${i}" onchange="updateProgress()"><label for="check${i}">${item}</label></div>
+    `).join('');
+    seconds = 0; updateTimer();
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => { seconds++; updateTimer(); }, 1000);
+    document.getElementById('progressModal').classList.add('active');
+}
+function updateTimer() {
+    const m = Math.floor(seconds / 60), s = seconds % 60;
+    document.getElementById('timerDisplay').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function updateProgress() {
+    const checks = document.querySelectorAll('#checklistItems input');
+    const done = Array.from(checks).filter(c => c.checked).length;
+    document.getElementById('progressFill').style.width = `${(done / checks.length) * 100}%`;
+}
+function finishGrooming() {
+    if (!currentAppointment) return;
+    const checks = document.querySelectorAll('#checklistItems input');
+    if (Array.from(checks).some(c => !c.checked)) { alert('Please complete all checklist items!'); return; }
+    currentAppointment.status = 'completed';
+    currentAppointment.completedAt = new Date().toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
+    currentAppointment.duration = document.getElementById('timerDisplay').textContent;
+    clearInterval(timerInterval);
+    closeModal('progressModal');
+    renderAppointments();
+}
+function viewDetails(id) {
+    const a = appointments.find(x => x.id === id);
+    if (!a) return;
+    document.getElementById('viewDetails').innerHTML = `
+        <div class="info-row"><span class="info-label">Time</span><span class="info-value">${a.time}</span></div>
+        <div class="info-row"><span class="info-label">Customer</span><span class="info-value">${a.customer}</span></div>
+        <div class="info-row"><span class="info-label">Payment</span><span class="info-value">${a.payment}</span></div>
+        <div class="info-row"><span class="info-label">Pet Name</span><span class="info-value">${a.petName} ${a.petIcon}</span></div>
+        <div class="info-row"><span class="info-label">Pet Type</span><span class="info-value">${a.petType}</span></div>
+        <div class="info-row"><span class="info-label">Weight</span><span class="info-value">${a.weight}</span></div>
+        <div class="info-row"><span class="info-label">Gender</span><span class="info-value">${a.gender}</span></div>
+        <div class="info-row"><span class="info-label">Service</span><span class="info-value">${a.service}</span></div>
+        ${a.notes ? `<div class="info-row"><span class="info-label">Notes</span><span class="info-value">${a.notes}</span></div>` : ''}
+        ${a.completedAt ? `<div class="info-row"><span class="info-label">Completed At</span><span class="info-value">${a.completedAt}</span></div>` : ''}
+        ${a.duration ? `<div class="info-row"><span class="info-label">Duration</span><span class="info-value">${a.duration}</span></div>` : ''}
+    `;
+    document.getElementById('viewModal').classList.add('active');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('active'); if (id === 'progressModal') clearInterval(timerInterval); }
+function logout() { alert('Logging out...'); }
+renderAppointments();
+</script>
 </body>
 </html>
