@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Petshop Lala - Your Trusted Pet Care Partner</title>
-    
+    <title>Book Appointment - Pet Care</title>
     <style>
         * {
             margin: 0;
@@ -15,10 +14,26 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow-x: hidden;
-            padding-top: 50px;
-            background: #f9f9f9;
+            background: url('https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=1920') center/cover no-repeat fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            padding-top: 70px;
         }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 245, 235, 0.85);
+            z-index: -1;
+        }
+
         /* Navigation */
         nav {
             position: fixed;
@@ -658,17 +673,17 @@
     <nav>
         <div class="nav-container">
             <!-- Logo -->
-            <a href="{{ route('dashboard') }}" class="logo">
+            <a href="/" class="logo">
                 <img src="/images/logoo.png" alt="Petshop Lala">
                 <span>Petshop Lala</span>
             </a>
             
             <!-- Navigation Links -->
             <ul class="nav-links">
-                <li><a href="#home" data-section="home">Home</a></li>
-                <li><a href="#appointment" data-section="appointment">Appointment</a></li>
-                <li><a href="#products" data-section="products">Products</a></li>
-                <li><a href="#contact" data-section="contact">Contact Us</a></li>
+                <li><a href="/">Home</a></li>
+                <li><a href="/appointment" class="active">Appointment</a></li>
+                <li><a href="/products">Products</a></li>
+                <li><a href="/contact">Contact Us</a></li>
             </ul>
 
             <!-- Right Section -->
@@ -762,65 +777,206 @@
     </div>
     @endauth
 
-    <!-- Main Content -->
-    <main>
-        @include('sections.home')
-        @include('sections.appointment')
-        @include('sections.products')
-        @include('sections.contact')
-    </main>
+    <div class="container">
+        <form action="/appointment" method="POST" enctype="multipart/form-data" id="appointmentForm">
+            @csrf
+            
+            <!-- Step 1: Pet Information -->
+            <div class="form-step active" data-step="1">
+                <div class="form-title">
+                    <h2>Pet Information</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="pet_name">Pet Name</label>
+                    <input type="text" id="pet_name" name="pet_name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Pet Type</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="dog" name="pet_type" value="dog" required>
+                            <label for="dog">Dog</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="cat" name="pet_type" value="cat">
+                            <label for="cat">Cat</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pet_age">Pet Age</label>
+                    <div class="date-time-row">
+                        <input type="number" id="pet_age_years" name="pet_age_years" placeholder="Years" min="0">
+                        <input type="number" id="pet_age_months" name="pet_age_months" placeholder="Months" min="0" max="11">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pet_breed">Pet Breed</label>
+                    <input type="text" id="pet_breed" name="pet_breed" required>
+                    <small class="link-text">mixed breed dog</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Pet Gender</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="female" name="pet_gender" value="female" required>
+                            <label for="female">Female</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="male" name="pet_gender" value="male">
+                            <label for="male">Male</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pet_weight">Weight</label>
+                    <input type="number" id="pet_weight" name="pet_weight" placeholder="kg" step="0.1" required>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-cancel" onclick="window.location.href='/'">Cancel</button>
+                    <button type="button" class="btn btn-next" onclick="nextStep(2)">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Appointment Details -->
+            <div class="form-step" data-step="2">
+                <div class="form-title">
+                    <h2>Appointment Details</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="appointment_date">Appointment Date</label>
+                    <input type="date" id="appointment_date" name="appointment_date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="appointment_time">Appointment Time</label>
+                    <div class="date-time-row">
+                        <input type="time" id="appointment_time" name="appointment_time" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Service</label>
+                    
+             <div class="service-checkbox">
+                        <input type="checkbox" id="bath_only" name="services[]" value="bath_only" data-price="400000">
+                        <div class="service-info">
+                            <strong>Bath Only - Rp 50.000</strong>
+                        </div>
+                    </div>
+
+                    <div class="service-checkbox">
+                        <input type="checkbox" id="full_grooming" name="services[]" value="full_grooming" data-price="750000">
+                        <div class="service-info">
+                            <strong>Full Grooming - Rp 120.000 (bath, haircut, nail cut, ear cleaning, perfume)</strong>
+                            <span>Complete grooming package</span>
+                        </div>
+                    </div>
+
+
+
+                <div class="form-group">
+                    <label for="notes">Additional Notes</label>
+                    <textarea id="notes" name="notes" placeholder="e.g. dog doesn't like cold water, please use warm water"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-back" onclick="prevStep(1)">Back</button>
+                    <button type="button" class="btn btn-next" onclick="nextStep(3)">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Payment Summary -->
+            <div class="form-step" data-step="3">
+                <div class="form-title">
+                    <h2>Payment Summary</h2>
+                </div>
+
+                <div class="form-group">
+                    <div class="summary-row">
+                        <label>Customer Name:</label>
+                        <span id="summary_customer">{{ Auth::user()->name ?? 'Guest' }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <label>Pet Name:</label>
+                        <span id="summary_pet">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <label>Appointment Date:</label>
+                        <span id="summary_date">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <label>Appointment Time:</label>
+                        <span id="summary_time">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <label>Selected Service:</label>
+                        <span id="summary_service">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <label>Total Price:</label>
+                        <span id="summary_price">Rp 0</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="cash" name="payment_method" value="cash" required>
+                            <label for="cash">Cash</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="bank_transfer" name="payment_method" value="bank_transfer">
+                            <label for="bank_transfer">Bank Transfer</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="ewallet" name="payment_method" value="ewallet">
+                            <label for="ewallet">E-Wallet (GoPay)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="transfer-info" style="display: none; background: #FFF5EB; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                    <label style="font-size: 1.1em; margin-bottom: 15px;">Transfer to:</label>
+                    <p id="transfer-details" style="color: #FF8C42; font-weight: 700; font-size: 1.2em; margin-top: 10px;"></p>
+                </div>
+
+                <div class="upload-section" id="upload-section" style="display: none;">
+                    <label style="display: block; margin-bottom: 10px; font-weight: 600;">Upload Proof of Payment:</label>
+                    <small style="color: #666; display: block; margin-bottom: 10px;">Support file types: JPG, JPEG, PNG (max. 2MB)</small>
+                    <label class="upload-btn">
+                        Choose File
+                        <input type="file" name="payment_proof" accept="image/*" id="payment_proof" onchange="showFileName()">
+                    </label>
+                    <span class="file-name" id="file-name"></span>
+                </div>
+
+                <div class="alert-info" id="cash-info" style="display: none;">
+                    Pembayaran cash akan dikonfirmasi saat Anda datang ke toko
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-back" onclick="prevStep(2)">Back</button>
+                    <button type="button" class="btn btn-submit" onclick="submitForm()">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
 
     <script>
-        // Toast notification
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
-            
-            if (toast && toastMessage) {
-                toast.className = `toast ${type}`;
-                toastMessage.textContent = message;
-                toast.classList.add('show');
-                
-                setTimeout(() => {
-                    hideToast();
-                }, 4000);
-            }
-        }
-
-        function hideToast() {
-            const toast = document.getElementById('toast');
-            if (toast) {
-                toast.classList.remove('show');
-            }
-        }
-
-        function updateCartBadge() {
-            fetch('/cart/count')
-                .then(response => response.json())
-                .then(data => {
-                    const badge = document.getElementById('cartBadge');
-                    if (data.count > 0) {
-                        if (badge) {
-                            badge.textContent = data.count;
-                        } else {
-                            const newBadge = document.createElement('span');
-                            newBadge.id = 'cartBadge';
-                            newBadge.className = 'cart-badge';
-                            newBadge.textContent = data.count;
-                            document.querySelector('.cart-icon').appendChild(newBadge);
-                        }
-                    } else if (badge) {
-                        badge.remove();
-                    }
-                });
-        }
-
         // Dropdown
         function toggleDropdown() {
             const dropdown = document.getElementById('profileDropdown');
-            if (dropdown) {
-                dropdown.classList.toggle('active');
-            }
+            dropdown.classList.toggle('active');
         }
 
         document.addEventListener('click', function(event) {
@@ -833,18 +989,12 @@
         // Modal
         function openEditProfile(event) {
             event.preventDefault();
-            const modal = document.getElementById('editProfileModal');
-            const dropdown = document.getElementById('profileDropdown');
-            
-            if (modal) modal.classList.add('active');
-            if (dropdown) dropdown.classList.remove('active');
+            document.getElementById('editProfileModal').classList.add('active');
+            document.getElementById('profileDropdown').classList.remove('active');
         }
 
         function closeEditProfile() {
-            const modal = document.getElementById('editProfileModal');
-            if (modal) {
-                modal.classList.remove('active');
-            }
+            document.getElementById('editProfileModal').classList.remove('active');
         }
 
         const modal = document.getElementById('editProfileModal');
@@ -854,92 +1004,152 @@
             });
         }
 
-        // Smooth Scroll Navigation - FIXED
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                
-                // Check if it's a hash link (starts with #)
-                if (href && href.startsWith('#')) {
-                    e.preventDefault();
-                    
-                    const targetId = href.substring(1); // Remove the #
-                    const target = document.getElementById(targetId);
-                    
-                    if (target) {
-                        // Remove active class from all links
-                        document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
-                        
-                        // Add active class to clicked link
-                        this.classList.add('active');
-                        
-                        // Smooth scroll to target
-                        target.scrollIntoView({ 
-                            behavior: 'smooth', 
-                            block: 'start' 
-                        });
+        function nextStep(step) {
+            // Validasi step sebelum pindah
+            const currentStep = document.querySelector('.form-step.active');
+            const inputs = currentStep.querySelectorAll('input[required], textarea[required]');
+            let isValid = true;
+
+            inputs.forEach(input => {
+                if (input.type === 'radio') {
+                    const name = input.name;
+                    const checked = document.querySelector(`input[name="${name}"]:checked`);
+                    if (!checked) {
+                        isValid = false;
                     }
-                }
-                // If it's not a hash link, let it navigate normally
-            });
-        });
-
-        // Scroll-based active state update
-        window.addEventListener('scroll', function() {
-            const sections = document.querySelectorAll('main > section');
-            const navLinks = document.querySelectorAll('.nav-links a');
-            
-            let current = '';
-            
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                
-                // Check if section is in view (with some offset for navbar)
-                if (pageYOffset >= (sectionTop - 100)) {
-                    current = section.getAttribute('id');
+                } else if (input.type === 'checkbox') {
+                    // Skip checkbox validation for now
+                } else if (!input.value) {
+                    isValid = false;
                 }
             });
 
-            // Update active state
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                const href = link.getAttribute('href');
-                
-                if (href === '#' + current) {
-                    link.classList.add('active');
-                }
-            });
-        });
-
-        // Set initial active state on page load
-        window.addEventListener('load', function() {
-            const hash = window.location.hash;
-            
-            if (hash) {
-                // If there's a hash in URL, activate that link
-                const targetLink = document.querySelector(`.nav-links a[href="${hash}"]`);
-                if (targetLink) {
-                    document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
-                    targetLink.classList.add('active');
-                }
-            } else {
-                // Otherwise, activate home
-                const homeLink = document.querySelector('.nav-links a[href="#home"]');
-                if (homeLink) {
-                    homeLink.classList.add('active');
-                }
+            if (!isValid) {
+                alert('Please fill all required fields');
+                return;
             }
+
+            document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+            document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
+            
+            if(step === 3) {
+                updateSummary();
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        function prevStep(step) {
+            document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+            document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function updateSummary() {
+            // Update pet name
+            const petName = document.getElementById('pet_name').value;
+            document.getElementById('summary_pet').textContent = petName || '-';
+            
+            // Update date
+            const date = document.getElementById('appointment_date').value;
+            document.getElementById('summary_date').textContent = date || '-';
+            
+            // Update time
+            const time = document.getElementById('appointment_time').value;
+            document.getElementById('summary_time').textContent = time || '-';
+            
+            // Update selected services and calculate total
+            const services = [];
+            let totalPrice = 0;
+            
+            document.querySelectorAll('input[name="services[]"]:checked').forEach(checkbox => {
+                const serviceText = checkbox.nextElementSibling.querySelector('strong').textContent;
+                services.push(serviceText);
+                totalPrice += parseInt(checkbox.dataset.price);
+            });
+            
+            document.getElementById('summary_service').textContent = services.length > 0 ? services.join(', ') : '-';
+            document.getElementById('summary_price').textContent = 'Rp ' + totalPrice.toLocaleString('id-ID');
+        }
+
+        function showFileName() {
+            const input = document.getElementById('payment_proof');
+            const fileName = document.getElementById('file-name');
+            if (input.files.length > 0) {
+                fileName.textContent = input.files[0].name;
+            }
+        }
+
+        function togglePaymentInfo() {
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+            const transferInfo = document.getElementById('transfer-info');
+            const transferDetails = document.getElementById('transfer-details');
+            const uploadSection = document.getElementById('upload-section');
+            const cashInfo = document.getElementById('cash-info');
+            
+            console.log('Payment method changed:', paymentMethod ? paymentMethod.value : 'none');
+            
+            if (!paymentMethod) return;
+            
+            // Hide all sections first
+            transferInfo.style.display = 'none';
+            uploadSection.style.display = 'none';
+            cashInfo.style.display = 'none';
+            
+            const method = paymentMethod.value;
+            
+            if (method === 'cash') {
+                cashInfo.style.display = 'block';
+                console.log('Showing cash info');
+            } else if (method === 'bank_transfer') {
+                transferInfo.style.display = 'block';
+                transferDetails.textContent = 'SeaBank - 901683597161';
+                uploadSection.style.display = 'block';
+                console.log('Showing bank transfer info');
+            } else if (method === 'ewallet') {
+                transferInfo.style.display = 'block';
+                transferDetails.textContent = 'GoPay - 081260968298';
+                uploadSection.style.display = 'block';
+                console.log('Showing ewallet info');
+            }
+        }
+        
+        function submitForm() {
+            // Check if payment method is selected
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+            
+            if (!paymentMethod) {
+                alert('Please select a payment method!');
+                return false;
+            }
+            
+            // Check if upload required for non-cash payments
+            const method = paymentMethod.value;
+            const paymentProof = document.getElementById('payment_proof');
+            
+            if ((method === 'bank_transfer' || method === 'ewallet') && !paymentProof.files.length) {
+                alert('Please upload proof of payment!');
+                return false;
+            }
+            
+            // If all validation passed, submit the form
+            console.log('Form is valid, submitting...');
+            document.getElementById('appointmentForm').submit();
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('appointment_date').setAttribute('min', today);
+            
+            // Add event listeners to all payment method radios
+            document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+                radio.addEventListener('change', togglePaymentInfo);
+            });
+            
+            // Check if payment method already selected and show info
+            togglePaymentInfo();
         });
-
-        // Success/Error messages
-        @if(session('success'))
-            showToast('{{ session('success') }}', 'success');
-        @endif
-
-        @if(session('error'))
-            showToast('{{ session('error') }}', 'error');
-        @endif
     </script>
 
 </body>
