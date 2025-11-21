@@ -51,8 +51,12 @@
         }
 
         @keyframes moveLine {
-            0% { transform: translateX(-100%) translateY(-100%); }
-            100% { transform: translateX(100%) translateY(100%); }
+            0% {
+                transform: translateX(-100%) translateY(-100%);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%);
+            }
         }
 
         .network-line:nth-child(1) { top: 20%; width: 300px; animation-delay: 0s; }
@@ -68,13 +72,39 @@
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.2; }
-            50% { transform: scale(1.3); opacity: 0.5; }
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.2;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.5;
+            }
         }
 
-        .glow-circle:nth-child(5) { width: 120px; height: 120px; top: 15%; right: 20%; animation-delay: 0s; }
-        .glow-circle:nth-child(6) { width: 180px; height: 180px; bottom: 20%; left: 15%; animation-delay: 2s; }
-        .glow-circle:nth-child(7) { width: 100px; height: 100px; top: 50%; right: 10%; animation-delay: 4s; }
+        .glow-circle:nth-child(5) {
+            width: 120px;
+            height: 120px;
+            top: 15%;
+            right: 20%;
+            animation-delay: 0s;
+        }
+
+        .glow-circle:nth-child(6) {
+            width: 180px;
+            height: 180px;
+            bottom: 20%;
+            left: 15%;
+            animation-delay: 2s;
+        }
+
+        .glow-circle:nth-child(7) {
+            width: 100px;
+            height: 100px;
+            top: 50%;
+            right: 10%;
+            animation-delay: 4s;
+        }
 
         .loading-overlay {
             position: fixed;
@@ -91,19 +121,23 @@
             animation: fadeIn 0.5s ease;
         }
 
-        .loading-overlay.active { display: flex; }
+        .loading-overlay.active {
+            display: flex;
+        }
 
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
 
-        .loading-content { text-align: center; }
+        .loading-content {
+            text-align: center;
+        }
 
         .loading-spinner {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 30px;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 40px;
             position: relative;
         }
 
@@ -111,15 +145,26 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            border: 4px solid transparent;
+            border: 5px solid transparent;
             border-top-color: #fff;
             border-radius: 50%;
             animation: spin 1.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
         }
 
-        .spinner-ring:nth-child(1) { border-top-color: #fff; animation-delay: -0.45s; }
-        .spinner-ring:nth-child(2) { border-top-color: rgba(255, 255, 255, 0.7); animation-delay: -0.3s; }
-        .spinner-ring:nth-child(3) { border-top-color: rgba(255, 255, 255, 0.4); animation-delay: -0.15s; }
+        .spinner-ring:nth-child(1) {
+            border-top-color: #fff;
+            animation-delay: -0.45s;
+        }
+
+        .spinner-ring:nth-child(2) {
+            border-top-color: rgba(255, 255, 255, 0.7);
+            animation-delay: -0.3s;
+        }
+
+        .spinner-ring:nth-child(3) {
+            border-top-color: rgba(255, 255, 255, 0.4);
+            animation-delay: -0.15s;
+        }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -128,17 +173,18 @@
 
         .loading-text {
             color: white;
-            font-size: 22px;
+            font-size: 28px;
             font-weight: 700;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             animation: fadeInOut 2s infinite;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
         }
 
         .loading-subtext {
             color: rgba(255, 255, 255, 0.9);
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 500;
+            margin-bottom: 10px;
         }
 
         @keyframes fadeInOut {
@@ -147,11 +193,11 @@
         }
 
         .loading-progress {
-            width: 250px;
-            height: 4px;
+            width: 300px;
+            height: 5px;
             background: rgba(255, 255, 255, 0.3);
             border-radius: 10px;
-            margin: 25px auto 0;
+            margin: 30px auto 0;
             overflow: hidden;
         }
 
@@ -169,14 +215,22 @@
 
         .loading-dots {
             color: white;
-            font-size: 32px;
-            margin-top: 18px;
-            letter-spacing: 4px;
+            font-size: 40px;
+            margin-top: 20px;
+            letter-spacing: 5px;
         }
 
-        .loading-dots span { animation: blink 1.4s infinite; }
-        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+        .loading-dots span {
+            animation: blink 1.4s infinite;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
 
         @keyframes blink {
             0%, 100% { opacity: 0.2; }
@@ -190,19 +244,27 @@
         }
 
         @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.95) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
 
         .login-card {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(15px);
             border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 24px;
-            padding: 35px 40px;
+            border-radius: 30px;
+            padding: 60px 50px;
             width: 100%;
-            max-width: 450px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2), inset 0 0 80px rgba(255, 255, 255, 0.1);
+            max-width: 480px;
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.2),
+                inset 0 0 80px rgba(255, 255, 255, 0.1);
             position: relative;
             overflow: hidden;
         }
@@ -224,25 +286,27 @@
         }
 
         .login-title {
-            font-size: 42px;
+            font-size: 64px;
             font-weight: 800;
             color: #fff;
             text-align: center;
-            margin-bottom: 28px;
-            text-shadow: 0 3px 15px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 212, 255, 0.3);
+            margin-bottom: 50px;
+            text-shadow: 
+                0 3px 15px rgba(0, 0, 0, 0.4),
+                0 0 40px rgba(0, 212, 255, 0.3);
             position: relative;
             z-index: 1;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             text-transform: uppercase;
         }
 
         .info-text {
             background: rgba(255, 255, 255, 0.2);
-            border-left: 3px solid #fff;
-            padding: 14px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            font-size: 13px;
+            border-left: 4px solid #fff;
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 12px;
+            font-size: 14px;
             color: rgba(255, 255, 255, 0.95);
             line-height: 1.6;
             position: relative;
@@ -251,11 +315,11 @@
 
         .success-message {
             background: rgba(16, 185, 129, 0.2);
-            border-left: 3px solid #10b981;
-            padding: 14px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            font-size: 13px;
+            border-left: 4px solid #10b981;
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 12px;
+            font-size: 14px;
             color: #fff;
             font-weight: 500;
             position: relative;
@@ -266,43 +330,49 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-top: 20px;
+            margin-top: 24px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
             position: relative;
             z-index: 1;
         }
 
         .btn-submit {
-            padding: 14px 28px;
+            padding: 18px 32px;
             background: linear-gradient(135deg, #FF8C42, #FF6B35);
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 15px;
+            border-radius: 15px;
+            font-size: 18px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             font-family: 'Poppins', sans-serif;
-            box-shadow: 0 10px 35px rgba(255, 140, 66, 0.5), 0 0 25px rgba(255, 107, 53, 0.4);
+            box-shadow: 
+                0 10px 35px rgba(255, 140, 66, 0.5),
+                0 0 25px rgba(255, 107, 53, 0.4);
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
         }
 
         .btn-submit:hover {
             transform: translateY(-3px);
-            box-shadow: 0 15px 45px rgba(255, 140, 66, 0.6), 0 0 35px rgba(255, 107, 53, 0.5);
+            box-shadow: 
+                0 15px 45px rgba(255, 140, 66, 0.6),
+                0 0 35px rgba(255, 107, 53, 0.5);
             background: linear-gradient(135deg, #FF9D5C, #FF7B45);
         }
 
-        .btn-submit:active { transform: translateY(-1px); }
+        .btn-submit:active {
+            transform: translateY(-1px);
+        }
 
         .btn-secondary {
             background: transparent;
             color: rgba(255, 255, 255, 0.95);
-            padding: 12px 20px;
+            padding: 14px 24px;
             border: none;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -316,11 +386,29 @@
         }
 
         @media (max-width: 580px) {
-            .login-card { padding: 30px 28px; }
-            .login-title { font-size: 36px; margin-bottom: 24px; }
-            .form-actions { flex-direction: column; align-items: stretch; }
-            .btn-submit { width: 100%; font-size: 14px; padding: 12px; }
-            .btn-secondary { text-align: center; }
+            .login-card {
+                padding: 45px 35px;
+            }
+
+            .login-title {
+                font-size: 48px;
+                margin-bottom: 40px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-submit {
+                width: 100%;
+                font-size: 16px;
+                padding: 16px;
+            }
+
+            .btn-secondary {
+                text-align: center;
+            }
         }
     </style>
 

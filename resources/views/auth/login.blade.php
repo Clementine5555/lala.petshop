@@ -17,18 +17,18 @@
             justify-content: center;
             padding: 20px;
             position: relative;
-            overflow-x: hidden;
-            overflow-y: auto;
+            overflow: hidden;
         }
 
         /* Background untuk gambar custom */
         body::before {
             content: '';
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            /* Ganti dengan URL gambar Anda */
             background-image: url('{{ asset('images/anjingg.jpg') }}');
             background-size: cover;
             background-position: center;
@@ -38,7 +38,7 @@
 
         /* Animated Network Background */
         .network-bg {
-            position: fixed;
+            position: absolute;
             width: 100%;
             height: 100%;
             overflow: hidden;
@@ -246,7 +246,6 @@
             position: relative;
             z-index: 10;
             animation: fadeInScale 1s ease-out;
-            margin: 30px 0;
         }
 
         @keyframes fadeInScale {
@@ -264,10 +263,10 @@
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(15px);
             border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 25px;
-            padding: 40px 35px;
+            border-radius: 30px;
+            padding: 60px 50px;
             width: 100%;
-            max-width: 420px;
+            max-width: 480px;
             box-shadow: 
                 0 10px 40px rgba(0, 0, 0, 0.2),
                 inset 0 0 80px rgba(255, 255, 255, 0.1);
@@ -292,11 +291,11 @@
         }
 
         .login-title {
-            font-size: 48px;
+            font-size: 64px;
             font-weight: 800;
             color: #fff;
             text-align: center;
-            margin-bottom: 35px;
+            margin-bottom: 50px;
             text-shadow: 
                 0 3px 15px rgba(0, 0, 0, 0.4),
                 0 0 40px rgba(0, 212, 255, 0.3);
@@ -307,19 +306,19 @@
         }
 
         .form-group {
-            margin-bottom: 22px;
+            margin-bottom: 30px;
             position: relative;
             z-index: 1;
         }
 
         .form-group label {
             display: block;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.95);
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
         }
 
         .input-wrapper {
@@ -328,22 +327,22 @@
 
         .input-icon {
             position: absolute;
-            right: 18px;
+            right: 20px;
             top: 50%;
             transform: translateY(-50%);
             color: rgba(255, 255, 255, 0.7);
-            font-size: 18px;
+            font-size: 20px;
             z-index: 2;
         }
 
         input[type="email"],
         input[type="password"] {
             width: 100%;
-            padding: 15px 50px 15px 18px;
+            padding: 18px 55px 18px 22px;
             background: rgba(255, 255, 255, 0.15);
             border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
-            font-size: 15px;
+            border-radius: 15px;
+            font-size: 16px;
             color: white;
             font-family: 'Poppins', sans-serif;
             transition: all 0.3s ease;
@@ -362,63 +361,38 @@
             box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
         }
 
-        .remember-forgot {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 25px;
-            position: relative;
-            z-index: 1;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
         .remember-group {
             display: flex;
             align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
         }
 
         input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
             cursor: pointer;
             accent-color: #fff;
         }
 
         .remember-group label {
-            font-size: 14px;
+            font-size: 15px;
             color: rgba(255, 255, 255, 0.95);
             cursor: pointer;
             user-select: none;
             font-weight: 500;
-            margin: 0;
-            text-transform: none;
-            letter-spacing: normal;
-        }
-
-        .forgot-password {
-            font-size: 14px;
-            color: #fff;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-
-        .forgot-password:hover {
-            text-decoration: underline;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
         }
 
         .btn-submit {
             width: 100%;
-            padding: 15px;
+            padding: 18px;
             background: linear-gradient(135deg, #FF8C42, #FF6B35);
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
+            border-radius: 15px;
+            font-size: 18px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -426,7 +400,7 @@
             box-shadow: 
                 0 10px 35px rgba(255, 140, 66, 0.5),
                 0 0 25px rgba(255, 107, 53, 0.4);
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             position: relative;
             z-index: 1;
             text-transform: uppercase;
@@ -447,7 +421,7 @@
 
         .form-footer {
             text-align: center;
-            font-size: 14px;
+            font-size: 15px;
             color: rgba(255, 255, 255, 0.9);
             position: relative;
             z-index: 1;
@@ -470,11 +444,11 @@
         .error-message {
             color: #fff;
             background: rgba(231, 76, 60, 0.9);
-            padding: 12px 15px;
-            border-radius: 10px;
-            font-size: 13px;
-            margin-top: 10px;
-            border-left: 4px solid #c0392b;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-top: 12px;
+            border-left: 5px solid #c0392b;
             animation: shake 0.6s;
             box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
         }
@@ -488,40 +462,23 @@
         /* Responsive */
         @media (max-width: 580px) {
             .login-card {
-                padding: 35px 28px;
+                padding: 45px 35px;
             }
 
             .login-title {
-                font-size: 38px;
-                margin-bottom: 30px;
+                font-size: 48px;
+                margin-bottom: 40px;
             }
 
             input[type="email"],
             input[type="password"] {
-                padding: 14px 45px 14px 16px;
-                font-size: 14px;
+                padding: 16px 50px 16px 18px;
+                font-size: 15px;
             }
 
             .btn-submit {
-                font-size: 15px;
-                padding: 14px;
-            }
-
-            .remember-forgot {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-        }
-
-        @media (max-height: 700px) {
-            .login-title {
-                font-size: 40px;
-                margin-bottom: 25px;
-            }
-            
-            .login-card {
-                padding: 30px;
+                font-size: 16px;
+                padding: 16px;
             }
         }
     </style>
@@ -600,16 +557,9 @@
                     @enderror
                 </div>
 
-                <div class="remember-forgot">
-                    <div class="remember-group">
-                        <input id="remember_me" type="checkbox" name="remember">
-                        <label for="remember_me">Remember me</label>
-                    </div>
-                    @if (Route::has('password.request'))
-                        <a href="{{ route('password.request') }}" class="forgot-password">
-                            Forgot password?
-                        </a>
-                    @endif
+                <div class="remember-group">
+                    <input id="remember_me" type="checkbox" name="remember">
+                    <label for="remember_me">Remember me</label>
                 </div>
 
                 <button type="submit" class="btn-submit">
@@ -627,12 +577,12 @@
     </div>
 
     <script>
-        // Loading animation saat form di-submit
+
         document.getElementById('loginForm').addEventListener('submit', function() {
             document.getElementById('loadingOverlay').classList.add('active');
         });
 
-        // Jika ada error, hide loading
+ 
         @if ($errors->any())
             document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('loadingOverlay').classList.remove('active');

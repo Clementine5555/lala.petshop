@@ -20,6 +20,7 @@
             overflow: hidden;
         }
 
+        /* Background untuk gambar custom */
         body::before {
             content: '';
             position: absolute;
@@ -34,6 +35,7 @@
             z-index: 0;
         }
 
+        /* Animated Network Background */
         .network-bg {
             position: absolute;
             width: 100%;
@@ -106,6 +108,7 @@
             animation-delay: 4s;
         }
 
+        /* Login Container */
         .login-container {
             position: relative;
             z-index: 10;
@@ -127,10 +130,10 @@
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(15px);
             border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 28px 34px;
+            border-radius: 30px;
+            padding: 60px 50px;
             width: 100%;
-            max-width: 420px;
+            max-width: 480px;
             box-shadow: 
                 0 10px 40px rgba(0, 0, 0, 0.2),
                 inset 0 0 80px rgba(255, 255, 255, 0.1);
@@ -155,22 +158,22 @@
         }
 
         .login-title {
-            font-size: 34px;
+            font-size: 64px;
             font-weight: 800;
             color: #fff;
             text-align: center;
-            margin-bottom: 26px;
+            margin-bottom: 50px;
             text-shadow: 
                 0 3px 15px rgba(0, 0, 0, 0.4),
                 0 0 40px rgba(0, 212, 255, 0.3);
             position: relative;
             z-index: 1;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             text-transform: uppercase;
         }
 
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 30px;
             position: relative;
             z-index: 1;
         }
@@ -180,9 +183,9 @@
             font-size: 13px;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.95);
-            margin-bottom: 7px;
+            margin-bottom: 12px;
             text-transform: uppercase;
-            letter-spacing: 1.2px;
+            letter-spacing: 2px;
         }
 
         .input-wrapper {
@@ -191,7 +194,7 @@
 
         .input-icon {
             position: absolute;
-            right: 16px;
+            right: 20px;
             top: 50%;
             transform: translateY(-50%);
             color: rgba(255, 255, 255, 0.7);
@@ -203,11 +206,11 @@
         input[type="email"],
         input[type="password"] {
             width: 100%;
-            padding: 13px 48px 13px 15px;
+            padding: 18px 55px 18px 22px;
             background: rgba(255, 255, 255, 0.15);
             border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 11px;
-            font-size: 15px;
+            border-radius: 15px;
+            font-size: 16px;
             color: white;
             font-family: 'Poppins', sans-serif;
             transition: all 0.3s ease;
@@ -228,14 +231,38 @@
             box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
         }
 
+        .remember-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #fff;
+        }
+
+        .remember-group label {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.95);
+            cursor: pointer;
+            user-select: none;
+            font-weight: 500;
+        }
+
         .btn-submit {
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             background: linear-gradient(135deg, #FF8C42, #FF6B35);
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 17px;
+            border-radius: 15px;
+            font-size: 18px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -243,12 +270,11 @@
             box-shadow: 
                 0 10px 35px rgba(255, 140, 66, 0.5),
                 0 0 25px rgba(255, 107, 53, 0.4);
-            margin-bottom: 20px;
-            margin-top: 10px;
+            margin-bottom: 25px;
             position: relative;
             z-index: 1;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
         }
 
         .btn-submit:hover {
@@ -288,11 +314,11 @@
         .error-message {
             color: #fff;
             background: rgba(231, 76, 60, 0.9);
-            padding: 10px 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-top: 8px;
-            border-left: 4px solid #c0392b;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-top: 12px;
+            border-left: 5px solid #c0392b;
             animation: shake 0.6s;
             box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
         }
@@ -303,35 +329,32 @@
             75% { transform: translateX(10px); }
         }
 
+        /* Responsive */
         @media (max-width: 580px) {
             .login-card {
-                padding: 30px 35px;
-                max-width: 480px;
+                padding: 45px 35px;
             }
 
             .login-title {
-                font-size: 32px;
-                margin-bottom: 25px;
+                font-size: 48px;
+                margin-bottom: 40px;
             }
 
             input[type="text"],
             input[type="email"],
             input[type="password"] {
-                padding: 13px 45px 13px 14px;
+                padding: 16px 50px 16px 18px;
                 font-size: 15px;
             }
 
             .btn-submit {
                 font-size: 16px;
-                padding: 14px;
-            }
-
-            .form-footer {
-                font-size: 14px;
+                padding: 16px;
             }
         }
     </style>
 
+    <!-- Animated Network Background -->
     <div class="network-bg">
         <div class="network-line"></div>
         <div class="network-line"></div>
@@ -342,6 +365,7 @@
         <div class="glow-circle"></div>
     </div>
 
+    <!-- Login Container -->
     <div class="login-container">
         <div class="login-card">
             <h1 class="login-title">Register</h1>
@@ -349,6 +373,7 @@
             <form method="POST" action="{{ route('register') }}">
                 @csrf
 
+                <!-- Name -->
                 <div class="form-group">
                     <label for="name">Name</label>
                     <div class="input-wrapper">
@@ -368,6 +393,7 @@
                     @enderror
                 </div>
 
+                <!-- Email Address -->
                 <div class="form-group">
                     <label for="email">Email</label>
                     <div class="input-wrapper">
@@ -386,6 +412,7 @@
                     @enderror
                 </div>
 
+                <!-- Password -->
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="input-wrapper">
@@ -403,6 +430,7 @@
                     @enderror
                 </div>
 
+                <!-- Confirm Password -->
                 <div class="form-group">
                     <label for="password_confirmation">Confirm Password</label>
                     <div class="input-wrapper">
