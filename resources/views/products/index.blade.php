@@ -334,7 +334,7 @@
             color: #FF8C42;
         }
 
-        /* Products Page */
+        /* Products Page dengan Sidebar */
         .products-page {
             padding: 40px 20px;
             max-width: 1400px;
@@ -388,11 +388,94 @@
             font-size: 1.3em;
         }
 
+        /* LAYOUT DENGAN SIDEBAR */
+        .products-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        /* SIDEBAR KATEGORI */
+        .category-sidebar {
+            background: white;
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            height: fit-content;
+            sticky: top;
+            position: sticky;
+            top: 70px;
+        }
+
+        .category-sidebar h3 {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-list {
+            list-style: none;
+        }
+
+        .category-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.05em;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .category-item:hover {
+            background: rgba(255, 140, 66, 0.1);
+            color: #FF8C42;
+            transform: translateX(5px);
+        }
+
+        .category-item.active {
+            background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 100%);
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.3);
+        }
+
+        .category-item.active:hover {
+            transform: translateX(0);
+        }
+
+        .category-icon {
+            font-size: 1.3em;
+        }
+
+        .category-count {
+            margin-left: auto;
+            background: rgba(255, 140, 66, 0.2);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #FF8C42;
+        }
+
+        .category-item.active .category-count {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
         .products-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 30px;
-            margin-bottom: 50px;
         }
 
         .product-card {
@@ -825,6 +908,10 @@
             .nav-links a {
                 font-size: 1.15em;
             }
+
+            .products-layout {
+                grid-template-columns: 250px 1fr;
+            }
         }
 
         @media (max-width: 992px) {
@@ -842,6 +929,14 @@
 
             .product-modal-body {
                 grid-template-columns: 1fr;
+            }
+
+            .products-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .category-sidebar {
+                position: static;
             }
         }
 
@@ -986,81 +1081,125 @@
             <input type="text" class="search-box" id="searchInput" placeholder="Search products...">
         </div>
 
-        <div class="products-grid" id="productsGrid">
-            <?php
-            $products = [
-                ['product_id' => 1, 'name' => 'Whiskas', 'description' => 'Makanan lezat dan bergizi untuk kucing kesayangan Anda', 'price' => 130000, 'stock' => 15, 'average_rating' => 5, 'reviews_count' => 28, 'image_url' => asset('images/whiskas.avif')],
-                ['product_id' => 2, 'name' => 'Me-O', 'description' => 'Premium cat food with salmon', 'price' => 99000, 'stock' => 30, 'average_rating' => 4.5, 'reviews_count' => 15, 'image_url' => asset('images/me-o.jpg')],
-                ['product_id' => 3, 'name' => 'Royal Canin', 'description' => 'High quality pet nutrition', 'price' => 99000, 'stock' => 20, 'average_rating' => 5, 'reviews_count' => 42, 'image_url' => asset('images/caninneanj.jpeg')],
-                ['product_id' => 4, 'name' => 'Cat Choize', 'description' => 'Makanan kucing berkualitas tinggi', 'price' => 210000, 'stock' => 18, 'average_rating' => 4, 'reviews_count' => 22, 'image_url' => asset('images/me-o.jpg')],
-                ['product_id' => 5, 'name' => 'Premium Dry Dog Food', 'description' => 'Nutrisi lengkap untuk anjing dewasa, 5kg', 'price' => 350000, 'stock' => 12, 'average_rating' => 5, 'reviews_count' => 35, 'image_url' => asset('images/premiumdry.webp')],
-                ['product_id' => 6, 'name' => 'Pedigree Adult', 'description' => 'Complete nutrition for adult dogs', 'price' => 285000, 'stock' => 25, 'average_rating' => 4.5, 'reviews_count' => 18, 'image_url' => asset('images/pedigree.jpg')],
-                ['product_id' => 7, 'name' => 'Purina Pro Plan', 'description' => 'Advanced nutrition for cats', 'price' => 425000, 'stock' => 8, 'average_rating' => 5, 'reviews_count' => 31, 'image_url' => asset('images/purina.jpeg')],
-                ['product_id' => 8, 'name' => 'Friskies', 'description' => 'Delicious meals for playful cats', 'price' => 75000, 'stock' => 40, 'average_rating' => 4, 'reviews_count' => 12, 'image_url' => asset('images/friskies.avif')]
-            ];
-
-            $reviews = [
-                1 => [
-                    ['user_name' => 'Tachyang Cutesy', 'rating' => 5, 'comment' => 'Eeck - eek aa. Kucing saya sangat suka!', 'date' => '20 Jan 2026'],
-                    ['user_name' => 'Budi Santoso', 'rating' => 5, 'comment' => 'Kualitas bagus, kucing jadi lebih sehat', 'date' => '18 Jan 2026']
-                ],
-                2 => [
-                    ['user_name' => 'Siti Aminah', 'rating' => 4, 'comment' => 'Bagus tapi agak mahal', 'date' => '15 Jan 2026']
-                ],
-                3 => [
-                    ['user_name' => 'John Doe', 'rating' => 5, 'comment' => 'Best quality pet food!', 'date' => '10 Jan 2026']
-                ],
-                4 => [
-                    ['user_name' => 'Maria Clara', 'rating' => 4, 'comment' => 'Kucing saya doyan banget', 'date' => '12 Jan 2026']
-                ],
-                5 => [
-                    ['user_name' => 'Ahmad Yani', 'rating' => 5, 'comment' => 'Anjing saya jadi lebih energik', 'date' => '8 Jan 2026']
-                ],
-                6 => [
-                    ['user_name' => 'Linda Wijaya', 'rating' => 4, 'comment' => 'Good product for my dog', 'date' => '5 Jan 2026']
-                ],
-                7 => [
-                    ['user_name' => 'Rina Susanti', 'rating' => 5, 'comment' => 'Premium quality, worth the price', 'date' => '3 Jan 2026']
-                ],
-                8 => [
-                    ['user_name' => 'Tommy Lee', 'rating' => 4, 'comment' => 'Affordable and good', 'date' => '1 Jan 2026']
-                ]
-            ];
-            ?>
-                <?php foreach($products as $product): ?>
-                <div class="product-card" data-id="<?php echo $product['product_id']; ?>">
-                <div class="product-image-wrapper">
-                    <img src="<?php echo $product['image_url']; ?>" alt="<?php echo $product['name']; ?>">
-                </div>
-                <div class="product-info">
-                    <h3><?php echo $product['name']; ?></h3>
-                    
-                    <div class="product-rating">
-                        <div class="stars">
-                            <?php for($i = 1; $i <= 5; $i++): ?>
-                                <span class="star <?php echo $i <= round($product['average_rating']) ? '' : 'empty'; ?>">★</span>
-                            <?php endfor; ?>
-                        </div>
-                        <span class="review-count">(<?php echo $product['reviews_count']; ?> reviews)</span>
-                    </div>
-
-                    <div class="product-price">Rp <?php echo number_format($product['price'], 0, ',', '.'); ?></div>
-
-                    <div class="stock-status <?php echo $product['stock'] > 0 ? '' : 'out-of-stock'; ?>">
-                        <?php echo $product['stock'] > 0 ? '✓ Stock (' . $product['stock'] . ' tersedia)' : '✗ Out of Stock'; ?>
-                    </div>
-
-                    <div class="product-actions">
-                        <button class="btn btn-secondary" onclick="event.stopPropagation(); openProductDetail(<?php echo $product['product_id']; ?>)">
-                            Detail
-                        </button>
-                        <button class="btn btn-primary" onclick="event.stopPropagation(); addToCart(<?php echo $product['product_id']; ?>, '<?php echo addslashes($product['name']); ?>')" <?php echo $product['stock'] <= 0 ? 'disabled' : ''; ?>>
-                            Add to Cart
-                        </button>
-                    </div>
-                </div>
+        <!-- LAYOUT DENGAN SIDEBAR -->
+        <div class="products-layout">
+            <!-- SIDEBAR KATEGORI -->
+            <div class="category-sidebar">
+                <h3>
+                    <span>📂</span>
+                    Kategori
+                </h3>
+                <ul class="category-list">
+                    <li class="category-item active" onclick="filterCategory('all')" data-category="all">
+                        <span class="category-icon">🏠</span>
+                        <span>Semua Produk</span>
+                        <span class="category-count" id="count-all">8</span>
+                    </li>
+                    <li class="category-item" onclick="filterCategory('cat-food')" data-category="cat-food">
+                        <span class="category-icon">🐱</span>
+                        <span>Makanan Kucing</span>
+                        <span class="category-count" id="count-cat-food">4</span>
+                    </li>
+                    <li class="category-item" onclick="filterCategory('dog-food')" data-category="dog-food">
+                        <span class="category-icon">🐶</span>
+                        <span>Makanan Anjing</span>
+                        <span class="category-count" id="count-dog-food">2</span>
+                    </li>
+                    <li class="category-item" onclick="filterCategory('vitamin')" data-category="vitamin">
+                        <span class="category-icon">💊</span>
+                        <span>Vitamin & Suplemen</span>
+                        <span class="category-count" id="count-vitamin">0</span>
+                    </li>
+                    <li class="category-item" onclick="filterCategory('grooming')" data-category="grooming">
+                        <span class="category-icon">🧴</span>
+                        <span>Perawatan & Grooming</span>
+                        <span class="category-count" id="count-grooming">0</span>
+                    </li>
+                    <li class="category-item" onclick="filterCategory('toys')" data-category="toys">
+                        <span class="category-icon">🎾</span>
+                        <span>Mainan & Aksesoris</span>
+                        <span class="category-count" id="count-toys">0</span>
+                    </li>
+                </ul>
             </div>
-            <?php endforeach; ?>
+
+            <!-- PRODUCTS GRID -->
+            <div class="products-grid" id="productsGrid">
+                <?php
+                $products = [
+                    ['product_id' => 1, 'name' => 'Whiskas', 'description' => 'Makanan lezat dan bergizi untuk kucing kesayangan Anda', 'price' => 130000, 'stock' => 15, 'average_rating' => 5, 'reviews_count' => 28, 'image_url' => asset('images/whiskas.avif'), 'category' => 'cat-food'],
+                    ['product_id' => 2, 'name' => 'Me-O', 'description' => 'Premium cat food with salmon', 'price' => 99000, 'stock' => 30, 'average_rating' => 4.5, 'reviews_count' => 15, 'image_url' => asset('images/me-o.jpg'), 'category' => 'cat-food'],
+                    ['product_id' => 3, 'name' => 'Royal Canin', 'description' => 'High quality pet nutrition', 'price' => 99000, 'stock' => 20, 'average_rating' => 5, 'reviews_count' => 42, 'image_url' => asset('images/caninneanj.jpeg'), 'category' => 'cat-food'],
+                    ['product_id' => 4, 'name' => 'Cat Choize', 'description' => 'Makanan kucing berkualitas tinggi', 'price' => 210000, 'stock' => 18, 'average_rating' => 4, 'reviews_count' => 22, 'image_url' => asset('images/me-o.jpg'), 'category' => 'cat-food'],
+                    ['product_id' => 5, 'name' => 'Premium Dry Dog Food', 'description' => 'Nutrisi lengkap untuk anjing dewasa, 5kg', 'price' => 350000, 'stock' => 12, 'average_rating' => 5, 'reviews_count' => 35, 'image_url' => asset('images/premiumdry.webp'), 'category' => 'dog-food'],
+                    ['product_id' => 6, 'name' => 'Pedigree Adult', 'description' => 'Complete nutrition for adult dogs', 'price' => 285000, 'stock' => 25, 'average_rating' => 4.5, 'reviews_count' => 18, 'image_url' => asset('images/pedigree.jpg'), 'category' => 'dog-food'],
+                    ['product_id' => 7, 'name' => 'Purina Pro Plan', 'description' => 'Advanced nutrition for cats', 'price' => 425000, 'stock' => 8, 'average_rating' => 5, 'reviews_count' => 31, 'image_url' => asset('images/purina.jpeg'), 'category' => 'cat-food'],
+                    ['product_id' => 8, 'name' => 'Friskies', 'description' => 'Delicious meals for playful cats', 'price' => 75000, 'stock' => 40, 'average_rating' => 4, 'reviews_count' => 12, 'image_url' => asset('images/friskies.avif'), 'category' => 'cat-food']
+                ];
+
+                $reviews = [
+                    1 => [
+                        ['user_name' => 'Tachyang Cutesy', 'rating' => 5, 'comment' => 'Eeck - eek aa. Kucing saya sangat suka!', 'date' => '20 Jan 2026'],
+                        ['user_name' => 'Budi Santoso', 'rating' => 5, 'comment' => 'Kualitas bagus, kucing jadi lebih sehat', 'date' => '18 Jan 2026']
+                    ],
+                    2 => [
+                        ['user_name' => 'Siti Aminah', 'rating' => 4, 'comment' => 'Bagus tapi agak mahal', 'date' => '15 Jan 2026']
+                    ],
+                    3 => [
+                        ['user_name' => 'John Doe', 'rating' => 5, 'comment' => 'Best quality pet food!', 'date' => '10 Jan 2026']
+                    ],
+                    4 => [
+                        ['user_name' => 'Maria Clara', 'rating' => 4, 'comment' => 'Kucing saya doyan banget', 'date' => '12 Jan 2026']
+                    ],
+                    5 => [
+                        ['user_name' => 'Ahmad Yani', 'rating' => 5, 'comment' => 'Anjing saya jadi lebih energik', 'date' => '8 Jan 2026']
+                    ],
+                    6 => [
+                        ['user_name' => 'Linda Wijaya', 'rating' => 4, 'comment' => 'Good product for my dog', 'date' => '5 Jan 2026']
+                    ],
+                    7 => [
+                        ['user_name' => 'Rina Susanti', 'rating' => 5, 'comment' => 'Premium quality, worth the price', 'date' => '3 Jan 2026']
+                    ],
+                    8 => [
+                        ['user_name' => 'Tommy Lee', 'rating' => 4, 'comment' => 'Affordable and good', 'date' => '1 Jan 2026']
+                    ]
+                ];
+                ?>
+                    <?php foreach($products as $product): ?>
+                    <div class="product-card" data-id="<?php echo $product['product_id']; ?>" data-category="<?php echo $product['category']; ?>">
+                    <div class="product-image-wrapper">
+                        <img src="<?php echo $product['image_url']; ?>" alt="<?php echo $product['name']; ?>">
+                    </div>
+                    <div class="product-info">
+                        <h3><?php echo $product['name']; ?></h3>
+                        
+                        <div class="product-rating">
+                            <div class="stars">
+                                <?php for($i = 1; $i <= 5; $i++): ?>
+                                    <span class="star <?php echo $i <= round($product['average_rating']) ? '' : 'empty'; ?>">★</span>
+                                <?php endfor; ?>
+                            </div>
+                            <span class="review-count">(<?php echo $product['reviews_count']; ?> reviews)</span>
+                        </div>
+
+                        <div class="product-price">Rp <?php echo number_format($product['price'], 0, ',', '.'); ?></div>
+
+                        <div class="stock-status <?php echo $product['stock'] > 0 ? '' : 'out-of-stock'; ?>">
+                            <?php echo $product['stock'] > 0 ? '✓ Stock (' . $product['stock'] . ' tersedia)' : '✗ Out of Stock'; ?>
+                        </div>
+
+                        <div class="product-actions">
+                            <button class="btn btn-secondary" onclick="event.stopPropagation(); openProductDetail(<?php echo $product['product_id']; ?>)">
+                                Detail
+                            </button>
+                            <button class="btn btn-primary" onclick="event.stopPropagation(); addToCart(<?php echo $product['product_id']; ?>, '<?php echo addslashes($product['name']); ?>')" <?php echo $product['stock'] <= 0 ? 'disabled' : ''; ?>>
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
         </div>
     </div>
 
@@ -1083,6 +1222,27 @@
         // Sample product data for JavaScript
         const productsData = <?php echo json_encode($products); ?>;
         const allReviews = <?php echo json_encode($reviews); ?>;
+
+        // ============================================
+        // FILTER KATEGORI - FITUR BARU
+        // ============================================
+        function filterCategory(category) {
+            // Update active state
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+
+            // Filter products
+            const productCards = document.querySelectorAll('.product-card');
+            productCards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
 
         // ============================================
         // CART MANAGEMENT - TETAP FUNGSIONAL
@@ -1222,7 +1382,7 @@
                 <div class="reviews-header">
                     <h3>Customer Reviews (${productReviews.length})</h3>
                     <button class="btn-add-review" onclick="toggleReviewForm()">
-                        ✍️ Tulis Review
+                        ✏️ Tulis Review
                     </button>
                 </div>
                 
