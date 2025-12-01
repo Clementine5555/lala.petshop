@@ -3,27 +3,35 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Review extends BaseModel
+class Review extends Model
 {
-    use HasFactory, SoftDeletes;
-    
-    protected $primaryKey = 'review_id';
-    // protected $fillable = [
-    //     'user_id',
-    //     'product_id',
-    //     'rate',
-    //     'comment',
-    //     'date',
-    // ];
+    use HasFactory;
 
+    protected $table = 'reviews';
+    protected $primaryKey = 'review_id';
+    public $timestamps = true;
+
+    protected $fillable = [
+        'user_id',
+        'product_id',
+        'rating',
+        'comment',
+    ];
+
+    /**
+     * Review belongs to a User
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 
+    /**
+     * Review belongs to a Product
+     */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'product_id', 'product_id');

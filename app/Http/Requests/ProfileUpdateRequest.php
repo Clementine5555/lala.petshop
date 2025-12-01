@@ -23,7 +23,8 @@ class ProfileUpdateRequest extends FormRequest
                 'lowercase',
                 'email',
                 'max:255',
-                Rule::unique(User::class)->ignore($this->user()->id),
+                // Ignore the currently authenticated user by primary key (works with custom PK)
+                Rule::unique(User::class)->ignore($this->user()->getKey(), $this->user()->getKeyName()),
             ],
         ];
     }

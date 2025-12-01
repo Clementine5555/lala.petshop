@@ -5,25 +5,31 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\AppointmentDetail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Groomer extends BaseModel
 {
     use HasFactory, SoftDeletes;
 
-    // Menentukan Primary Key
     protected $primaryKey = 'groomer_id';
 
-    // // Mengizinkan mass assignment
-    // protected $fillable = [
-    //     'user_id',
-    //     'total_appointments_completed',
-    //     'total_minutes_worked', 
-    // ];
+    protected $fillable = [
+        'user_id',
+        'name',
+        'email',
+        'phone_number',
+        'address',
+        'total_appointments_completed',
+        'total_hours_worked',
+    ];
+
+    protected $casts = [
+        'total_appointments_completed' => 'integer',
+        'total_hours_worked' => 'integer',
+    ];
 
     /**
-     * Relasi: Groomer dimiliki oleh satu User (FK user_id).
+     * Groomer belongs to User
      */
     public function user(): BelongsTo
     {
@@ -31,10 +37,19 @@ class Groomer extends BaseModel
     }
 
     /**
-     * Relasi: Groomer memiliki banyak AppointmentDetails
+     * Groomer has many Appointment Details
      */
     public function appointmentDetails(): HasMany
     {
-        return $this->hasMany(AppointmentDetail::class, 'groomer_id', 'groomer_id');
+        return $this->hasMany(Appointment_Detail::class, 'groomer_id', 'groomer_id');
+    }
+
+    /**
+     * Groomer has many Appointments
+     */
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class, 'groomer_id', 'groomer_id');
     }
 }
+

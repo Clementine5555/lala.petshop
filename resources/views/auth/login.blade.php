@@ -562,31 +562,16 @@
                     <label for="remember_me">Remember me</label>
                 </div>
 
-                <button type="submit" class="btn-submit">
-                    Submit
-                </button>
+        <div class="flex items-center justify-end mt-4">
+            @if (Route::has('password.request'))
+                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
+                    {{ __('Forgot your password?') }}
+                </a>
+            @endif
 
-                <div class="form-footer">
-                    Don't have account? 
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}">Sign up</a>
-                    @endif
-                </div>
-            </form>
+            <x-primary-button class="ms-3">
+                {{ __('Log in') }}
+            </x-primary-button>
         </div>
-    </div>
-
-    <script>
-        // Loading animation saat form di-submit
-        document.getElementById('loginForm').addEventListener('submit', function() {
-            document.getElementById('loadingOverlay').classList.add('active');
-        });
-
-        // Jika ada error, hide loading
-        @if ($errors->any())
-            document.addEventListener('DOMContentLoaded', function() {
-                document.getElementById('loadingOverlay').classList.remove('active');
-            });
-        @endif
-    </script>
+    </form>
 </x-guest-layout>

@@ -11,20 +11,31 @@ class Delivery extends BaseModel
     use HasFactory, SoftDeletes;
 
     protected $primaryKey = 'delivery_id';
-    // protected $fillable = [
-    //     'courier_id',
-    //     'transaction_id',
-    //     'address',
-    //     'status', // pending, shipped, delivered, returned
-    //     'description',
-    //     'delivery_date',
-    // ];
 
+    protected $fillable = [
+        'courier_id',
+        'transaction_id',
+        'address',
+        'status',
+        'description',
+        'delivery_date',
+    ];
+
+    protected $casts = [
+        'delivery_date' => 'datetime',
+    ];
+
+    /**
+     * Delivery belongs to Courier
+     */
     public function courier(): BelongsTo
     {
         return $this->belongsTo(Courier::class, 'courier_id', 'courier_id');
     }
 
+    /**
+     * Delivery belongs to Transaction
+     */
     public function transaction(): BelongsTo
     {
         return $this->belongsTo(Transaction::class, 'transaction_id', 'transaction_id');

@@ -3,41 +3,32 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
 
-class Product extends BaseModel
+class Product extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+
+    protected $table = 'products';
 
     protected $primaryKey = 'product_id';
-    // protected $fillable = [
-    //     'supplier_id',
-    //     'name',
-    //     'category',
-    //     'description',
-    //     'price',
-    //     'stock',
-    // ];
 
-    public function supplier(): BelongsTo
+    public $timestamps = true;
+
+    protected $fillable = [
+        'name',
+        'description',
+        'price',
+        'stock',
+        'category',
+        'supplier_id',
+    ];
+
+    /**
+     * Product belongs to a Supplier
+     */
+    public function supplier()
     {
         return $this->belongsTo(Supplier::class, 'supplier_id', 'supplier_id');
-    }
-
-    public function carts(): HasMany
-    {
-        return $this->hasMany(Cart::class, 'product_id', 'product_id');
-    }
-    
-    public function reviews(): HasMany
-    {
-        return $this->hasMany(Review::class, 'product_id', 'product_id');
-    }
-
-    public function transactionDetails(): HasMany
-    {
-        return $this->hasMany(TransactionDetail::class, 'product_id', 'product_id');
     }
 }

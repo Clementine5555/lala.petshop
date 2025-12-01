@@ -21,5 +21,11 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // seed groomers and services for grooming feature
+        $this->call([
+            \Database\Seeders\GroomerSeeder::class,
+            \Database\Seeders\ServiceSeeder::class,
+        ]);
     }
 }

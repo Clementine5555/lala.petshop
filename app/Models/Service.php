@@ -3,23 +3,28 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Service extends BaseModel
+class Service extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
+    protected $table = 'services';
     protected $primaryKey = 'service_id';
-    // protected $fillable = [
-    //     'service_name',
-    //     'description',
-    //     'price',
-    //     'duration_minutes',
-    // ];
-    
+    public $timestamps = true;
+
+    protected $fillable = [
+        'name',
+        'description',
+        'price',
+    ];
+
+    /**
+     * Service has many AppointmentDetails
+     */
     public function appointmentDetails(): HasMany
     {
-        return $this->hasMany(AppointmentDetail::class, 'service_id', 'service_id');
+        return $this->hasMany(Appointment_Detail::class, 'service_id', 'service_id');
     }
 }

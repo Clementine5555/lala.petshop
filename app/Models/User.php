@@ -2,86 +2,84 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\Traits\LogsAllActivity;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable, SoftDeletes, LogsAllActivity;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected $primaryKey = 'user_id';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
-    // protected $fillable = [
-    //     'name',
-    //     'email',
-    //     'password',
-    //     'phone_number',
-    //     'role'
-    // ];
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
 
-    // Relasi
-  
-    // Pelanggan
-    public function pets(): HasMany
-    {
-        return $this->hasMany(Pet::class, 'user_id', 'user_id');
-    }
+    // ==========================
+    // Customer Relationships
+    // ==========================
 
     public function carts(): HasMany
     {
         return $this->hasMany(Cart::class, 'user_id', 'user_id');
     }
-    
+
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class, 'user_id', 'user_id');
     }
-    
+
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class, 'user_id', 'user_id');
     }
-    
-    // Staf (Groomer/Courier)
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'user_id', 'user_id');
+    }
+
+    public function refunds(): HasMany
+    {
+        return $this->hasMany(Refund::class, 'user_id', 'user_id');
+    }
+
+    public function pets(): HasMany
+    {
+        return $this->hasMany(Pet::class, 'user_id', 'user_id');
+    }
+
+    public function appointmentDetails(): HasMany
+    {
+        return $this->hasMany(Appointment_Detail::class, 'user_id', 'user_id');
+    }
+
+    // ==========================
+    // Staff Relationships
+    // ==========================
+
     public function groomer(): HasOne
     {
         return $this->hasOne(Groomer::class, 'user_id', 'user_id');
     }
-    
+
     public function courier(): HasOne
     {
         return $this->hasOne(Courier::class, 'user_id', 'user_id');

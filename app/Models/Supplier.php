@@ -3,23 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
 
-class Supplier extends BaseModel
+class Supplier extends Model
 {
-    use HasFactory, SoftDeletes;
-    
-    protected $primaryKey = 'supplier_id';
-    // protected $fillable = [
-    //     'name',
-    //     'address',
-    //     'email',
-    //     'phone_number',
-    // ];
+    use HasFactory;
 
-    public function products(): HasMany
-    {
-        return $this->hasMany(Product::class, 'supplier_id', 'supplier_id');
-    }
+    protected $table = 'suppliers';
+
+    protected $primaryKey = 'supplier_id';
+
+    public $timestamps = true;
+
+    protected $fillable = [
+        'name',
+        'address',
+        'email',
+        'phone_number',
+    ];
 }
