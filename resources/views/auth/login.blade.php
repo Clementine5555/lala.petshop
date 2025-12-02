@@ -267,7 +267,7 @@
             padding: 60px 50px;
             width: 100%;
             max-width: 480px;
-            box-shadow: 
+            box-shadow:
                 0 10px 40px rgba(0, 0, 0, 0.2),
                 inset 0 0 80px rgba(255, 255, 255, 0.1);
             position: relative;
@@ -296,7 +296,7 @@
             color: #fff;
             text-align: center;
             margin-bottom: 50px;
-            text-shadow: 
+            text-shadow:
                 0 3px 15px rgba(0, 0, 0, 0.4),
                 0 0 40px rgba(0, 212, 255, 0.3);
             position: relative;
@@ -397,7 +397,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-family: 'Poppins', sans-serif;
-            box-shadow: 
+            box-shadow:
                 0 10px 35px rgba(255, 140, 66, 0.5),
                 0 0 25px rgba(255, 107, 53, 0.4);
             margin-bottom: 25px;
@@ -409,7 +409,7 @@
 
         .btn-submit:hover {
             transform: translateY(-3px);
-            box-shadow: 
+            box-shadow:
                 0 15px 45px rgba(255, 140, 66, 0.6),
                 0 0 35px rgba(255, 107, 53, 0.5);
             background: linear-gradient(135deg, #FF9D5C, #FF7B45);
@@ -524,13 +524,13 @@
                 <div class="form-group">
                     <label for="email">Username</label>
                     <div class="input-wrapper">
-                        <input 
-                            id="email" 
-                            type="email" 
-                            name="email" 
-                            value="{{ old('email') }}" 
-                            required 
-                            autofocus 
+                        <input
+                            id="email"
+                            type="email"
+                            name="email"
+                            value="{{ old('email') }}"
+                            required
+                            autofocus
                             placeholder="Enter your username"
                         />
                         <span class="input-icon">👤</span>
@@ -543,11 +543,11 @@
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="input-wrapper">
-                        <input 
-                            id="password" 
-                            type="password" 
-                            name="password" 
-                            required 
+                        <input
+                            id="password"
+                            type="password"
+                            name="password"
+                            required
                             placeholder="Enter your password"
                         />
                         <span class="input-icon">🔒</span>

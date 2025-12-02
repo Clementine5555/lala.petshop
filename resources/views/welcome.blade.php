@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Petshop Lala - Your Trusted Pet Care Partner</title>
-    
+
     <style>
         * {
             margin: 0;
@@ -493,9 +493,9 @@
     <nav>
         <div class="nav-container">
             <!-- Logo -->
-            <img src="/images/logoo.png" alt="Petshop Lala">
-            
-            
+            <img src="/img/logoo.png" alt="Petshop Lala">
+
+
             <!-- Navigation Links -->
             <ul class="nav-links">
                 <li><a href="#home" class="active">Home</a></li>
@@ -520,8 +520,8 @@
                 <!-- Profile Dropdown (Logged In) -->
                 <div class="profile-dropdown" id="profileDropdown">
                     <div class="profile-trigger" onclick="toggleDropdown()">
-                        <img src="{{ Auth::user()->profile_photo_url ?? 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23FF8C42\'/%3E%3Cpath d=\'M50 45c8 0 15-7 15-15s-7-15-15-15-15 7-15 15 7 15 15 15zm0 5c-13 0-25 6-25 15v10h50V65c0-9-12-15-25-15z\' fill=\'white\'/%3E%3C/svg%3E' }}" 
-                             alt="User" 
+                        <img src="{{ Auth::user()->profile_photo_url ?? 'data:img/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23FF8C42\'/%3E%3Cpath d=\'M50 45c8 0 15-7 15-15s-7-15-15-15-15 7-15 15 7 15 15 15zm0 5c-13 0-25 6-25 15v10h50V65c0-9-12-15-25-15z\' fill=\'white\'/%3E%3C/svg%3E' }}"
+                             alt="User"
                              class="profile-avatar">
                         <span class="profile-name">{{ Auth::user()->name }}</span>
                         <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -573,7 +573,7 @@
             <form id="editProfileForm" method="POST" action="{{ route('profile.update') }}">
                 @csrf
                 @method('PUT')
-                
+
                 <div class="form-group">
                     <label>Full Name</label>
                     <input type="text" name="name" id="userName" value="{{ Auth::user()->name }}" placeholder="Enter your name">
@@ -608,11 +608,11 @@
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
-            
+
             toast.className = `toast ${type}`;
             toastMessage.textContent = message;
             toast.classList.add('show');
-            
+
             setTimeout(() => {
                 hideToast();
             }, 4000);
@@ -691,7 +691,7 @@
         window.addEventListener('scroll', function() {
             const sections = document.querySelectorAll('main > section');
             const navLinks = document.querySelectorAll('.nav-links a');
-            
+
             let current = '';
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;

@@ -12,11 +12,11 @@
         <!-- Search Form -->
         <form method="GET" action="{{ route('products.shop') }}" class="mb-8">
             <div class="flex gap-4">
-                <input 
-                    type="text" 
-                    name="search" 
-                    value="{{ request('search') }}" 
-                    placeholder="Search products by name or category..." 
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Search products by name or category..."
                     class="flex-1 px-6 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition"
                 />
                 <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-lg font-semibold transition">
@@ -33,7 +33,7 @@
                         <!-- Image Placeholder -->
                         <div class="w-full h-48 bg-gradient-to-br from-orange-200 to-orange-100 flex items-center justify-center overflow-hidden relative">
                             @if ($product->image)
-                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-110 transition">
+                            <img src="{{ asset('img/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-110 transition">
                             @else
                                 <div class="text-center">
                                     <svg class="w-16 h-16 text-orange-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,11 +51,11 @@
                                     {{ $product->category ?? 'Uncategorized' }}
                                 </span>
                             </div>
-                            
+
                             <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{{ $product->name }}</h3>
-                            
+
                             <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ $product->description ?? 'High quality product for your pets' }}</p>
-                            
+
                             <div class="flex items-baseline justify-between mb-6">
                                 <span class="text-2xl font-bold text-orange-600">
                                     Rp {{ number_format($product->price, 0, ',', '.') }}
