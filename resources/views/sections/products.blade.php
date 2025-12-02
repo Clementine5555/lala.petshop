@@ -170,16 +170,17 @@
 
                 <div class="product-price">Rp 140.000</div>
 
-                <form action="{{ route('cart.add') }}" method="POST">
+                <form action="{{ route('cart.store') }}" method="POST">
                     @csrf
                     <input type="hidden" name="product_id" value="1">
+                    <input type="hidden" name="quantity" value="1">
                     <button type="submit" class="btn-add-cart">Add to Cart</button>
                 </form>
             </div>
         </div>
 
         <div class="view-all-section">
-            <a href="{{ route('products.index') }}" class="btn-view-all">
+            <a href="{{ route('products.shop') }}" class="btn-view-all">
                 See all Products
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>

@@ -673,15 +673,21 @@
 
             <!-- Right Section -->
             <div class="nav-right">
-                <!-- Cart Icon -->
                 <div class="cart-icon" onclick="window.location.href='{{ route('cart.index') }}'">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    @if(session('cart') && count(session('cart')) > 0)
-                    <span class="cart-badge" id="cartBadge">{{ count(session('cart')) }}</span>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                @auth
+                    @php
+                        $cartCount = \App\Models\Cart::where('user_id', auth()->id())
+                                                    ->where('status', 'active')
+                                                    ->sum('quantity');
+                    @endphp
+                    @if($cartCount > 0)
+                    <span class="cart-badge" id="cartBadge">{{ $cartCount }}</span>
                     @endif
-                </div>
+                @endauth
+            </div>
 
                 @auth
                 <!-- Profile Dropdown (Logged In) -->
@@ -756,7 +762,9 @@
                     <input type="tel" name="phone" id="userPhone" value="{{ Auth::user()->phone ?? '' }}" placeholder="Enter your phone">
                 </div>
 
-                <button type="submit" class="btn-register" style="width: 100%; padding: 12px; margin-top: 20px;">Save Changes</button>
+                <button type="button" onclick="saveProfile()" class="btn-register" style="width: 100%; padding: 12px; margin-top: 20px;">
+                    Save Changes
+                </button>
             </form>
         </div>
     </div>
@@ -854,37 +862,30 @@
             });
         }
 
-        // Smooth Scroll Navigation - FIXED
         document.querySelectorAll('.nav-links a').forEach(link => {
             link.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
-
-                // Check if it's a hash link (starts with #)
+                
                 if (href && href.startsWith('#')) {
                     e.preventDefault();
-
-                    const targetId = href.substring(1); // Remove the #
+                    
+                    const targetId = href.substring(1); 
                     const target = document.getElementById(targetId);
 
                     if (target) {
-                        // Remove active class from all links
                         document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
 
-                        // Add active class to clicked link
                         this.classList.add('active');
 
-                        // Smooth scroll to target
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
+                        target.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'start' 
                         });
                     }
                 }
-                // If it's not a hash link, let it navigate normally
             });
         });
 
-        // Scroll-based active state update
         window.addEventListener('scroll', function() {
             const sections = document.querySelectorAll('main > section');
             const navLinks = document.querySelectorAll('.nav-links a');
@@ -894,14 +895,12 @@
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
                 const sectionHeight = section.clientHeight;
-
-                // Check if section is in view (with some offset for navbar)
+                
                 if (pageYOffset >= (sectionTop - 100)) {
                     current = section.getAttribute('id');
                 }
             });
 
-            // Update active state
             navLinks.forEach(link => {
                 link.classList.remove('active');
                 const href = link.getAttribute('href');
@@ -912,19 +911,16 @@
             });
         });
 
-        // Set initial active state on page load
         window.addEventListener('load', function() {
             const hash = window.location.hash;
 
             if (hash) {
-                // If there's a hash in URL, activate that link
                 const targetLink = document.querySelector(`.nav-links a[href="${hash}"]`);
                 if (targetLink) {
                     document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
                     targetLink.classList.add('active');
                 }
             } else {
-                // Otherwise, activate home
                 const homeLink = document.querySelector('.nav-links a[href="#home"]');
                 if (homeLink) {
                     homeLink.classList.add('active');
@@ -932,7 +928,6 @@
             }
         });
 
-        // Success/Error messages
         @if(session('success'))
             showToast('{{ session('success') }}', 'success');
         @endif
@@ -940,6 +935,52 @@
         @if(session('error'))
             showToast('{{ session('error') }}', 'error');
         @endif
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+    function saveProfile() {
+        let name = document.getElementById('userName').value;
+        let email = document.getElementById('userEmail').value;
+        let phone = document.getElementById('userPhone').value;
+
+        fetch("{{ route('profile.update') }}", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                phone: phone
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            // 🚀 NOTIF SUKSES
+            Swal.fire({
+                icon: 'success',
+                title: 'Profile Updated!',
+                text: data.message,
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                timer: 2500
+            });
+
+            // 🚀 TUTUP MODAL
+            closeEditProfile();
+        })
+        .catch(err => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Something went wrong!',
+            });
+        });
+    }
     </script>
 
 </body>

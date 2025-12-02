@@ -22,7 +22,7 @@ class ProfileController extends Controller
     /**
      * user dapat memperbarui profilnya
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request)
     {
         $request->user()->fill($request->validated());
 
@@ -32,7 +32,11 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        // RETURN JSON (WAJIB BIAR GAK RELOAD)
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Mantap! Profile berhasil diupdate.'
+        ]);
     }
 
     /**
@@ -54,5 +58,22 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    // Update Nama Lengkap (Full Name)
+     
+    public function fullNameUpdate(Request $request): RedirectResponse
+    {
+        // 1. Validasi dulu biar inputnya gak kosong/sembarangan
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+        ]);
+
+        $request->user()->update([
+            'name' => $validated['name'],
+        ]);
+
+        // 3. Balikin user ke halaman sebelumnya (redirect)
+        return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 }

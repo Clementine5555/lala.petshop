@@ -12,44 +12,35 @@ use Illuminate\Support\Facades\Auth;
 
 class AppointmentController extends Controller
 {
-    /**
-     * menampilkan riwayat appointment user
-     */
-    public function history()
+    // ... (keep create method as is) ...
+    public function create(Request $request)
     {
-        $appointmentDetails = Appointment_Detail::where('user_id', Auth::id())
-                                                 ->with('appointments.service', 'groomer', 'pet')
-                                                 ->orderBy('created_at', 'desc')
-                                                 ->get();
-
-        return view('appointments.history', compact('appointmentDetails'));
-    }
-
-    /**
-     *  menampilkan form booking appointment
-     */
-    public function create(Service $service)
-    {
+        // ... (your existing create logic) ...
+        $serviceId = $request->query('service_id');
+        $selectedService = null;
+        if($serviceId) {
+            $selectedService = Service::find($serviceId);
+        }
         $pets = Pet::where('user_id', Auth::id())->get();
         $groomers = Groomer::all();
-
-        return view('appointments.create', compact('service', 'pets', 'groomers'));
+        $services = Service::all(); 
+        return view('appointment.create', compact('selectedService', 'services', 'pets', 'groomers'));
     }
 
-    /**
-     * menyimpan appointment baru
-     */
-    public function store(Request $request, Service $service)
+    public function store(Request $request)
     {
+        // 1. Validate
         $request->validate([
+            'service_id' => 'required|exists:services,service_id', 
             'pet_id' => 'required|exists:pet,pet_id',
             'groomer_id' => 'required|exists:groomer,groomer_id',
             'appointment_date' => 'required|date|after:today',
-            'notes' => 'nullable|string|max:500',
+            'appointment_time' => 'required',
+            'payment_method' => 'required',
         ]);
 
-        // membuat appointment detail record
-        $appointmentDetail = Appointment_Detail::create([
+        // 2. Create Detail
+        $detail = Appointment_Detail::create([
             'user_id' => Auth::id(),
             'groomer_id' => $request->groomer_id,
             'pet_id' => $request->pet_id,
@@ -57,51 +48,49 @@ class AppointmentController extends Controller
             'total_appointments_completed' => 0,
         ]);
 
-        // membuat appointment record
-        $appointment = Appointment::create([
+        // 3. Create Appointment
+        $datetime = $request->appointment_date . ' ' . $request->appointment_time;
+        
+        Appointment::create([
             'groomer_id' => $request->groomer_id,
-            'appointment_detail_id' => $appointmentDetail->appointment_detail_id,
-            'service_id' => $service->service_id,
-            'date' => $request->appointment_date,
+            'appointment_detail_id' => $detail->appointment_detail_id,
+            'service_id' => $request->service_id,
+            'date' => $datetime,
             'status' => 'pending',
         ]);
 
-        return redirect()->route('appointments.history')
-                         ->with('success', 'Appointment booked successfully! We will confirm your booking shortly.');
+        // 4. Prepare Data for Confirmation Page
+        $service = Service::find($request->service_id);
+        $pet = Pet::find($request->pet_id);
+
+        $appointmentData = [
+            'pet_name' => $pet->pet_name,
+            'appointment_date' => $request->appointment_date,
+            'appointment_time' => $request->appointment_time,
+            'services' => $service->service_name,
+            'total_price' => $service->price
+        ];
+
+        // 5. Redirect to Confirmation Page with Data
+        return redirect()->back()->with('success', 'Booking berhasil! Mohon tunggu konfirmasi admin.');
     }
 
-    /**
-     * menampilkan detail appointment
-     */
-    public function show($id)
+    public function confirmation()
     {
-        $appointmentDetail = Appointment_Detail::where('user_id', Auth::id())
-                                                ->with('appointments.service', 'groomer', 'pet')
-                                                ->findOrFail($id);
-
-        return view('appointments.show', compact('appointmentDetail'));
-    }
-
-    /**
-     * menbatalkan appointment
-     */
-    public function cancel($id)
-    {
-        $appointmentDetail = Appointment_Detail::where('user_id', Auth::id())
-                                                ->findOrFail($id);
-
-        if ($appointmentDetail->status === 'completed') {
-            return redirect()->back()->with('error', 'Cannot cancel a completed appointment.');
+        if (!session()->has('appointment')) {
+            return redirect()->route('dashboard'); // Prevent accessing directly without booking
         }
+        return view('appointment.confirmation');
+    }
 
-        // Update appointment detail status
-        $appointmentDetail->update(['status' => 'cancelled']);
+    public function history()
+    {
+        // ...
+         $appointmentDetails = Appointment_Detail::where('user_id', Auth::id())
+            ->with(['appointments.service', 'groomer', 'pet'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        // melakukan update pada appointment 
-        Appointment::where('appointment_detail_id', $id)
-                   ->update(['status' => 'cancelled']);
-
-        return redirect()->route('appointments.history')
-                         ->with('success', 'Appointment cancelled successfully.');
+        return view('appointments.history', compact('appointmentDetails'));
     }
 }

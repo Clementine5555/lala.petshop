@@ -43,9 +43,6 @@ class Payment extends BaseModel
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 
-    /**
-     * Optional: one-to-one with Appointment (if payments used for appointments)
-     */
     public function appointment(): HasOne
     {
         return $this->hasOne(Appointment::class, 'payment_id', 'payment_id');

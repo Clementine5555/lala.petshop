@@ -20,14 +20,15 @@
         .btn-send {
             width: 100%; padding: 16px; background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 100%);
             color: white; border: none; border-radius: 50px; font-weight: 700; font-size: 1.1em;
-            cursor: pointer; box-shadow: 0 5px 20px rgba(255, 140, 66, 0.4);
+            cursor: pointer; box-shadow: 0 5px 20px rgba(255, 140, 66, 0.4); transition: all 0.3s;
         }
         .btn-send:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(255, 140, 66, 0.6); }
+        .btn-send:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .contact-info-section { display: flex; flex-direction: column; gap: 25px; }
         .contact-method {
             background: white; padding: 30px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-            display: flex; align-items: center; gap: 20px; text-decoration: none; color: inherit;
+            display: flex; align-items: center; gap: 20px; text-decoration: none; color: inherit; transition: all 0.3s;
         }
         .contact-method:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255, 140, 66, 0.2); }
 
@@ -39,6 +40,23 @@
         .contact-details h4 { font-size: 1.3em; color: #333; margin-bottom: 8px; font-weight: 700; }
         .contact-details p { color: #666; font-size: 1.1em; }
 
+        /* Toast Notification */
+        .toast {
+            position: fixed; bottom: 30px; right: 30px; background: white;
+            padding: 16px 24px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            display: flex; align-items: center; gap: 12px; z-index: 9999;
+            transform: translateX(120%); transition: transform 0.4s ease; min-width: 300px;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left: 4px solid #10b981; }
+        .toast.error { border-left: 4px solid #ef4444; }
+        .toast-icon { width: 24px; height: 24px; flex-shrink: 0; }
+        .toast.success .toast-icon { color: #10b981; }
+        .toast.error .toast-icon { color: #ef4444; }
+        .toast-message { flex: 1; color: #333; font-weight: 500; }
+        .toast-close { width: 20px; height: 20px; cursor: pointer; color: #999; transition: color 0.3s; }
+        .toast-close:hover { color: #333; }
+
         /* RESPONSIVE */
         @media (max-width: 992px) {
             .contact-content { grid-template-columns: 1fr; }
@@ -48,6 +66,7 @@
             .contact-container { padding: 0 20px; }
             .contact-header h2 { font-size: 2.2em; }
             .contact-form-section { padding: 30px 20px; }
+            .toast { right: 20px; min-width: calc(100% - 40px); }
         }
     </style>
 
@@ -61,11 +80,11 @@
             <!-- FORM -->
             <div class="contact-form-section">
                 <h3>Send Us Message</h3>
-                <form action="{{ route('contact.send') }}" method="POST">
+                <form id="contactForm" action="{{ route('contact.send') }}" method="POST">
                     @csrf
                     <div class="form-group"><input type="text" name="name" placeholder="Your Name" required></div>
                     <div class="form-group"><input type="email" name="email" placeholder="Your Email" required></div>
-                    <div class="form-group"><input type="tel" name="phone" placeholder="Phone Number" required></div>
+                    <div class="form-group"><input type="tel" name="phone" placeholder="Phone Number (Optional)"></div>
                     <div class="form-group">
                         <select name="subject" required>
                             <option value="">Select Subject</option>
@@ -104,7 +123,7 @@
                     </div>
                 </a>
 
-                <a href="https://wa.me/081789445290" class="contact-method" target="_blank">
+                <a href="https://wa.me/6282381182066" class="contact-method" target="_blank">
                     <div class="contact-icon whatsapp">
                         <img src="/img/wa.png" alt="WhatsApp" style="width: 35px; height: 35px;">
                     </div>
@@ -116,67 +135,75 @@
             </div>
         </div>
     </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <svg class="toast-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span class="toast-message" id="toastMessage"></span>
+        <svg class="toast-close" onclick="hideToast()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+    </div>
 </section>
 
-
-
-<!-- FOOTER (SUDAH DIPISAH) -->
-<footer class="footer" style="background: linear-gradient(135deg, #C67B48 0%, #A0613C 100%); color: white; padding: 60px 0 30px;">
-    <style>
-        .footer-content { max-width: 1400px; margin: 0 auto; padding: 0 50px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 50px; margin-bottom: 40px; }
-        .footer-about h3 { font-size: 1.8em; margin-bottom: 20px; color: #FFE5D9; }
-        .footer-about p { line-height: 1.8; opacity: 0.9; margin-bottom: 15px; }
-        .footer-section h4 { font-size: 1.3em; margin-bottom: 20px; color: #FFE5D9; }
-        .footer-section ul { list-style: none; }
-        .footer-section ul li { margin-bottom: 12px; }
-        .footer-section ul li a { color: white; text-decoration: none; opacity: 0.9; }
-        .footer-section ul li a:hover { opacity: 1; text-decoration: underline; }
-        .footer-bottom { text-align: center; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.2); opacity: 0.8; }
-
-        @media (max-width: 1200px) { .footer-content { grid-template-columns: 1fr 1fr; } }
-        @media (max-width: 768px) {
-            .footer-content { grid-template-columns: 1fr; gap: 30px; padding: 0 20px; }
+<script>
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    
+    // Disable button & show loading
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+    
+    const formData = new FormData(this);
+    
+    fetch('{{ route("contact.send") }}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
         }
-    </style>
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+            this.reset();
+        } else {
+            showToast(data.message || 'Failed to send message', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('An error occurred. Please try again.', 'error');
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    });
+});
 
-    <div class="footer-content">
-        <div class="footer-about">
-            <h3>Petshop Lala</h3>
-            <p>Your trusted partner in pet care. Menyediakan grooming dan makanan hewan berkualitas.</p>
-            <p><strong>Jl. Perjuangan No.9 Setia Budi, Medan</strong></p>
-            <p><strong>📞 082381182066</strong></p>
-            <p><strong>✉️ info@petshoplala.com</strong></p>
-            <p><strong>🕒 Mon-Sun: 08:00 - 20:00</strong></p>
-        </div>
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
 
-        <div class="footer-section">
-            <h4>Services</h4>
-            <ul>
-                <li><a href="#">Pet Grooming</a></li>
-                <li><a href="#">Appointment Booking</a></li>
-            </ul>
-        </div>
+    toastMessage.textContent = message;
 
-        <div class="footer-section">
-            <h4>Customer Service</h4>
-            <ul>
-                <li><a href="#">FAQs</a></li>
-                <li><a href="#">Refund Policy</a></li>
-                <li><a href="#">Payment Methods</a></li>
-                <li><a href="#">Terms & Conditions</a></li>
-            </ul>
-        </div>
+    toast.classList.remove('success', 'error');
+    toast.classList.add(type);
 
-        <div class="footer-section">
-            <h4>Follow Us</h4>
-            <p>Instagram: @petshoplala</p>
-            <p>Facebook: Petshop Lala</p>
-            <p>TikTok: @petshoplala</p>
-            <p>WhatsApp Business</p>
-        </div>
-    </div>
+    toast.classList.add('show');
 
-    <div class="footer-bottom">
-        <p>© 2025 Petshop Lala. All rights reserved. | Trusted, happy pet owners</p>
-    </div>
-</footer>
+    setTimeout(() => hideToast(), 3000);
+}
+
+function hideToast() {
+    const toast = document.getElementById('toast');
+    toast.classList.remove('show');
+}
+
+</script>

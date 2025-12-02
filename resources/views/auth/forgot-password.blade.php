@@ -1,7 +1,15 @@
-<x-guest-layout>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Forgot Password</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
-
+        /* Custom Styles */
         * {
             margin: 0;
             padding: 0;
@@ -9,530 +17,121 @@
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: #FF8C42;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         }
 
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('{{ asset('images/anjingg.jpg') }}');
-            background-size: cover;
-            background-position: center;
-            opacity: 0.3;
-            z-index: 0;
-        }
-
-        .network-bg {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            opacity: 0.2;
-            z-index: 1;
-        }
-
-        .network-line {
-            position: absolute;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            height: 2px;
-            animation: moveLine 10s linear infinite;
-        }
-
-        @keyframes moveLine {
-            0% {
-                transform: translateX(-100%) translateY(-100%);
-            }
-            100% {
-                transform: translateX(100%) translateY(100%);
-            }
-        }
-
-        .network-line:nth-child(1) { top: 20%; width: 300px; animation-delay: 0s; }
-        .network-line:nth-child(2) { top: 40%; width: 400px; animation-delay: 2s; }
-        .network-line:nth-child(3) { top: 60%; width: 350px; animation-delay: 4s; }
-        .network-line:nth-child(4) { top: 80%; width: 450px; animation-delay: 6s; }
-
-        .glow-circle {
-            position: absolute;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.25), transparent);
-            animation: pulse 4s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 0.2;
-            }
-            50% {
-                transform: scale(1.3);
-                opacity: 0.5;
-            }
-        }
-
-        .glow-circle:nth-child(5) {
-            width: 120px;
-            height: 120px;
-            top: 15%;
-            right: 20%;
-            animation-delay: 0s;
-        }
-
-        .glow-circle:nth-child(6) {
-            width: 180px;
-            height: 180px;
-            bottom: 20%;
-            left: 15%;
-            animation-delay: 2s;
-        }
-
-        .glow-circle:nth-child(7) {
-            width: 100px;
-            height: 100px;
-            top: 50%;
-            right: 10%;
-            animation-delay: 4s;
-        }
-
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 140, 66, 0.95);
-            backdrop-filter: blur(20px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .loading-content {
-            text-align: center;
-        }
-
-        .loading-spinner {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 40px;
-            position: relative;
-        }
-
-        .spinner-ring {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border: 5px solid transparent;
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 1.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-        }
-
-        .spinner-ring:nth-child(1) {
-            border-top-color: #fff;
-            animation-delay: -0.45s;
-        }
-
-        .spinner-ring:nth-child(2) {
-            border-top-color: rgba(255, 255, 255, 0.7);
-            animation-delay: -0.3s;
-        }
-
-        .spinner-ring:nth-child(3) {
-            border-top-color: rgba(255, 255, 255, 0.4);
-            animation-delay: -0.15s;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: white;
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            animation: fadeInOut 2s infinite;
-            letter-spacing: 2px;
-        }
-
-        .loading-subtext {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 16px;
+        label {
+            font-size: 0.875rem;
             font-weight: 500;
-            margin-bottom: 10px;
         }
 
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
+        input {
+            outline: none;
+            padding: 0.75rem;
+            font-size: 1rem;
         }
 
-        .loading-progress {
-            width: 300px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            margin: 30px auto 0;
-            overflow: hidden;
-        }
-
-        .loading-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0.7));
-            animation: progress 3s ease-in-out infinite;
-        }
-
-        @keyframes progress {
-            0% { width: 0%; }
-            50% { width: 70%; }
-            100% { width: 100%; }
-        }
-
-        .loading-dots {
-            color: white;
-            font-size: 40px;
-            margin-top: 20px;
-            letter-spacing: 5px;
-        }
-
-        .loading-dots span {
-            animation: blink 1.4s infinite;
-        }
-
-        .loading-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .loading-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 1; }
-        }
-
-        .login-container {
-            position: relative;
-            z-index: 10;
-            animation: fadeInScale 1s ease-out;
-        }
-
-        @keyframes fadeInScale {
-            from {
-                opacity: 0;
-                transform: scale(0.95) translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        .login-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(15px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 30px;
-            padding: 60px 50px;
-            width: 100%;
-            max-width: 480px;
-            box-shadow: 
-                0 10px 40px rgba(0, 0, 0, 0.2),
-                inset 0 0 80px rgba(255, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-            animation: shimmer 5s linear infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .login-title {
-            font-size: 64px;
-            font-weight: 800;
-            color: #fff;
-            text-align: center;
-            margin-bottom: 50px;
-            text-shadow: 
-                0 3px 15px rgba(0, 0, 0, 0.4),
-                0 0 40px rgba(0, 212, 255, 0.3);
-            position: relative;
-            z-index: 1;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-
-        .info-text {
-            background: rgba(255, 255, 255, 0.2);
-            border-left: 4px solid #fff;
-            padding: 16px;
-            margin-bottom: 24px;
-            border-radius: 12px;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.95);
-            line-height: 1.6;
-            position: relative;
-            z-index: 1;
-        }
-
-        .success-message {
-            background: rgba(16, 185, 129, 0.2);
-            border-left: 4px solid #10b981;
-            padding: 16px;
-            margin-bottom: 24px;
-            border-radius: 12px;
-            font-size: 14px;
-            color: #fff;
-            font-weight: 500;
-            position: relative;
-            z-index: 1;
-        }
-
-        .form-group {
-            margin-bottom: 30px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.95);
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 20px;
-            z-index: 2;
-        }
-
-        input[type="email"] {
-            width: 100%;
-            padding: 18px 55px 18px 22px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
-            font-size: 16px;
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s ease;
+        input:focus {
             outline: none;
         }
 
-        input[type="email"]::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        input[type="email"]:focus {
-            background: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.6);
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #FF8C42, #FF6B35);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Poppins', sans-serif;
-            box-shadow: 
-                0 10px 35px rgba(255, 140, 66, 0.5),
-                0 0 25px rgba(255, 107, 53, 0.4);
-            margin-bottom: 25px;
-            position: relative;
-            z-index: 1;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-3px);
-            box-shadow: 
-                0 15px 45px rgba(255, 140, 66, 0.6),
-                0 0 35px rgba(255, 107, 53, 0.5);
-            background: linear-gradient(135deg, #FF9D5C, #FF7B45);
-        }
-
-        .btn-submit:active {
-            transform: translateY(-1px);
+        .rounded-xl {
+            border-radius: 0.75rem;
         }
 
         .error-message {
-            color: #fff;
-            background: rgba(231, 76, 60, 0.9);
-            padding: 14px 18px;
-            border-radius: 12px;
-            font-size: 14px;
-            margin-top: 12px;
-            border-left: 5px solid #c0392b;
-            animation: shake 0.6s;
-            box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+            color: #ef4444;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+        .success-message {
+            color: #10b981;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
         }
 
-        @media (max-width: 580px) {
-            .login-card {
-                padding: 45px 35px;
-            }
+        button[type="submit"] {
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
 
-            .login-title {
-                font-size: 48px;
-                margin-bottom: 40px;
-            }
+        button[type="submit"]:hover {
+            opacity: 0.9;
+        }
 
-            input[type="email"] {
-                padding: 16px 50px 16px 18px;
-                font-size: 15px;
-            }
-
-            .btn-submit {
-                font-size: 16px;
-                padding: 16px;
-            }
+        /* Custom background */
+        .bg-pattern {
+            background-color: #f3f4f6;
         }
     </style>
-
-    <div class="network-bg">
-        <div class="network-line"></div>
-        <div class="network-line"></div>
-        <div class="network-line"></div>
-        <div class="network-line"></div>
-        <div class="glow-circle"></div>
-        <div class="glow-circle"></div>
-        <div class="glow-circle"></div>
-    </div>
-
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-content">
-            <div class="loading-spinner">
-                <div class="spinner-ring"></div>
-                <div class="spinner-ring"></div>
-                <div class="spinner-ring"></div>
-            </div>
-            <p class="loading-text">Sending Email</p>
-            <p class="loading-subtext">Please wait, sending password reset link</p>
-            <div class="loading-progress">
-                <div class="loading-progress-bar"></div>
-            </div>
-            <div class="loading-dots">
-                <span>.</span><span>.</span><span>.</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="login-container">
-        <div class="login-card">
-            <h1 class="login-title">Forgot Password</h1>
-
-            <div class="info-text">
-                {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-            </div>
-
-            @if (session('status'))
-                <div class="success-message">
-                    {{ session('status') }}
+</head>
+<body class="bg-pattern">
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+        <div style="width: 100%; max-width: 28rem;">
+            
+            <!-- Card Container -->
+            <div style="background-color: #1e293b; border-radius: 0.75rem; padding: 2rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+                
+                <!-- Info Text -->
+                <div class="error-message" style="margin-bottom: 1.5rem;">
+                    Lupa kata sandi Anda? Tidak masalah. Cukup beri tahu kami alamat email Anda dan kami akan mengirimkan tautan reset kata sandi melalui email Anda.
                 </div>
-            @endif
 
-            <form method="POST" action="{{ route('password.email') }}" id="forgotForm">
-                @csrf
-
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <div class="input-wrapper">
-                        <input 
-                            id="email" 
-                            type="email" 
-                            name="email" 
-                            value="{{ old('email') }}" 
-                            required 
-                            autofocus
-                            placeholder="Enter your email"
-                        />
-                        <span class="input-icon">📧</span>
+                <!-- Session Status (Laravel akan inject ini jika ada) -->
+                @if (session('status'))
+                    <div class="success-message">
+                        {{ session('status') }}
                     </div>
-                    @error('email')
-                        <div class="error-message">{{ $message }}</div>
-                    @enderror
-                </div>
+                @endif
 
-                <button type="submit" class="btn-submit">
-                    {{ __('Email Password Reset Link') }}
-                </button>
-            </form>
+                <!-- Form Laravel dengan @csrf dan action -->
+                <form method="POST" action="{{ route('password.email') }}">
+                    @csrf
+                    
+                    <!-- Email Field -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label for="email" style="display: block; color: #e2e8f0; margin-bottom: 0.5rem;">
+                            Email
+                        </label>
+                        <input
+                            id="email"
+                            type="email"
+                            name="email"
+                            value="{{ old('email') }}"
+                            style="width: 100%; background-color: #1e293b; border: 2px solid #3b82f6; border-radius: 0.375rem; color: #e2e8f0; padding: 0.75rem;"
+                            required
+                            autofocus
+                        />
+                        @error('email')
+                            <p style="color: #ef4444; font-size: 0.875rem; margin-top: 0.5rem;">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div>
+                        <button
+                            type="submit"
+                            style="width: 100%; background-color: #94a3b8; color: #1e293b; border-radius: 0.375rem; padding: 0.75rem; font-weight: 600; border: none; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.875rem;"
+                        >
+                            EMAIL PASSWORD RESET LINK
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Back to Login Link -->
+                <div style="margin-top: 1.5rem; text-align: center;">
+                    @if (Route::has('login'))
+                        <a href="{{ route('login') }}" style="color: #94a3b8; font-size: 0.875rem; text-decoration: none; transition: color 0.15s ease;">
+                            Back to Login
+                        </a>
+                    @endif
+                </div>
+            </div>
+
         </div>
     </div>
-
-    <script>
-        document.getElementById('forgotForm').addEventListener('submit', function() {
-            document.getElementById('loadingOverlay').classList.add('active');
-        });
-
-        @if ($errors->any())
-            document.addEventListener('DOMContentLoaded', function() {
-                document.getElementById('loadingOverlay').classList.remove('active');
-            });
-        @endif
-    </script>
-</x-guest-layout>
+</body>
+</html>
