@@ -46,9 +46,11 @@ return new class extends Migration
                 continue;
             }
 
-            Schema::table($tableName, function (Blueprint $table) {
-                $table->softDeletes(); // nambahin deleted_at nullable
-            });
+            if (Schema::hasTable($tableName) && ! Schema::hasColumn($tableName, 'deleted_at')) {
+                Schema::table($tableName, function (Blueprint $table) {
+                    $table->softDeletes(); // nambahin deleted_at nullable
+                });
+            }
         }
     }
 
@@ -62,9 +64,11 @@ return new class extends Migration
                 continue;
             }
 
-            Schema::table($tableName, function (Blueprint $table) {
-                $table->dropSoftDeletes();
-            });
+            if (Schema::hasTable($tableName) && Schema::hasColumn($tableName, 'deleted_at')) {
+                Schema::table($tableName, function (Blueprint $table) {
+                    $table->dropSoftDeletes();
+                });
+            }
         }
     }
 };

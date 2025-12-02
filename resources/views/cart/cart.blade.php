@@ -15,7 +15,7 @@
 
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: url('/images/anjingkucing.jpeg') center/cover no-repeat fixed;
+        background: url('/public/images/anjingkucing.jpeg') center/cover no-repeat fixed;
         min-height: 100vh;
         padding: 40px 20px;
         position: relative;

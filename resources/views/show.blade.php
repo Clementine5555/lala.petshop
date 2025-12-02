@@ -586,7 +586,7 @@
     </div>
 
     <script>
-        const productId = {{ $product->id }};
+        const productId = {{ $product->product_id ?? $product->getKey() }};
         const maxStock = {{ $product->stock ?? 15 }};
 
         // Toast functions

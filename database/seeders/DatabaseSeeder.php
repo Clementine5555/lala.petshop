@@ -22,8 +22,9 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        // seed groomers and services for grooming feature
+        // seed products, groomers and services
         $this->call([
+            \Database\Seeders\ProductSeeder::class,
             \Database\Seeders\GroomerSeeder::class,
             \Database\Seeders\ServiceSeeder::class,
         ]);

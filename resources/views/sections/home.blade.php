@@ -2,7 +2,7 @@
     <style>
         #home {
         background: 
-        linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+        linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)),
         url('{{ asset('images/background.jpeg') }}');
         background-size: cover;
         background-position: center;
@@ -115,7 +115,7 @@
         </div>
 
         <div class="hero-image">
-    <img src="{{ asset('images/kucinganjing.jpeg') }}" alt="Happy Pet">
+    <img src="{{ asset('images/anjingkucing.jpeg') }}" alt="Happy Pet">
 
         </div>
     </div>

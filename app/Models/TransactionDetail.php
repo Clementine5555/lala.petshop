@@ -2,35 +2,40 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class TransactionDetail extends BaseModel
+class Transaction_Detail extends Model
 {
-    use HasFactory, SoftDeletes;
-    
+    protected $table = 'transaction_detail';
     protected $primaryKey = 'transaction_detail_id';
-    // protected $fillable = [
-    //     'transaction_id',
-    //     'product_id',
-    //     'cart_id',
-    //     'quantity',
-    // ];
+    public $timestamps = true;
 
+    protected $fillable = [
+        'transaction_id',
+        'product_id',
+        'quantity',
+        'price',
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    /**
+     * Transaction Detail belongs to Transaction
+     */
     public function transaction(): BelongsTo
     {
         return $this->belongsTo(Transaction::class, 'transaction_id', 'transaction_id');
     }
 
+    /**
+     * Transaction Detail belongs to Product
+     */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'product_id', 'product_id');
-    }
-
-    public function refundDetails(): HasMany
-    {
-        return $this->hasMany(RefundDetail::class, 'transaction_detail_id', 'transaction_detail_id');
     }
 }
