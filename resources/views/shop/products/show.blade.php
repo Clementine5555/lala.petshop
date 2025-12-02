@@ -593,6 +593,21 @@
             ← Back to Products
         </a>
 
+        <!-- Product Details -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
+                <!-- Image -->
+                <div class="flex items-center justify-center bg-gradient-to-br from-orange-100 to-orange-50 rounded-lg h-96">
+                    @if ($product->image)
+                    <img src="{{ asset('img/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover rounded-lg">
+                    @else
+                        <div class="text-center">
+                            <svg class="w-24 h-24 text-orange-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <p class="text-orange-400 text-lg mt-4">No Image Available</p>
+                        </div>
+                    @endif
         <!-- Product Main Info -->
         <div class="product-main">
             <!-- Product Images -->
@@ -628,6 +643,31 @@
                     </div>
                 </div>
 
+                    <p class="text-gray-700 text-lg leading-relaxed mb-8">
+                        {{ $product->description ?? 'Premium quality product designed for your beloved pets. Trusted by pet owners everywhere.' }}
+                    </p>
+
+                    <!-- Add to Cart Form -->
+                    <form action="{{ route('cart.store') }}" method="POST" class="mb-6">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->product_id }}">
+
+                        <div class="flex items-center gap-4 mb-6">
+                            <label class="font-semibold text-gray-700">Quantity:</label>
+                            <div class="flex items-center border-2 border-gray-300 rounded-lg">
+                                <button type="button" class="px-4 py-2 text-gray-600 hover:bg-gray-100 transition" onclick="decreaseQty()">−</button>
+                                <input
+                                    type="number"
+                                    id="quantity"
+                                    name="quantity"
+                                    value="1"
+                                    min="1"
+                                    max="{{ $product->stock }}"
+                                    class="w-16 text-center border-none focus:outline-none font-semibold"
+                                >
+                                <button type="button" class="px-4 py-2 text-gray-600 hover:bg-gray-100 transition" onclick="increaseQty()">+</button>
+                            </div>
+                        </div>
                 <div class="product-price">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
 
                 <div class="stock-info {{ ($product->stock ?? 15) > 0 ? '' : 'out-of-stock' }}">
@@ -678,6 +718,38 @@
             </div>
 
             <!-- Review Form -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-lg p-6 sticky top-4">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Leave a Review</h2>
+
+                    @auth
+                        <form action="{{ route('reviews.store', $product->product_id) }}" method="POST">
+                            @csrf
+
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-semibold mb-2">Rating</label>
+                                <div class="flex gap-2">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        <button
+                                            type="button"
+                                            onclick="document.querySelector('input[name=rating]').value = {{ $i }}; updateStars({{ $i }})"
+                                            class="text-3xl transition hover:scale-110">
+                                            <span id="star-{{ $i }}" class="text-gray-300">★</span>
+                                        </button>
+                                    @endfor
+                                </div>
+                                <input type="hidden" name="rating" value="5">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-semibold mb-2">Comment</label>
+                                <textarea
+                                    name="comment"
+                                    rows="5"
+                                    placeholder="Share your experience with this product..."
+                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition resize-none">
+                                </textarea>
+                            </div>
             <div class="review-form" id="reviewForm">
                 <h3>Share Your Experience</h3>
                 <form onsubmit="submitReview(event)">

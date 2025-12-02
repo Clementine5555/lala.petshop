@@ -35,7 +35,7 @@
             margin-bottom: 50px;
         }
 
-        .product-image img {
+        .product-img img {
             width: 100%;
             max-width: 400px;
             height: auto;
@@ -131,7 +131,7 @@
                 padding: 40px;
                 text-align: center;
             }
-            .product-image img { margin: 0 auto; }
+            .product-img img { margin: 0 auto; }
             .rating { justify-content: center; }
         }
 
@@ -152,14 +152,14 @@
         </div>
 
         <div class="product-showcase">
-            <div class="product-image">
-                <img src="{{ asset('images/makanan.jpeg') }}" alt="Monge">
+            <div class="product-img">
+                <img src="{{ asset('img/makanan.jpeg') }}" alt="Monge">
             </div>
 
             <div class="product-details">
                 <h3>Pedigree</h3>
                 <p class="product-description">Nutrisi lengkap untuk anjing dewasa, 3kg</p>
-                
+
                 <div class="rating">
                     <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                     <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>

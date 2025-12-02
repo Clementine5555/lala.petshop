@@ -105,7 +105,7 @@
             <div class="contact-info-section">
                 <a href="mailto:petshoplala@gmail.com" class="contact-method">
                     <div class="contact-icon gmail">
-                        <img src="/images/gmail.png" alt="Gmail" style="width: 35px; height: 35px;">
+                        <img src="/img/gmail.png" alt="Gmail" style="width: 35px; height: 35px;">
                     </div>
                     <div class="contact-details">
                         <h4>Gmail</h4>
@@ -115,7 +115,7 @@
 
                 <a href="https://instagram.com/petshoplala" class="contact-method" target="_blank">
                     <div class="contact-icon instagram">
-                        <img src="/images/ig.png" alt="Instagram" style="width: 35px; height: 35px;">
+                        <img src="/img/ig.png" alt="Instagram" style="width: 35px; height: 35px;">
                     </div>
                     <div class="contact-details">
                         <h4>Instagram</h4>
@@ -125,7 +125,7 @@
 
                 <a href="https://wa.me/6282381182066" class="contact-method" target="_blank">
                     <div class="contact-icon whatsapp">
-                        <img src="/images/wa.png" alt="WhatsApp" style="width: 35px; height: 35px;">
+                        <img src="/img/wa.png" alt="WhatsApp" style="width: 35px; height: 35px;">
                     </div>
                     <div class="contact-details">
                         <h4>WhatsApp</h4>

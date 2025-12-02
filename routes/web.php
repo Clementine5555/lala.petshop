@@ -22,19 +22,22 @@ use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use App\Models\Product;
 
 // halaman utama
 Route::get('/', function () {
-    return view('welcome');
+    $products = Product::latest()->get();
+
+    return view('welcome', compact('products'));
 })->name('welcome');
 
-// Authentication & Email Verification 
+// Authentication & Email Verification
 require __DIR__.'/auth.php';
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
 
-// email verifikasi 
+// email verifikasi
 Route::get('/email/verify/{id}/{hash}', function () {
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
@@ -115,10 +118,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/cart/{id}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
     Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
-    
+    Route::post('/cart/add', [CartController::class, 'store'])->name('cart.add');
     Route::resource('pets', PetController::class);
 });
 
 // contact us routes
 Route::post('/contact/send', [ContactController::class, 'store'])->name('contact.send');
-

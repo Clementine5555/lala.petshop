@@ -1,16 +1,16 @@
 <section id="home" style="min-height: 100vh; position: relative; display: flex; align-items: center;">
     <style>
         #home {
-        background: 
-        linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)),
-        url('{{ asset('images/background.jpeg') }}');
+        background:
+        linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+        url('{{ asset('img/background.jpeg') }}');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         background-attachment: fixed;
     }
 
-        
+
         .hero-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -70,11 +70,11 @@
             box-shadow: 0 6px 25px rgba(255, 140, 66, 0.6);
         }
 
-        .hero-image {
+        .hero-img {
             position: relative;
         }
 
-        .hero-image img {
+        .hero-img img {
             width: 100%;
             height: auto;
             border-radius: 30px;
@@ -108,14 +108,14 @@
             <div class="hero-subtitle">Save Your Next</div>
             <h1 class="hero-title">BEST FRIEND</h1>
             <p class="hero-description">
-                Because your pets deserve more than just food they deserve comfort, care, and love. 
+                Because your pets deserve more than just food they deserve comfort, care, and love.
                 Find all their needs here and make every day a little happier for your best friend.
             </p>
             <a href="#products" class="hero-btn">Shop Now!</a>
         </div>
 
-        <div class="hero-image">
-    <img src="{{ asset('images/anjingkucing.jpeg') }}" alt="Happy Pet">
+        <div class="hero-img">
+    <img src="{{ asset('img/kucinganjing.jpeg') }}" alt="Happy Pet">
 
         </div>
     </div>
