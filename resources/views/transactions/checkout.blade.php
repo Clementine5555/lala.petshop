@@ -482,26 +482,24 @@
             <div class="order-summary">
                 <h2>Order Summary</h2>
                 
-                @if(session('cart') && count(session('cart')) > 0)
-                    @php
-                        $subtotal = 0;
-                    @endphp
+                {{-- LOGIC BARU: Cek variabel $cartItems (dari Database), BUKAN session --}}
+                @if(isset($cartItems) && count($cartItems) > 0)
                     
-                    @foreach(session('cart') as $id => $item)
-                    @php
-                        $itemTotal = $item['price'] * $item['quantity'];
-                        $subtotal += $itemTotal;
-                    @endphp
-                    
+                    @foreach($cartItems as $item)
                     <div class="order-item">
                         <div class="order-item-image">
-                            <img src="{{ $item['image'] ?? 'https://via.placeholder.com/70x70' }}" alt="{{ $item['name'] }}">
+                            {{-- Pastikan folder gambar sesuai, pakai placeholder kalau null --}}
+                            <img src="{{ $item->product->image ? asset('images/' . $item->product->image) : 'https://via.placeholder.com/70' }}" 
+                                alt="{{ $item->product->name }}">
                         </div>
                         <div class="order-item-info">
-                            <div class="order-item-name">{{ $item['name'] }}</div>
+                            {{-- Akses data sebagai OBJECT (pakai tanda panah ->) --}}
+                            <div class="order-item-name">{{ $item->product->name }}</div>
                             <div class="order-item-details">
-                                <span>Qty: {{ $item['quantity'] }}</span>
-                                <span class="order-item-price">Rp {{ number_format($itemTotal, 0, ',', '.') }}</span>
+                                <span>Qty: {{ $item->quantity }}</span>
+                                <span class="order-item-price">
+                                    Rp {{ number_format(($item->product->price * $item->quantity), 0, ',', '.') }}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -511,9 +509,9 @@
                     
                     <div class="summary-row">
                         <span>Subtotal</span>
-                        <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                        <span>Rp {{ number_format($total, 0, ',', '.') }}</span>
                     </div>
-                    
+
                     <div class="summary-row">
                         <span>Shipping</span>
                         <span>Rp 15.000</span>
@@ -521,20 +519,18 @@
                     
                     <div class="summary-row total">
                         <span>Total</span>
-                        <span>Rp {{ number_format($subtotal + 15000, 0, ',', '.') }}</span>
+                        {{-- Total + Ongkir --}}
+                        <span>Rp {{ number_format($total + 15000, 0, ',', '.') }}</span>
                     </div>           
-                        <button type="button" class="btn-place-order" onclick="submitCheckout()">
-                            Place Order
-                        </button>
+                    
+                    {{-- Tombol Submit Order --}}
+                    <button type="button" class="btn-place-order" onclick="submitCheckout()">
+                        Place Order
+                    </button>
 
-                    <div class="security-note">
-                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
-                        </svg>
-                        Secure checkout
-                    </div>
                 @else
-                    <p>Your cart is empty</p>
+                    {{-- Pesan kalau keranjang benar-benar kosong --}}
+                    <p>Keranjang belanja kosong.</p>
                 @endif
             </div>
         </div>

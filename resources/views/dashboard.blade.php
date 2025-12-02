@@ -651,6 +651,77 @@
                 flex-direction: column;
             }
         }
+
+            /* --- CSS FOOTER (WARNA COKLAT EMAS) --- */
+        footer {
+            background-color: #bf8c3c; /* Warna sesuai gambar */
+            color: white;
+            padding: 60px 0 20px;
+            margin-top: 50px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 60px;
+        }
+
+        /* Bagian Kiri */
+        .footer-logo-area { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .footer-logo-circle { width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .footer-logo-circle img { width: 35px; height: 35px; object-fit: contain; }
+        .footer-brand-name { font-size: 1.5em; font-weight: 800; letter-spacing: 0.5px; }
+        
+        .footer-desc { 
+            line-height: 1.6; margin-bottom: 40px; font-size: 1em; font-weight: 500;
+            max-width: 90%;
+        }
+
+        .footer-heading { 
+            font-weight: 800; font-size: 1.1em; margin-bottom: 15px; display: block; 
+            letter-spacing: 0.5px;
+        }
+
+        .footer-list { list-style: none; padding: 0; margin: 0; }
+        .footer-list li { margin-bottom: 10px; font-size: 0.95em; font-weight: 600; }
+        .footer-list.contact li { display: flex; align-items: flex-start; gap: 12px; font-weight: 600; }
+
+        /* Bagian Kanan */
+        .footer-right-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        /* Bagian Tengah (Follow Us) */
+        .footer-center {
+            text-align: center;
+            margin-top: 50px;
+            margin-bottom: 30px;
+        }
+        
+        /* Garis & Copyright */
+        .footer-line {
+            border: 0;
+            border-top: 3px solid white;
+            margin: 0 40px 25px 40px;
+            opacity: 1;
+        }
+
+        .copyright {
+            text-align: center;
+            font-size: 0.95em;
+            font-weight: 700;
+        }
+
+        @media (max-width: 992px) { 
+            .footer-container { grid-template-columns: 1fr; gap: 40px; } 
+        }
+
     </style>
 </head>
 <body>
@@ -983,5 +1054,73 @@
     }
     </script>
 
+    <footer>
+        <div class="footer-container">
+            <div class="footer-left">
+                <div class="footer-logo-area">
+                    <div class="footer-logo-circle">
+                        <img src="/img/logoo.png" alt="Petshop Lala">
+                    </div>
+                    <span class="footer-brand-name">Petshop Lala</span>
+                </div>
+                
+                <p class="footer-desc">
+                    Your trusted partner in pet care.<br>
+                    Menyediakan layanan grooming profesional<br>
+                    dan produk pet berkualitas sejak 2020.
+                </p>
+
+                <div class="footer-contact-area">
+                    <span class="footer-heading">Contact</span>
+                    <ul class="footer-list contact">
+                        <li><span>📍</span> Jl. Pet Lover No. 123, Medan</li>
+                        <li><span>📞</span> +62 812-3456-7890</li>
+                        <li><span>📧</span> info@petshoplala.com</li>
+                        <li><span>⏰</span> Mon-Sun: 08:00 - 20:00</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-right-grid">
+                <div>
+                    <span class="footer-heading">Services</span>
+                    <ul class="footer-list">
+                        <li>Pet Grooming</li>
+                        <li>Pet Hotel</li>
+                        <li>Health Check</li>
+                        <li>Appointment</li>
+                        <li>Booking</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <span class="footer-heading">Customer Service</span>
+                    <ul class="footer-list">
+                        <li>FAQs</li>
+                        <li>Refund Policy</li>
+                        <li>Payment Methods</li>
+                        <li>Terms & Conditions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-center">
+            <span class="footer-heading">Follow Us</span>
+            <div class="footer-list" style="font-weight: 600;">
+                Instagram @petshoplala<br>
+                Facebook<br>
+                TikTok<br>
+                WhatsApp Business
+            </div>
+        </div>
+
+        <hr class="footer-line">
+
+        <div class="copyright">
+            © 2025 Petshop Lala. All rights reserved. | Trusted by 10,000+ happy pet owners
+        </div>
+    </footer>
+    ```
 </body>
 </html>

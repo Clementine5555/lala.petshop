@@ -866,16 +866,13 @@
 </head>
 <body>
 
-    <!-- Navigation - SAMA PERSIS DENGAN DASHBOARD -->
     <nav>
         <div class="nav-container">
-            <!-- Logo -->
             <a href="{{ route('dashboard') }}" class="logo">
                 <img src="/images/logoo.png" alt="Petshop Lala">
                 <span>Petshop Lala</span>
             </a>
             
-            <!-- Navigation Links -->
             <ul class="nav-links">
                 <li><a href="{{ route('dashboard') }}#home">Home</a></li>
                 <li><a href="{{ route('dashboard') }}#appointment">Appointment</a></li>
@@ -883,18 +880,14 @@
                 <li><a href="{{ route('dashboard') }}#contact">Contact Us</a></li>
             </ul>
 
-            <!-- Right Section -->
             <div class="nav-right">
-                <!-- Cart Icon -->
                 <div class="cart-icon" onclick="window.location.href='{{ route('cart.index') }}'">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                     </svg>
                     @auth
                         @php
-                            $cartCount = \App\Models\Cart::where('user_id', auth()->id())
-                                                        ->where('status', 'active')
-                                                        ->sum('quantity');
+                            $cartCount = \App\Models\Cart::where('user_id', auth()->id())->sum('quantity');
                         @endphp
                         @if($cartCount > 0)
                         <span class="cart-badge" id="cartBadge">{{ $cartCount }}</span>
@@ -903,7 +896,6 @@
                 </div>
 
                 @auth
-                <!-- Profile Dropdown (Logged In) -->
                 <div class="profile-dropdown" id="profileDropdown">
                     <div class="profile-trigger" onclick="toggleDropdown()">
                         <img src="{{ Auth::user()->profile_photo_url ?? 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23FF8C42\'/%3E%3Cpath d=\'M50 45c8 0 15-7 15-15s-7-15-15-15-15 7-15 15 7 15 15 15zm0 5c-13 0-25 6-25 15v10h50V65c0-9-12-15-25-15z\' fill=\'white\'/%3E%3C/svg%3E' }}" 
@@ -935,7 +927,6 @@
                     </div>
                 </div>
                 @else
-                <!-- Auth Buttons (Not Logged In) -->
                 <div class="auth-buttons">
                     <a href="{{ route('login') }}" class="btn-login">Login</a>
                     <a href="{{ route('register') }}" class="btn-register">Register</a>
@@ -945,62 +936,6 @@
         </div>
     </nav>
 
-        <!-- Search Form -->
-        <form method="GET" action="{{ route('products.shop') }}" class="mb-8">
-            <div class="flex gap-4">
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Search products by name or category..."
-                    class="flex-1 px-6 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition"
-                />
-                <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-lg font-semibold transition">
-                    Search
-                </button>
-            </div>
-        </form>
-
-        <!-- Products Grid -->
-        @if($products->count())
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach($products as $product)
-                    <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition overflow-hidden group">
-                        <!-- Image Placeholder -->
-                        <div class="w-full h-48 bg-gradient-to-br from-orange-200 to-orange-100 flex items-center justify-center overflow-hidden relative">
-                            @if ($product->image)
-                            <img src="{{ asset('img/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-110 transition">
-                            @else
-                                <div class="text-center">
-                                    <svg class="w-16 h-16 text-orange-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <p class="text-orange-400 text-sm mt-2">No Image</p>
-                                </div>
-                            @endif
-                        </div>
-
-                        <!-- Content -->
-                        <div class="p-6">
-                            <div class="mb-3">
-                                <span class="inline-block bg-orange-100 text-orange-700 text-xs font-semibold px-3 py-1 rounded-full">
-                                    {{ $product->category ?? 'Uncategorized' }}
-                                </span>
-                            </div>
-
-                            <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{{ $product->name }}</h3>
-
-                            <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ $product->description ?? 'High quality product for your pets' }}</p>
-
-                            <div class="flex items-baseline justify-between mb-6">
-                                <span class="text-2xl font-bold text-orange-600">
-                                    Rp {{ number_format($product->price, 0, ',', '.') }}
-                                </span>
-                                <span class="text-sm text-gray-500">
-                                    {{ $product->stock }} in stock
-                                </span>
-                            </div>
-    <!-- Edit Profile Modal -->
     @auth
     <div class="modal" id="editProfileModal">
         <div class="modal-content">
@@ -1036,7 +971,6 @@
     </div>
     @endauth
 
-    <!-- Products Page Content -->
     <div class="products-page">
         <div class="page-header">
             <h1>Yummy Bites for Happy Pets</h1>
@@ -1049,67 +983,70 @@
         </div>
 
         <div class="products-grid" id="productsGrid">
-                <?php foreach($products as $product): ?>
-                <div class="product-card" data-id="<?php echo $product['product_id']; ?>">
-                <div class="product-image-wrapper">
-                    <img src="<?php echo $product['image_url']; ?>" alt="<?php echo $product['name']; ?>">
-                </div>
-                <div class="product-info">
-                    <h3><?php echo $product['name']; ?></h3>
-                    
-                    <div class="product-rating">
-                        <div class="stars">
-                            <?php for($i = 1; $i <= 5; $i++): ?>
-                                <span class="star <?php echo $i <= round($product['average_rating']) ? '' : 'empty'; ?>">★</span>
-                            <?php endfor; ?>
+            @if($products->count())
+                @foreach($products as $product)
+                <div class="product-card" data-id="{{ $product['product_id'] }}">
+                    <div class="product-image-wrapper">
+                        <img src="{{ $product['image_url'] }}" alt="{{ $product['name'] }}">
+                    </div>
+                    <div class="product-info">
+                        <h3>{{ $product['name'] }}</h3>
+                        
+                        <div class="product-rating">
+                            <div class="stars">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <span class="star {{ $i <= round($product['average_rating']) ? '' : 'empty' }}">★</span>
+                                @endfor
+                            </div>
+                            <span class="review-count">
+                                @if ($product['reviews_count'] > 0)
+                                    ({{ $product['reviews_count'] }} reviews)
+                                @else
+                                    (Belum ada review)
+                                @endif
+                            </span>
                         </div>
-                        <span class="review-count">
-                            <?php if ($product['reviews_count'] > 0): ?>
-                                (<?php echo $product['reviews_count']; ?> reviews)
-                            <?php else: ?>
-                                (Belum ada review)
-                            <?php endif; ?>
-                        </span>
-                    </div>
 
-                    <div class="product-price">Rp <?php echo number_format($product['price'], 0, ',', '.'); ?></div>
+                        <div class="product-price">Rp {{ number_format($product['price'], 0, ',', '.') }}</div>
 
-                    <div class="stock-status <?php echo $product['stock'] > 0 ? '' : 'out-of-stock'; ?>">
-                        <?php echo $product['stock'] > 0 ? '✓ Stock (' . $product['stock'] . ' tersedia)' : '✗ Out of Stock'; ?>
-                    </div>
+                        <div class="stock-status {{ $product['stock'] > 0 ? '' : 'out-of-stock' }}">
+                            {{ $product['stock'] > 0 ? '✓ Stock (' . $product['stock'] . ' tersedia)' : '✗ Out of Stock' }}
+                        </div>
 
-                    <div class="product-actions">
-                        <button class="btn btn-secondary" onclick="event.stopPropagation(); openProductDetail(<?php echo $product['product_id']; ?>)">
-                            Detail
-                        </button>
-                        <button class="btn btn-primary" onclick="event.stopPropagation(); addToCart(<?php echo $product['product_id']; ?>, '<?php echo addslashes($product['name']); ?>')" <?php echo $product['stock'] <= 0 ? 'disabled' : ''; ?>>
-                            Add to Cart
-                        </button>
+                        <div class="product-actions">
+                            <button class="btn btn-secondary" onclick="event.stopPropagation(); openProductDetail({{ $product['product_id'] }})">
+                                Detail
+                            </button>
+                            <button class="btn btn-primary" onclick="event.stopPropagation(); addToCart({{ $product['product_id'] }}, '{{ addslashes($product['name']) }}')" {{ $product['stock'] <= 0 ? 'disabled' : '' }}>
+                                Add to Cart
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <?php endforeach; ?>
+                @endforeach
+            @else
+                <div style="grid-column: 1/-1; text-align: center; padding: 50px; color: #666;">
+                    <h3>Tidak ada produk ditemukan.</h3>
+                </div>
+            @endif
         </div>
     </div>
 
-    <!-- Product Detail Modal -->
     <div class="product-modal" id="productModal">
         <div class="product-modal-content">
             <div class="product-modal-header">
                 <span class="product-modal-close" onclick="closeModal()">✕</span>
             </div>
             <div class="product-modal-body" id="modalBody">
-                <!-- Content loaded dynamically -->
-            </div>
+                </div>
             <div class="reviews-section" id="reviewsSection">
-                <!-- Reviews loaded dynamically -->
-            </div>
+                </div>
         </div>
     </div>
 
     <script>
         // Product data from backend
-        const productsData = <?php echo json_encode($products); ?>;
+        const productsData = @json($products);
         
         // Load reviews from database via API
         let allReviews = {};
@@ -1156,12 +1093,12 @@
             return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
         }
         document.addEventListener('DOMContentLoaded', async function() {
-            await loadReviewsFromDatabase(); // ✅ Tunggu sampai selesai
+            await loadReviewsFromDatabase(); 
             console.log('Page ready, reviews loaded');
         });
 
         // ============================================
-        // CART MANAGEMENT - TETAP FUNGSIONAL
+        // CART MANAGEMENT
         // ============================================
         function updateCartCount() {
             fetch('/cart/count')
@@ -1177,7 +1114,8 @@
                             newBadge.id = 'cartBadge';
                             newBadge.className = 'cart-badge';
                             newBadge.textContent = data.count;
-                            document.querySelector('.cart-icon').appendChild(newBadge);
+                            const cartIcon = document.querySelector('.cart-icon');
+                            if (cartIcon) cartIcon.appendChild(newBadge);
                         }
                     } else if (badge) {
                         badge.style.display = 'none';
@@ -1220,7 +1158,7 @@
         }
 
         // ============================================
-        // SEARCH FUNCTIONALITY - TETAP FUNGSIONAL
+        // SEARCH FUNCTIONALITY
         // ============================================
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
@@ -1229,7 +1167,7 @@
             productCards.forEach(card => {
                 const productName = card.querySelector('h3').textContent.toLowerCase();
                 if (productName.includes(searchTerm)) {
-                    card.style.display = 'block';
+                    card.style.display = 'flex';
                 } else {
                     card.style.display = 'none';
                 }
@@ -1237,7 +1175,7 @@
         });
 
         // ============================================
-        // PRODUCT DETAIL MODAL - TETAP FUNGSIONAL
+        // PRODUCT DETAIL MODAL
         // ============================================
         function openProductDetail(productId) {
             // menunggu reviews selesai load dulu
@@ -1246,7 +1184,6 @@
 
             const modal = document.getElementById('productModal');
             const modalBody = document.getElementById('modalBody');
-            // const reviewsSection = document.getElementById('reviewsSection');
 
             // Render product details
             const stars = Array.from({length: 5}, (_, i) => 
@@ -1292,42 +1229,40 @@
         }
 
         function renderReviews(productId) {
-    const reviewsSection = document.getElementById('reviewsSection');
-    const productReviews = allReviews[productId] || [];
+            const reviewsSection = document.getElementById('reviewsSection');
+            const productReviews = allReviews[productId] || [];
 
-    console.log(`Rendering reviews for product ${productId}:`, productReviews);
+            console.log(`Rendering reviews for product ${productId}:`, productReviews);
 
-    let reviewsHTML = `
-        <div class="reviews-header">
-            <h3>Customer Reviews (${productReviews.length})</h3>
-            <button class="btn-add-review" onclick="toggleReviewForm()">
-                ✍️ Tulis Review
-            </button>
-        </div>
-        
-        <div class="review-form" id="reviewForm">
-            <h4 style="margin-bottom: 20px; color: #333;">Tulis Review Anda</h4>
-            <form onsubmit="submitReview(event, ${productId})">
-                <div class="form-group">
-                    <label>Rating Anda</label>
-                    <div class="rating-input" id="ratingInput">
-                        ${Array.from({length: 5}, (_, i) => `<span onclick="setRating(${i + 1})">★</span>`).join('')}
-                    </div>
-                    <input type="hidden" id="ratingValue" name="rating" value="5">
+            let reviewsHTML = `
+                <div class="reviews-header">
+                    <h3>Customer Reviews (${productReviews.length})</h3>
+                    <button class="btn-add-review" onclick="toggleReviewForm()">
+                        ✍️ Tulis Review
+                    </button>
                 </div>
-                <!-- ❌ HAPUS INPUT NAMA -->
-                <div class="form-group">
-                    <label>Komentar Anda</label>
-                    <textarea class="form-control" name="comment" placeholder="Berikan review terbaik Anda..." required></textarea>
+                
+                <div class="review-form" id="reviewForm">
+                    <h4 style="margin-bottom: 20px; color: #333;">Tulis Review Anda</h4>
+                    <form onsubmit="submitReview(event, ${productId})">
+                        <div class="form-group">
+                            <label>Rating Anda</label>
+                            <div class="rating-input" id="ratingInput">
+                                ${Array.from({length: 5}, (_, i) => `<span onclick="setRating(${i + 1})">★</span>`).join('')}
+                            </div>
+                            <input type="hidden" id="ratingValue" name="rating" value="5">
+                        </div>
+                        <div class="form-group">
+                            <label>Komentar Anda</label>
+                            <textarea class="form-control" name="comment" placeholder="Berikan review terbaik Anda..." required></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Kirim Review</button>
+                            <button type="button" class="btn btn-secondary" onclick="toggleReviewForm()">Batal</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Kirim Review</button>
-                    <button type="button" class="btn btn-secondary" onclick="toggleReviewForm()">Batal</button>
-                </div>
-            </form>
-        </div>
-    `;
- 
+            `;
 
             if (productReviews.length > 0) {
                 productReviews.forEach(review => {
