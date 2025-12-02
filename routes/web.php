@@ -4,21 +4,24 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\ReviewController;  
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AppointmentController;
+// Tambahan: Import ContactController agar tidak error "Class not found"
+use App\Http\Controllers\ContactController;
 
 // halaman utama
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
-// Authentication & Email Verification 
+// Authentication & Email Verification
 require __DIR__.'/auth.php';
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
 
-// email verifikasi 
+// email verifikasi
 Route::get('/email/verify/{id}/{hash}', function () {
     // ...
 })->middleware(['auth', 'signed'])->name('verification.verify');
@@ -52,6 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
     Route::put('/cart/{id}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
+    Route::post('/cart/add', [CartController::class, 'store'])->name('cart.add');
 });
 
 // transaction routes
@@ -68,6 +72,9 @@ Route::middleware('auth')->group(function () {
     // deatil transaksi
     Route::get('/transactions/{id}', [TransactionController::class, 'show'])
         ->name('transactions.show');
+
+    Route::get('/appointment/create', [AppointmentController::class, 'create'])
+        ->name('appointment.create');
 });
 
 // review routes
@@ -75,3 +82,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/products/{productId}/reviews', [ReviewController::class, 'store'])
         ->name('reviews.store');
 });
+
+// CONTACT
+Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
