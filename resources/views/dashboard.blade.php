@@ -18,6 +18,7 @@
             overflow-x: hidden;
             padding-top: 50px;
             background: #f9f9f9;
+            min-width: 320px;
         }
         /* Navigation */
         nav {
@@ -31,13 +32,13 @@
         }
 
         .nav-container {
-            max-width: 1400px;
+            max-width: 1200px;  /* ← LEBIH KECIL */
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 30px;
-            gap: 30px;
+            padding: 0 20px;  /* ← PADDING LEBIH KECIL */
+            gap: 20px;
         }
 
         .logo {
@@ -193,12 +194,14 @@
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.3s;
+            display: none !important;
         }
 
         .profile-dropdown.active .dropdown-menu {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
+            display: block !important;
         }
 
         .dropdown-item {
@@ -664,10 +667,10 @@
         .footer-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 40px;
+            padding: 0 20px;
             display: grid;
             grid-template-columns: 1.2fr 1fr;
-            gap: 60px;
+            gap: 40;
         }
 
         /* Bagian Kiri */
@@ -730,7 +733,7 @@
         <div class="nav-container">
             <!-- Logo -->
             <a href="{{ route('dashboard') }}" class="logo">
-                <img src="/img/logoo.png" alt="Petshop Lala">
+                <img src="{{ asset('images/logoo.png') }}" alt="Petshop Lala">
                 <span>Petshop Lala</span>
             </a>
 
@@ -814,9 +817,22 @@
                 </svg>
             </div>
 
-            <form id="editProfileForm" method="POST" action="{{ route('profile.update') }}">
+            <form id="editProfileForm" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
                 @csrf
-                @method('PUT')
+                @method('PATCH')
+
+                <!-- Profile Photo Upload -->
+                <div class="form-group">
+                    <label>Profile Photo</label>
+                    <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
+                        <img id="previewPhoto" src="{{ Auth::user()->profile_photo_url ?? 'data:img/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2750%27 fill=%27%23FF8C42%27/%3E%3Cpath d=%27M50 45c8 0 15-7 15-15s-7-15-15-15-15 7-15 15 7 15 15 15zm0 5c-13 0-25 6-25 15v10h50V65c0-9-12-15-25-15z%27 fill=%27white%27/%3E%3C/svg%3E' }}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid #FF8C42;">
+                        <div style="display: flex; gap: 8px; flex-direction: column;">
+                            <button type="button" onclick="document.getElementById('photoUpload').click()" style="background: #FF8C42; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9em;">Upload Photo</button>
+                            <button type="button" onclick="deletePhoto()" style="background: #dc2626; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9em;">Delete Photo</button>
+                        </div>
+                    </div>
+                    <input type="file" id="photoUpload" name="profile_photo" accept="image/*" style="display: none;" onchange="previewProfilePhoto(event)">
+                </div>
 
                 <div class="form-group">
                     <label>Full Name</label>
@@ -833,7 +849,7 @@
                     <input type="tel" name="phone" id="userPhone" value="{{ Auth::user()->phone ?? '' }}" placeholder="Enter your phone">
                 </div>
 
-                <button type="button" onclick="saveProfile()" class="btn-register" style="width: 100%; padding: 12px; margin-top: 20px;">
+                <button type="submit" class="btn-register" style="width: 100%; padding: 12px; margin-top: 20px;">
                     Save Changes
                 </button>
             </form>
@@ -852,6 +868,7 @@
     <script>
         // Toast notification
         function showToast(message, type = 'success') {
+            if (!message) return; // avoid showing empty toast
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
 
@@ -923,6 +940,68 @@
             const modal = document.getElementById('editProfileModal');
             if (modal) {
                 modal.classList.remove('active');
+            }
+        }
+
+        // Close dropdowns/modals on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdown = document.getElementById('profileDropdown');
+            const modal = document.getElementById('editProfileModal');
+            
+            if (dropdown) {
+                dropdown.classList.remove('active');
+                const menu = dropdown.querySelector('.dropdown-menu');
+                if (menu) menu.style.display = 'none !important';
+            }
+            if (modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none !important';
+            }
+            
+            // Populate cart badge on load
+            try { updateCartBadge(); } catch (e) { console.warn('updateCartBadge not found', e); }
+
+            // Hide all modals and toasts with inline styles
+            try {
+                document.querySelectorAll('.modal').forEach(m => {
+                    m.classList.remove('active');
+                    m.style.display = 'none !important';
+                });
+            } catch (e) { /* ignore */ }
+
+            try {
+                const toast = document.getElementById('toast');
+                if (toast) {
+                    toast.classList.remove('show');
+                    toast.style.display = 'none !important';
+                }
+            } catch (e) { /* ignore */ }
+        });
+
+        function previewProfilePhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewPhoto').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function deletePhoto() {
+            if (confirm('Are you sure you want to delete your profile photo?')) {
+                // Create a hidden input to indicate deletion
+                const form = document.getElementById('editProfileForm');
+                const deleteInput = document.createElement('input');
+                deleteInput.type = 'hidden';
+                deleteInput.name = 'delete_profile_photo';
+                deleteInput.value = '1';
+                form.appendChild(deleteInput);
+                
+                // Reset file input and preview
+                document.getElementById('photoUpload').value = '';
+                document.getElementById('previewPhoto').src = 'data:img/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2750%27 fill=%27%23FF8C42%27/%3E%3Cpath d=%27M50 45c8 0 15-7 15-15s-7-15-15-15-15 7-15 15 7 15 15 15zm0 5c-13 0-25 6-25 15v10h50V65c0-9-12-15-25-15z%27 fill=%27white%27/%3E%3C/svg%3E';
             }
         }
 
@@ -1059,7 +1138,7 @@
             <div class="footer-left">
                 <div class="footer-logo-area">
                     <div class="footer-logo-circle">
-                        <img src="/img/logoo.png" alt="Petshop Lala">
+                        <img src="/images/logoo.png" alt="Petshop Lala">
                     </div>
                     <span class="footer-brand-name">Petshop Lala</span>
                 </div>

@@ -8,6 +8,11 @@ class CreateDeliveriesTable extends Migration
 {
     public function up()
     {
+        // Skip if table already exists
+        if (Schema::hasTable('deliveries')) {
+            return;
+        }
+
         Schema::create('deliveries', function (Blueprint $table) {
             $table->bigIncrements('delivery_id');
             $table->unsignedBigInteger('courier_id')->nullable();

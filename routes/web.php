@@ -77,6 +77,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/checkout', [TransactionController::class, 'showCheckoutPage'])
     ->name('checkout.process');
 
+    // halaman sukses checkout
+    Route::get('/transactions/success/{id}', [TransactionController::class, 'success'])
+    ->name('transactions.success');
+
     // riwayat transaksi
     Route::get('/transactions', [TransactionController::class, 'history'])
         ->name('transactions.history');
@@ -84,6 +88,8 @@ Route::middleware('auth')->group(function () {
     // deatil transaksi
     Route::get('/transactions/{id}', [TransactionController::class, 'show'])
         ->name('transactions.show');
+
+    Route::get('/checkout/success', [TransactionController::class, 'success'])->name('checkout.success');
 });
 
 // Reviews API 

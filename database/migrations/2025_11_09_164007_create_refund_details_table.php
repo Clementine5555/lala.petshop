@@ -8,6 +8,11 @@ class CreateRefundDetailsTable extends Migration
 {
     public function up()
     {
+        // Skip if table already exists
+        if (Schema::hasTable('refund_details')) {
+            return;
+        }
+
         Schema::create('refund_details', function (Blueprint $table) {
             $table->bigIncrements('refund_detail_id');
             $table->unsignedBigInteger('refund_id');

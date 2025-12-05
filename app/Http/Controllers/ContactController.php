@@ -29,11 +29,15 @@ class ContactController extends Controller
             ]);
             
         } catch (\Exception $e) {
-            Log::error('Contact form error: ' . $e->getMessage());
-            
+            Log::error('Contact form error: ' . $e->getMessage(), ['exception' => $e]);
+
+            // Return exception message when app is in debug mode to help diagnose issues locally.
+            $debugMessage = config('app.debug') ? $e->getMessage() : 'Failed to send message. Please try again.';
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to send message. Please try again.'
+                'message' => $debugMessage,
+                'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }

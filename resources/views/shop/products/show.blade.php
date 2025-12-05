@@ -697,7 +697,7 @@
                     </div>
 
                     <div class="action-buttons">
-                        <button type="submit" class="btn btn-primary" {{ ($product->stock ?? 15) <= 0 ? 'disabled' : '' }}>
+                        <button type="button" class="btn btn-primary" {{ ($product->stock ?? 15) <= 0 ? 'disabled' : '' }} onclick="addToCart()">
                             🛒 Add to Cart
                         </button>
                         <button type="button" class="btn btn-secondary" onclick="buyNow()">
@@ -723,8 +723,21 @@
                     <h2 class="text-2xl font-bold text-gray-900 mb-6">Leave a Review</h2>
 
                     @auth
-                        <form action="{{ route('reviews.store', $product->product_id) }}" method="POST">
-                            @csrf
+            <div class="review-form" id="reviewForm">
+                <h3>Share Your Experience</h3>
+                <form action="{{ route('reviews.store', $product->product_id) }}" method="POST" onsubmit="submitReview(event)">
+                    @csrf
+                    <div class="form-group">
+                        <label>Your Rating</label>
+                        <div class="rating-input" id="ratingInput">
+                            <span onclick="setRating(1)">★</span>
+                            <span onclick="setRating(2)">★</span>
+                            <span onclick="setRating(3)">★</span>
+                            <span onclick="setRating(4)">★</span>
+                            <span onclick="setRating(5)">★</span>
+                        </div>
+                        <input type="hidden" id="ratingValue" name="rating" value="5">
+                    </div>
 
                             <div class="mb-4">
                                 <label class="block text-gray-700 font-semibold mb-2">Rating</label>
@@ -750,21 +763,6 @@
                                     class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition resize-none">
                                 </textarea>
                             </div>
-            <div class="review-form" id="reviewForm">
-                <h3>Share Your Experience</h3>
-                <form onsubmit="submitReview(event)">
-                    <div class="form-group">
-                        <label>Your Rating</label>
-                        <div class="rating-input" id="ratingInput">
-                            <span onclick="setRating(1)">★</span>
-                            <span onclick="setRating(2)">★</span>
-                            <span onclick="setRating(3)">★</span>
-                            <span onclick="setRating(4)">★</span>
-                            <span onclick="setRating(5)">★</span>
-                        </div>
-                        <input type="hidden" id="ratingValue" name="rating" value="5">
-                    </div>
-
                     <div class="form-group">
                         <label>Your Name</label>
                         <input type="text" name="name" class="form-control" placeholder="Enter your name" required>
@@ -781,6 +779,7 @@
                     </div>
                 </form>
             </div>
+            @endauth
 
             <!-- Reviews List -->
             <div class="reviews-list">
@@ -824,6 +823,7 @@
 
     // Toast functions
     function showToast(message, type) {
+        if (!message) return; // don't show empty toasts
         type = type || 'success';
         const toast = document.getElementById('toast');
         const toastMessage = document.getElementById('toastMessage');
@@ -1004,6 +1004,56 @@
         console.log('Add to Cart button:', document.querySelector('.btn-primary'));
         console.log('Buy Now button:', document.querySelector('.btn-secondary'));
     });
+    
+    // Review form toggling and submission
+    function toggleReviewForm() {
+        const form = document.getElementById('reviewForm');
+        if (!form) return;
+        form.classList.toggle('active');
+        if (form.classList.contains('active')) {
+            form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function setRating(value) {
+        const ratingValue = document.getElementById('ratingValue');
+        if (!ratingValue) return;
+        ratingValue.value = value;
+        // highlight stars
+        for (let i = 1; i <= 5; i++) {
+            const star = document.getElementById('star-' + i);
+            if (!star) continue;
+            if (i <= value) star.classList.add('active'); else star.classList.remove('active');
+        }
+    }
+
+    async function submitReview(event) {
+        event.preventDefault();
+        const form = event.target.closest('form') || document.querySelector('#reviewForm form');
+        if (!form) return;
+        const formData = new FormData(form);
+        const url = form.getAttribute('action') || ('/reviews/' + productId);
+        const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+                body: formData
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(data.message || 'Review submitted', 'success');
+                // Optionally prepend review to list
+                // Reload reviews section via location reload or AJAX fetch — minimal approach: reload page to refresh reviews
+                setTimeout(() => { location.reload(); }, 600);
+            } else {
+                showToast(data.message || 'Failed to submit review', 'error');
+            }
+        } catch (err) {
+            console.error('Review submit error', err);
+            showToast('Failed to submit review', 'error');
+        }
+    }
 </script>
 </body>
 </html>

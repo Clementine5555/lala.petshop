@@ -44,6 +44,6 @@ class Refund extends Model
      */
     public function refundDetails(): HasMany
     {
-        return $this->hasMany(Refund_Detail::class, 'refund_id', 'refund_id');
+        return $this->hasMany(RefundDetail::class, 'refund_id', 'refund_id');
     }
 }

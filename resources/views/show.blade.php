@@ -591,6 +591,7 @@
 
         // Toast functions
         function showToast(message, type = 'success') {
+            if (!message) return; // don't show empty toasts
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
             

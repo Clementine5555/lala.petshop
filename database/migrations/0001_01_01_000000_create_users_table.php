@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('phone_number')->nullable();
             $table->enum('role', ['superadmin','admin','courier','customer'])->default('customer');
             $table->rememberToken();
+            // $table->softDeletes();
             $table->timestamps();
         });
 

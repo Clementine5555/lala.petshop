@@ -153,7 +153,7 @@
 
         <div class="product-showcase">
             <div class="product-img">
-                <img src="{{ asset('img/makanan.jpeg') }}" alt="Monge">
+                <img src="{{ asset('images/makanan.jpeg') }}" alt="Monge">
             </div>
 
             <div class="product-details">

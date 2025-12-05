@@ -8,6 +8,11 @@ class CreateTransactionsTable extends Migration
 {
     public function up()
     {
+        // Skip if table already exists (likely created by a previous migration)
+        if (Schema::hasTable('transactions')) {
+            return;
+        }
+
         Schema::create('transactions', function (Blueprint $table) {
             $table->bigIncrements('transaction_id');
             $table->unsignedBigInteger('user_id')->nullable();

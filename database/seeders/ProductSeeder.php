@@ -24,7 +24,7 @@ class ProductSeeder extends Seeder
                 'stock' => 15,
                 'category' => 'Cat Food',
                 'supplier_id' => null,
-                'image' => 'whiskas.avif',
+                'image' => 'whiskas.jpg',
             ],
             [
                 'product_id' => 2,
@@ -44,7 +44,7 @@ class ProductSeeder extends Seeder
                 'stock' => 20,
                 'category' => 'Cat Food',
                 'supplier_id' => null,
-                'image' => 'catDog.jpg',
+                'image' => 'caninneanj.jpeg',
             ],
             [
                 'product_id' => 4,

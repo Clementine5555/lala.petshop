@@ -105,7 +105,7 @@
             <div class="contact-info-section">
                 <a href="mailto:petshoplala@gmail.com" class="contact-method">
                     <div class="contact-icon gmail">
-                        <img src="/img/gmail.png" alt="Gmail" style="width: 35px; height: 35px;">
+                        <img src="/images/gmail.png" alt="Gmail" style="width: 35px; height: 35px;">
                     </div>
                     <div class="contact-details">
                         <h4>Gmail</h4>
@@ -115,7 +115,7 @@
 
                 <a href="https://instagram.com/petshoplala" class="contact-method" target="_blank">
                     <div class="contact-icon instagram">
-                        <img src="/img/ig.png" alt="Instagram" style="width: 35px; height: 35px;">
+                        <img src="/images/ig.png" alt="Instagram" style="width: 35px; height: 35px;">
                     </div>
                     <div class="contact-details">
                         <h4>Instagram</h4>
@@ -125,7 +125,7 @@
 
                 <a href="https://wa.me/6282381182066" class="contact-method" target="_blank">
                     <div class="contact-icon whatsapp">
-                        <img src="/img/wa.png" alt="WhatsApp" style="width: 35px; height: 35px;">
+                        <img src="/images/wa.png" alt="WhatsApp" style="width: 35px; height: 35px;">
                     </div>
                     <div class="contact-details">
                         <h4>WhatsApp</h4>
@@ -149,7 +149,7 @@
 </section>
 
 <script>
-document.getElementById('contactForm').addEventListener('submit', function(e) {
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
     const submitBtn = this.querySelector('button[type="submit"]');
@@ -164,13 +164,23 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
     fetch('{{ route("contact.send") }}', {
         method: 'POST',
         body: formData,
+        credentials: 'same-origin',
         headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}'
         }
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
+    .then(async response => {
+        const contentType = response.headers.get('content-type') || '';
+        let data;
+        if (contentType.includes('application/json')) {
+            data = await response.json();
+        } else {
+            // If server returned HTML (e.g. redirect to login or an error page), capture it for debugging
+            const text = await response.text();
+            throw new Error('Unexpected server response: ' + text.substring(0, 400));
+        }
+
+        if (response.ok && data.success) {
             showToast(data.message, 'success');
             this.reset();
         } else {
@@ -178,16 +188,15 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        showToast('An error occurred. Please try again.', 'error');
+        console.error('Contact form error:', error);
+        showToast('Failed to send message. Please try again.', 'error');
     })
     .finally(() => {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
     });
-});
-
-function showToast(message, type = 'success') {
+}function showToast(message, type = 'success') {
+    if (!message) return; // avoid showing empty toast
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toastMessage');
 
