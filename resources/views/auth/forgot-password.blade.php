@@ -1,6 +1,14 @@
-<x-guest-layout>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Forgot Password</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
         * {
             margin: 0;
@@ -9,101 +17,32 @@
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: #FF8C42;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #fbbf24 0%, #fb923c 50%, #f97316 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
             position: relative;
             overflow: hidden;
         }
 
-        body::before {
+        .gradient-bg::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('{{ asset('images/anjingg.jpg') }}');
-            background-size: cover;
-            background-position: center;
-            opacity: 0.3;
-            z-index: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(251, 191, 36, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(249, 115, 22, 0.3) 0%, transparent 50%);
+            animation: bgPulse 10s ease-in-out infinite;
         }
 
-        .network-bg {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            opacity: 0.2;
-            z-index: 1;
-        }
-
-        .network-line {
-            position: absolute;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            height: 2px;
-            animation: moveLine 10s linear infinite;
-        }
-
-        @keyframes moveLine {
-            0% {
-                transform: translateX(-100%) translateY(-100%);
-            }
-            100% {
-                transform: translateX(100%) translateY(100%);
-            }
-        }
-
-        .network-line:nth-child(1) { top: 20%; width: 300px; animation-delay: 0s; }
-        .network-line:nth-child(2) { top: 40%; width: 400px; animation-delay: 2s; }
-        .network-line:nth-child(3) { top: 60%; width: 350px; animation-delay: 4s; }
-        .network-line:nth-child(4) { top: 80%; width: 450px; animation-delay: 6s; }
-
-        .glow-circle {
-            position: absolute;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.25), transparent);
-            animation: pulse 4s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 0.2;
-            }
-            50% {
-                transform: scale(1.3);
-                opacity: 0.5;
-            }
-        }
-
-        .glow-circle:nth-child(5) {
-            width: 120px;
-            height: 120px;
-            top: 15%;
-            right: 20%;
-            animation-delay: 0s;
-        }
-
-        .glow-circle:nth-child(6) {
-            width: 180px;
-            height: 180px;
-            bottom: 20%;
-            left: 15%;
-            animation-delay: 2s;
-        }
-
-        .glow-circle:nth-child(7) {
-            width: 100px;
-            height: 100px;
-            top: 50%;
-            right: 10%;
-            animation-delay: 4s;
+        @keyframes bgPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
         .loading-overlay {
@@ -112,13 +51,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 140, 66, 0.95);
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.98) 0%, rgba(249, 115, 22, 0.98) 100%);
             backdrop-filter: blur(20px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            animation: fadeIn 0.5s ease;
+            animation: fadeIn 0.4s ease;
         }
 
         .loading-overlay.active {
@@ -135,9 +74,9 @@
         }
 
         .loading-spinner {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 40px;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 50px;
             position: relative;
         }
 
@@ -145,10 +84,9 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            border: 5px solid transparent;
-            border-top-color: #fff;
+            border: 4px solid transparent;
             border-radius: 50%;
-            animation: spin 1.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            animation: spin 2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
         }
 
         .spinner-ring:nth-child(1) {
@@ -157,12 +95,12 @@
         }
 
         .spinner-ring:nth-child(2) {
-            border-top-color: rgba(255, 255, 255, 0.7);
+            border-right-color: rgba(255, 255, 255, 0.7);
             animation-delay: -0.3s;
         }
 
         .spinner-ring:nth-child(3) {
-            border-top-color: rgba(255, 255, 255, 0.4);
+            border-bottom-color: rgba(255, 255, 255, 0.5);
             animation-delay: -0.15s;
         }
 
@@ -171,356 +109,180 @@
             100% { transform: rotate(360deg); }
         }
 
+        .loading-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 50px;
+        }
+
         .loading-text {
             color: white;
-            font-size: 28px;
-            font-weight: 700;
+            font-size: 32px;
+            font-weight: 800;
             margin-bottom: 20px;
-            animation: fadeInOut 2s infinite;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
 
         .loading-subtext {
             color: rgba(255, 255, 255, 0.9);
             font-size: 16px;
             font-weight: 500;
-            margin-bottom: 10px;
-        }
-
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
+            margin-bottom: 40px;
         }
 
         .loading-progress {
-            width: 300px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.3);
+            width: 320px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 10px;
-            margin: 30px auto 0;
+            margin: 0 auto;
             overflow: hidden;
         }
 
         .loading-progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0.7));
-            animation: progress 3s ease-in-out infinite;
+            background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0.8));
+            animation: progress 2.5s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
 
         @keyframes progress {
             0% { width: 0%; }
-            50% { width: 70%; }
+            50% { width: 80%; }
             100% { width: 100%; }
         }
 
-        .loading-dots {
-            color: white;
-            font-size: 40px;
-            margin-top: 20px;
-            letter-spacing: 5px;
+        .card {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 32px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 0.8s ease-out;
         }
 
-        .loading-dots span {
-            animation: blink 1.4s infinite;
-        }
-
-        .loading-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .loading-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 1; }
-        }
-
-        .login-container {
-            position: relative;
-            z-index: 10;
-            animation: fadeInScale 1s ease-out;
-        }
-
-        @keyframes fadeInScale {
+        @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: scale(0.95) translateY(20px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
-                transform: scale(1) translateY(0);
+                transform: translateY(0);
             }
         }
 
-        .login-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(15px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 30px;
-            padding: 60px 50px;
-            width: 100%;
-            max-width: 480px;
-            box-shadow: 
-                0 10px 40px rgba(0, 0, 0, 0.2),
-                inset 0 0 80px rgba(255, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-            animation: shimmer 5s linear infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .login-title {
-            font-size: 64px;
-            font-weight: 800;
-            color: #fff;
-            text-align: center;
-            margin-bottom: 50px;
-            text-shadow: 
-                0 3px 15px rgba(0, 0, 0, 0.4),
-                0 0 40px rgba(0, 212, 255, 0.3);
-            position: relative;
-            z-index: 1;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-
-        .info-text {
-            background: rgba(255, 255, 255, 0.2);
-            border-left: 4px solid #fff;
-            padding: 16px;
-            margin-bottom: 24px;
-            border-radius: 12px;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.95);
-            line-height: 1.6;
-            position: relative;
-            z-index: 1;
-        }
-
-        .success-message {
-            background: rgba(16, 185, 129, 0.2);
-            border-left: 4px solid #10b981;
-            padding: 16px;
-            margin-bottom: 24px;
-            border-radius: 12px;
-            font-size: 14px;
-            color: #fff;
-            font-weight: 500;
-            position: relative;
-            z-index: 1;
-        }
-
-        .form-group {
-            margin-bottom: 30px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.95);
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 20px;
-            z-index: 2;
-        }
-
-        input[type="email"] {
-            width: 100%;
-            padding: 18px 55px 18px 22px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
-            font-size: 16px;
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s ease;
+        input:focus {
             outline: none;
+            border-color: rgba(251, 146, 60, 0.8) !important;
+            box-shadow: 0 0 0 4px rgba(251, 146, 60, 0.2);
         }
 
-        input[type="email"]::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        input[type="email"]:focus {
-            background: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.6);
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #FF8C42, #FF6B35);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
+        button[type="submit"] {
             transition: all 0.3s ease;
-            font-family: 'Poppins', sans-serif;
-            box-shadow: 
-                0 10px 35px rgba(255, 140, 66, 0.5),
-                0 0 25px rgba(255, 107, 53, 0.4);
-            margin-bottom: 25px;
-            position: relative;
-            z-index: 1;
-            text-transform: uppercase;
-            letter-spacing: 2px;
         }
 
-        .btn-submit:hover {
-            transform: translateY(-3px);
-            box-shadow: 
-                0 15px 45px rgba(255, 140, 66, 0.6),
-                0 0 35px rgba(255, 107, 53, 0.5);
-            background: linear-gradient(135deg, #FF9D5C, #FF7B45);
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(249, 115, 22, 0.4);
         }
 
-        .btn-submit:active {
-            transform: translateY(-1px);
+        button[type="submit"]:active {
+            transform: translateY(0);
         }
 
-        .error-message {
-            color: #fff;
-            background: rgba(231, 76, 60, 0.9);
-            padding: 14px 18px;
-            border-radius: 12px;
-            font-size: 14px;
-            margin-top: 12px;
-            border-left: 5px solid #c0392b;
-            animation: shake 0.6s;
-            box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+        a {
+            transition: all 0.3s ease;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-
-        @media (max-width: 580px) {
-            .login-card {
-                padding: 45px 35px;
-            }
-
-            .login-title {
-                font-size: 48px;
-                margin-bottom: 40px;
-            }
-
-            input[type="email"] {
-                padding: 16px 50px 16px 18px;
-                font-size: 15px;
-            }
-
-            .btn-submit {
-                font-size: 16px;
-                padding: 16px;
-            }
+        a:hover {
+            text-shadow: 0 0 10px rgba(194, 65, 12, 0.5);
         }
     </style>
-
-    <div class="network-bg">
-        <div class="network-line"></div>
-        <div class="network-line"></div>
-        <div class="network-line"></div>
-        <div class="network-line"></div>
-        <div class="glow-circle"></div>
-        <div class="glow-circle"></div>
-        <div class="glow-circle"></div>
-    </div>
-
+</head>
+<body>
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
             <div class="loading-spinner">
                 <div class="spinner-ring"></div>
                 <div class="spinner-ring"></div>
                 <div class="spinner-ring"></div>
+                <div class="loading-icon">📧</div>
             </div>
-            <p class="loading-text">Sending Email</p>
-            <p class="loading-subtext">Please wait, sending password reset link</p>
+            <p class="loading-text">Sending Reset Link</p>
+            <p class="loading-subtext">Please wait while we send the email</p>
             <div class="loading-progress">
                 <div class="loading-progress-bar"></div>
-            </div>
-            <div class="loading-dots">
-                <span>.</span><span>.</span><span>.</span>
             </div>
         </div>
     </div>
 
-    <div class="login-container">
-        <div class="login-card">
-            <h1 class="login-title">Forgot Password</h1>
-
-            <div class="info-text">
-                {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-            </div>
-
-            @if (session('status'))
-                <div class="success-message">
-                    {{ session('status') }}
+    <div class="gradient-bg" style="display: flex; align-items: center; justify-content: center; padding: 2rem;">
+        <div style="width: 100%; max-width: 28rem; position: relative; z-index: 10;">
+            
+            <div class="card" style="padding: 2.5rem;">
+                
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 56px; margin-bottom: 1rem;">🔐</div>
+                    <h1 style="font-size: 2rem; font-weight: 800; color: white; margin-bottom: 0.5rem;">Forgot Password?</h1>
+                    <p style="color: rgba(255, 255, 255, 0.8); font-size: 0.875rem;">No worries, we'll send you reset instructions</p>
                 </div>
-            @endif
 
-            <form method="POST" action="{{ route('password.email') }}" id="forgotForm">
-                @csrf
+                <div style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); border-left: 4px solid #fff; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; color: rgba(255, 255, 255, 0.95); font-size: 0.875rem; line-height: 1.6;">
+                    Lupa kata sandi Anda? Tidak masalah. Cukup beri tahu kami alamat email Anda dan kami akan mengirimkan tautan reset kata sandi melalui email Anda.
+                </div>
 
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <div class="input-wrapper">
-                        <input 
-                            id="email" 
-                            type="email" 
-                            name="email" 
-                            value="{{ old('email') }}" 
-                            required 
+                @if (session('status'))
+                    <div style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.3); border-left: 4px solid #10b981; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; color: white; font-size: 0.875rem;">
+                        {{ session('status') }}
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('password.email') }}" id="forgotForm">
+                    @csrf
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label for="email" style="display: block; color: rgba(255, 255, 255, 0.95); margin-bottom: 0.75rem; font-weight: 600; font-size: 0.875rem; letter-spacing: 0.5px;">
+                            Email Address
+                        </label>
+                        <input
+                            id="email"
+                            type="email"
+                            name="email"
+                            value="{{ old('email') }}"
+                            style="width: 100%; background: rgba(255, 255, 255, 0.5); border: none; border-bottom: 2px solid #fb923c; padding: 0.875rem; color: #1f2937; transition: all 0.3s ease;"
+                            required
                             autofocus
                             placeholder="Enter your email"
                         />
-                        <span class="input-icon">📧</span>
+                        @error('email')
+                            <p style="color: #dc2626; font-size: 0.875rem; margin-top: 0.5rem;">{{ $message }}</p>
+                        @enderror
                     </div>
-                    @error('email')
-                        <div class="error-message">{{ $message }}</div>
-                    @enderror
-                </div>
 
-                <button type="submit" class="btn-submit">
-                    {{ __('Email Password Reset Link') }}
-                </button>
-            </form>
+                    <div style="margin-bottom: 1.5rem;">
+                        <button
+                            type="submit"
+                            style="width: 100%; background: linear-gradient(135deg, #f97316, #ea580c); color: white; border-radius: 12px; padding: 1rem; font-weight: 700; border: none; text-transform: uppercase; letter-spacing: 1px; font-size: 0.875rem; box-shadow: 0 10px 30px rgba(249, 115, 22, 0.3); cursor: pointer;"
+                        >
+                            Send Reset Link
+                        </button>
+                    </div>
+                </form>
+
+                <div style="text-align: center; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.3);">
+                    @if (Route::has('login'))
+                        <a href="{{ route('login') }}" style="color: rgba(255, 255, 255, 0.9); font-size: 0.875rem; text-decoration: none; font-weight: 500;">
+                            ← Back to Login
+                        </a>
+                    @endif
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -535,4 +297,5 @@
             });
         @endif
     </script>
-</x-guest-layout>
+</body>
+</html>
