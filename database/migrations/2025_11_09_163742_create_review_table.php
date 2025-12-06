@@ -15,10 +15,10 @@ return new class extends Migration
             $table->bigIncrements('review_id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('product_id');
-            $table->tinyInteger('rate')->unsigned()->default(5);
+            $table->integer('rating');
             $table->text('comment')->nullable();
             $table->dateTime('date')->nullable();
-            
+            $table->timestamps();
             $table->index('user_id');
             $table->index('product_id');
             
@@ -33,6 +33,7 @@ return new class extends Migration
                 ->on('products')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
+            
         });
     }
 

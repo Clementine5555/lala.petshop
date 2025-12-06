@@ -586,11 +586,12 @@
     </div>
 
     <script>
-        const productId = {{ $product->id }};
+        const productId = {{ $product->product_id ?? $product->getKey() }};
         const maxStock = {{ $product->stock ?? 15 }};
 
         // Toast functions
         function showToast(message, type = 'success') {
+            if (!message) return; // don't show empty toasts
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
             

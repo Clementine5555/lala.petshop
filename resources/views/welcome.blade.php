@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="user-authenticated" content="{{ auth()->check() ? 'true' : 'false' }}">
     <title>Petshop Lala - Your Trusted Pet Care Partner</title>
-    
+
     <style>
         * {
             margin: 0;
@@ -194,12 +195,14 @@
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.3s;
+            display: none !important;
         }
 
         .profile-dropdown.active .dropdown-menu {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
+            display: block !important;
         }
 
         .dropdown-item {
@@ -493,9 +496,11 @@
     <nav>
         <div class="nav-container">
             <!-- Logo -->
-            <img src="/images/logoo.png" alt="Petshop Lala">
-            
-            
+            <a href="{{ route('welcome') }}" class="logo">
+                <img src="{{ asset('images/logoo.png') }}" alt="Petshop Lala">
+                <span>Petshop Lala</span>
+            </a>
+
             <!-- Navigation Links -->
             <ul class="nav-links">
                 <li><a href="#home" class="active">Home</a></li>
@@ -520,8 +525,8 @@
                 <!-- Profile Dropdown (Logged In) -->
                 <div class="profile-dropdown" id="profileDropdown">
                     <div class="profile-trigger" onclick="toggleDropdown()">
-                        <img src="{{ Auth::user()->profile_photo_url ?? 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23FF8C42\'/%3E%3Cpath d=\'M50 45c8 0 15-7 15-15s-7-15-15-15-15 7-15 15 7 15 15 15zm0 5c-13 0-25 6-25 15v10h50V65c0-9-12-15-25-15z\' fill=\'white\'/%3E%3C/svg%3E' }}" 
-                             alt="User" 
+                        <img src="{{ Auth::user()->profile_photo_url ?? 'data:img/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23FF8C42\'/%3E%3Cpath d=\'M50 45c8 0 15-7 15-15s-7-15-15-15-15 7-15 15 7 15 15 15zm0 5c-13 0-25 6-25 15v10h50V65c0-9-12-15-25-15z\' fill=\'white\'/%3E%3C/svg%3E' }}"
+                             alt="User"
                              class="profile-avatar">
                         <span class="profile-name">{{ Auth::user()->name }}</span>
                         <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -570,10 +575,23 @@
                 </svg>
             </div>
 
-            <form id="editProfileForm" method="POST" action="{{ route('profile.update') }}">
+            <form id="editProfileForm" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
                 @csrf
-                @method('PUT')
-                
+                @method('PATCH')
+
+                <!-- Profile Photo Upload -->
+                <div class="form-group">
+                    <label>Profile Photo</label>
+                    <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
+                        <img id="previewPhoto" src="{{ Auth::user()->profile_photo_url ?? 'data:img/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2750%27 fill=%27%23FF8C42%27/%3E%3Cpath d=%27M50 45c8 0 15-7 15-15s-7-15-15-15-15 7-15 15 7 15 15 15zm0 5c-13 0-25 6-25 15v10h50V65c0-9-12-15-25-15z%27 fill=%27white%27/%3E%3C/svg%3E' }}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid #FF8C42;">
+                        <div style="display: flex; gap: 8px; flex-direction: column;">
+                            <button type="button" onclick="document.getElementById('photoUpload').click()" style="background: #FF8C42; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9em;">Upload Photo</button>
+                            <button type="button" onclick="deletePhoto()" style="background: #dc2626; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9em;">Delete Photo</button>
+                        </div>
+                    </div>
+                    <input type="file" id="photoUpload" name="profile_photo" accept="image/*" style="display: none;" onchange="previewProfilePhoto(event)">
+                </div>
+
                 <div class="form-group">
                     <label>Full Name</label>
                     <input type="text" name="name" id="userName" value="{{ Auth::user()->name }}" placeholder="Enter your name">
@@ -606,13 +624,14 @@
     <script>
         // Toast notification
         function showToast(message, type = 'success') {
+            if (!message) return; // don't show empty toasts
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
-            
+
             toast.className = `toast ${type}`;
             toastMessage.textContent = message;
             toast.classList.add('show');
-            
+
             setTimeout(() => {
                 hideToast();
             }, 4000);
@@ -667,6 +686,33 @@
             document.getElementById('editProfileModal').classList.remove('active');
         }
 
+        function previewProfilePhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewPhoto').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function deletePhoto() {
+            if (confirm('Are you sure you want to delete your profile photo?')) {
+                // Create a hidden input to indicate deletion
+                const form = document.getElementById('editProfileForm');
+                const deleteInput = document.createElement('input');
+                deleteInput.type = 'hidden';
+                deleteInput.name = 'delete_profile_photo';
+                deleteInput.value = '1';
+                form.appendChild(deleteInput);
+                
+                // Reset file input and preview
+                document.getElementById('photoUpload').value = '';
+                document.getElementById('previewPhoto').src = 'data:img/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2750%27 fill=%27%23FF8C42%27/%3E%3Cpath d=%27M50 45c8 0 15-7 15-15s-7-15-15-15-15 7-15 15 7 15 15 15zm0 5c-13 0-25 6-25 15v10h50V65c0-9-12-15-25-15z%27 fill=%27white%27/%3E%3C/svg%3E';
+            }
+        }
+
         const modal = document.getElementById('editProfileModal');
         if (modal) {
             modal.addEventListener('click', function(event) {
@@ -674,11 +720,14 @@
             });
         }
 
-        // Scroll nav highlight
+        // Scroll nav highlight — only intercept hash links
         document.querySelectorAll('.nav-links a').forEach(link => {
             link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href') || '';
+                if (!href.startsWith('#')) return; // allow normal navigation for non-hash links
+
                 e.preventDefault();
-                const targetId = this.getAttribute('href').substring(1);
+                const targetId = href.substring(1);
                 const target = document.getElementById(targetId);
                 if (target) {
                     document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
@@ -691,7 +740,7 @@
         window.addEventListener('scroll', function() {
             const sections = document.querySelectorAll('main > section');
             const navLinks = document.querySelectorAll('.nav-links a');
-            
+
             let current = '';
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
@@ -708,6 +757,38 @@
             });
         });
 
+        // Populate cart badge on load and force hide any UI overlays
+        document.addEventListener('DOMContentLoaded', function() {
+            try { updateCartBadge(); } catch (e) { console.warn('updateCartBadge not found', e); }
+
+            // Force close profile dropdown with inline style
+            try {
+                const profileDropdown = document.getElementById('profileDropdown');
+                if (profileDropdown) {
+                    profileDropdown.classList.remove('active');
+                    const menu = profileDropdown.querySelector('.dropdown-menu');
+                    if (menu) menu.style.display = 'none !important';
+                }
+            } catch (e) { /* ignore */ }
+
+            // Force close any modal overlays
+            try {
+                document.querySelectorAll('.modal').forEach(m => {
+                    m.classList.remove('active');
+                    m.style.display = 'none !important';
+                });
+            } catch (e) { /* ignore */ }
+
+            // Hide toasts
+            try {
+                const toast = document.getElementById('toast');
+                if (toast) {
+                    toast.classList.remove('show');
+                    toast.style.display = 'none !important';
+                }
+            } catch (e) { /* ignore */ }
+        });
+
         @if(session('success'))
             showToast('{{ session('success') }}', 'success');
         @endif
@@ -716,6 +797,75 @@
             showToast('{{ session('error') }}', 'error');
         @endif
     </script>
+
+    <!-- Footer (copied from layouts/app to ensure homepage shows footer) -->
+    <footer style="background-color: #bf8c3c; color: white; padding: 60px 0 20px; margin-top: 50px; font-family: 'Segoe UI', sans-serif;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                    <div style="width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <img src="{{ asset('images/logoo.png') }}" alt="Petshop Lala" style="width: 35px; height: 35px; object-fit: contain;">
+                    </div>
+                    <span style="font-size: 1.5em; font-weight: 800; letter-spacing: 0.5px;">Petshop Lala</span>
+                </div>
+
+                <p style="line-height: 1.6; margin-bottom: 40px; font-size: 1em; font-weight: 500; max-width: 90%;">
+                    Your trusted partner in pet care.<br>
+                    Menyediakan layanan grooming profesional<br>
+                    dan produk pet berkualitas sejak 2020.
+                </p>
+
+                <div>
+                    <span style="font-weight: 800; font-size: 1.1em; margin-bottom: 15px; display: block; letter-spacing: 0.5px;">Contact</span>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600; display: flex; align-items: flex-start; gap: 12px;"><span>📍</span> Jl. Pet Lover No. 123, Medan</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600; display: flex; align-items: flex-start; gap: 12px;"><span>📞</span> +62 812-3456-7890</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600; display: flex; align-items: flex-start; gap: 12px;"><span>📧</span> info@petshoplala.com</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600; display: flex; align-items: flex-start; gap: 12px;"><span>⏰</span> Mon-Sun: 08:00 - 20:00</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <span style="font-weight: 800; font-size: 1.1em; margin-bottom: 15px; display: block; letter-spacing: 0.5px;">Services</span>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">Pet Grooming</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">Pet Hotel</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">Health Check</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">Appointment</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">Booking</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <span style="font-weight: 800; font-size: 1.1em; margin-bottom: 15px; display: block; letter-spacing: 0.5px;">Customer Service</span>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">FAQs</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">Refund Policy</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">Payment Methods</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">Terms & Conditions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px; margin-bottom: 30px;">
+            <span style="font-weight: 800; font-size: 1.1em; margin-bottom: 15px; display: block; letter-spacing: 0.5px;">Follow Us</span>
+            <div style="font-weight: 600;">
+                Instagram @petshoplala<br>
+                Facebook<br>
+                TikTok<br>
+                WhatsApp Business
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 3px solid white; margin: 0 40px 25px 40px; opacity: 1;">
+
+        <div style="text-align: center; font-size: 0.95em; font-weight: 700;">
+            © 2025 Petshop Lala. All rights reserved. | Trusted by 10,000+ happy pet owners
+        </div>
+    </footer>
 
 </body>
 </html>

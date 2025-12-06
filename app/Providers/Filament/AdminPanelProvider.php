@@ -29,7 +29,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->sidebarCollapsibleOnDesktop()
             ->brandLogo(fn () => view('filament.admin.logo'))
-            ->favicon('img/logo.png')
+            ->favicon('images/logo.png')
             ->path('admin')
             ->resources([
                 UserResource::class,

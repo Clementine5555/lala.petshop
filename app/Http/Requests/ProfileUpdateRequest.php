@@ -26,6 +26,9 @@ class ProfileUpdateRequest extends FormRequest
                 // Ignore the currently authenticated user by primary key (works with custom PK)
                 Rule::unique(User::class)->ignore($this->user()->getKey(), $this->user()->getKeyName()),
             ],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'profile_photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'delete_profile_photo' => ['nullable', 'boolean'],
         ];
     }
 }

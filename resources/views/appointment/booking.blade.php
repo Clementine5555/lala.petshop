@@ -435,22 +435,26 @@
                 <div class="form-group">
                     <label>Service</label>
                     
-                    <div class="service-checkbox">
-                        <input type="checkbox" id="bath_only" name="services[]" value="bath_only" data-price="400000">
+                    <div class="service-radio-group">
+                    @foreach($services as $srv)
+                    <label class="service-checkbox" style="display: flex; gap: 10px; align-items: start; cursor: pointer;">
+                        <input type="radio" 
+                            name="service_id" 
+                            value="{{ $srv->service_id }}" 
+                            data-name="{{ $srv->service_name }}"
+                            data-price="{{ $srv->price }}"
+                            onchange="updateSummary()"
+                            {{ (isset($selectedService) && $selectedService->service_id == $srv->service_id) ? 'checked' : '' }}
+                            required 
+                            style="width: 20px; height: 20px; margin-top: 5px;">
+                        
                         <div class="service-info">
-                            <strong>Bath Only - Rp 50.000</strong>
+                            <strong>{{ $srv->service_name }} - Rp {{ number_format($srv->price, 0, ',', '.') }}</strong>
+                            <span style="display:block; font-size: 0.9em; color: #666;">{{ $srv->description }}</span>
                         </div>
-                    </div>
-
-                    <div class="service-checkbox">
-                        <input type="checkbox" id="full_grooming" name="services[]" value="full_grooming" data-price="750000">
-                        <div class="service-info">
-                            <strong>Full Grooming - Rp 120.000 (bath, haircut, ear cleaning, perfume)</strong>
-                            <span>Complete grooming package</span>
-                        </div>
-                    </div>
-
-
+                    </label>
+                    @endforeach
+                </div>
 
                 <div class="form-group">
                     <label for="notes">Additional Notes</label>
@@ -597,14 +601,30 @@
             const services = [];
             let totalPrice = 0;
             
-            document.querySelectorAll('input[name="services[]"]:checked').forEach(checkbox => {
-                const serviceText = checkbox.nextElementSibling.querySelector('strong').textContent;
-                services.push(serviceText);
-                totalPrice += parseInt(checkbox.dataset.price);
-            });
+            function updateSummary() {
+
+            const petName = document.getElementById('pet_name').value;
+            document.getElementById('summary_pet').textContent = petName || '-';
             
-            document.getElementById('summary_service').textContent = services.length > 0 ? services.join(', ') : '-';
-            document.getElementById('summary_price').textContent = 'Rp ' + totalPrice.toLocaleString('id-ID');
+            const date = document.getElementById('appointment_date').value;
+            document.getElementById('summary_date').textContent = date || '-';
+            
+            const time = document.getElementById('appointment_time').value;
+            document.getElementById('summary_time').textContent = time || '-';
+           
+            const selectedService = document.querySelector('input[name="service_id"]:checked');
+            
+            if (selectedService) {
+                const name = selectedService.dataset.name;
+                const price = parseInt(selectedService.dataset.price);
+                
+                document.getElementById('summary_service').textContent = name;
+                document.getElementById('summary_price').textContent = 'Rp ' + price.toLocaleString('id-ID');
+            } else {
+                document.getElementById('summary_service').textContent = '-';
+                document.getElementById('summary_price').textContent = 'Rp 0';
+            }
+        }
         }
 
         function showFileName() {

@@ -1,6 +1,6 @@
 <div style="display: flex; align-items: center;">
     <img 
-        src="{{ asset('img/logo.png') }}" 
+        src="{{ asset('images/logo.png') }}" 
         alt="Logo" 
         style="height: 45px !important; width: auto !important; margin: 5px !important;" 
     />

@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
-    /**
-     * Display a listing of grooming services.
-     */
+    // Menampilkan daftar layanan (Halaman Depan)
     public function index(Request $request)
     {
         $query = Service::query();
@@ -26,11 +24,12 @@ class ServiceController extends Controller
         return view('shop.services.index', compact('services'));
     }
 
-    /**
-     * Display the specified service.
-     */
-    public function show(Service $service)
+    // Menampilkan detail ;ayanan (halaman detail)
+    public function show($id)
     {
-        return view('shop.services.show', compact('service'));
+        // Cari service berdasarkan ID, kalau tidak ada tampilkan 404
+        $service = Service::findOrFail($id); 
+
+        return view('shop.services.show', compact('service')); 
     }
 }

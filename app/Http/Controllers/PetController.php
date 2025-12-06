@@ -9,11 +9,6 @@ use Illuminate\Support\Facades\Storage;
 
 class PetController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     /**
      * Display a listing of the authenticated user's pets.
      */
@@ -64,7 +59,7 @@ class PetController extends Controller
     public function show(Pet $pet)
     {
         if ($pet->user_id !== Auth::id()) {
-            abort(403);
+            abort(403, 'Unauthorized action.');
         }
 
         return view('pets.show', compact('pet'));
@@ -76,7 +71,7 @@ class PetController extends Controller
     public function edit(Pet $pet)
     {
         if ($pet->user_id !== Auth::id()) {
-            abort(403);
+            abort(403, 'Unauthorized action.');
         }
 
         return view('pets.edit', compact('pet'));
@@ -103,15 +98,16 @@ class PetController extends Controller
         ]);
 
         if ($request->hasFile('photo')) {
+            // Hapus foto lama jika ada
             if ($pet->photo && Storage::disk('public')->exists($pet->photo)) {
                 Storage::disk('public')->delete($pet->photo);
             }
-            $data['photo'] = $request->file('photo')->store('pets', 'public');
+            $validated['photo'] = $request->file('photo')->store('pets', 'public');
         }
 
-        $pet->update($data);
+        $pet->update($validated);
 
-        return redirect()->route('pets.show', $pet)->with('success', 'Pet updated successfully.');
+        return redirect()->route('pets.index')->with('success', 'Pet updated successfully!');
     }
 
     /**
@@ -120,7 +116,7 @@ class PetController extends Controller
     public function destroy(Pet $pet)
     {
         if ($pet->user_id !== Auth::id()) {
-            abort(403);
+            abort(403,  'Unauthorized action.');
         }
 
         if ($pet->photo && Storage::disk('public')->exists($pet->photo)) {

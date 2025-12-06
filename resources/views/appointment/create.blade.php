@@ -681,7 +681,7 @@
             <!-- Navigation Links -->
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
-                <li><a href="/appointment" class="active">Appointment</a></li>
+                <li><a href="{{ route('appointment.create') }}" class="active">Appointment</a></li>
                 <li><a href="/products">Products</a></li>
                 <li><a href="/contact">Contact Us</a></li>
             </ul>
@@ -778,7 +778,7 @@
     @endauth
 
     <div class="container">
-        <form action="/appointment" method="POST" enctype="multipart/form-data" id="appointmentForm">
+        <form  method="POST" enctype="multipart/form-data" id="appointmentForm">
             @csrf
             
             <!-- Step 1: Pet Information -->
@@ -864,22 +864,28 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Service</label>
-                    
-             <div class="service-checkbox">
-                        <input type="checkbox" id="bath_only" name="services[]" value="bath_only" data-price="400000">
-                        <div class="service-info">
-                            <strong>Bath Only - Rp 50.000</strong>
-                        </div>
-                    </div>
-
-                    <div class="service-checkbox">
-                        <input type="checkbox" id="full_grooming" name="services[]" value="full_grooming" data-price="750000">
-                        <div class="service-info">
-                            <strong>Full Grooming - Rp 120.000 (bath, haircut, nail cut, ear cleaning, perfume)</strong>
-                            <span>Complete grooming package</span>
-                        </div>
-                    </div>
+    <label>Select Service</label>
+    <div class="service-radio-group">
+        @foreach($services as $srv)
+        <label class="service-option">
+            <input type="radio" 
+                   name="service_id" 
+                   value="{{ $srv->service_id }}" 
+                   data-name="{{ $srv->service_name }}"
+                   data-price="{{ $srv->price }}"
+                   onchange="updateSummary()"
+                   /* Logic auto-checked jika dari tombol Book Now */
+                   {{ (isset($selectedService) && $selectedService->service_id == $srv->service_id) ? 'checked' : '' }}
+                   required>
+            
+            <div class="service-info">
+                <strong>{{ $srv->service_name }} - Rp {{ number_format($srv->price, 0, ',', '.') }}</strong>
+                <span style="display:block; font-size:0.9em; color:#666;">{{ $srv->description }}</span>
+            </div>
+        </label>
+        @endforeach
+    </div>
+</div>
 
 
 
@@ -1005,39 +1011,44 @@
         }
 
         function nextStep(step) {
-            // Validasi step sebelum pindah
-            const currentStep = document.querySelector('.form-step.active');
-            const inputs = currentStep.querySelectorAll('input[required], textarea[required]');
-            let isValid = true;
+        const currentStepDiv = document.querySelector('.form-step.active');
+        let valid = true;
 
-            inputs.forEach(input => {
-                if (input.type === 'radio') {
-                    const name = input.name;
-                    const checked = document.querySelector(`input[name="${name}"]:checked`);
-                    if (!checked) {
-                        isValid = false;
-                    }
-                } else if (input.type === 'checkbox') {
-                    // Skip checkbox validation for now
-                } else if (!input.value) {
-                    isValid = false;
-                }
-            });
-
-            if (!isValid) {
-                alert('Please fill all required fields');
-                return;
+        // 1. Validasi Input Biasa (Text, Date, Time, Select)
+        const inputs = currentStepDiv.querySelectorAll('input:not([type="radio"]):not([type="checkbox"])[required], select[required], textarea[required]');
+        
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                valid = false;
+                input.style.border = "2px solid red"; // Kasih merah biar tau mana yang kurang
+            } else {
+                input.style.border = "1px solid #ddd"; // Balikin warna normal
             }
+        });
 
-            document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
-            document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
-            
-            if(step === 3) {
-                updateSummary();
+        // 2. Validasi Khusus Service (Radio Button)
+        // Kita cek apakah step ini punya pilihan service
+        const serviceRadios = currentStepDiv.querySelectorAll('input[name="service_id"]');
+        if (serviceRadios.length > 0) {
+            const isChecked = currentStepDiv.querySelector('input[name="service_id"]:checked');
+            if (!isChecked) {
+                valid = false;
+                alert("⚠️ Please select at least one service!"); // Pesan lebih jelas
             }
-
-            window.scrollTo(0, 0);
         }
+
+        // Kalau ada yang ga valid, stop disini
+        if (!valid) {
+            // alert("Please fill all required fields"); // Opsional, bisa dimatiin kalau udah ada border merah
+            return;
+        }
+
+        // Kalau aman, lanjut pindah step
+        document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+        document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
+        
+        if(step === 3) updateSummary();
+    }
 
         function prevStep(step) {
             document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
@@ -1152,5 +1163,32 @@
         });
     </script>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Yeay! Berhasil 🎉',
+                text: '{{ session('success') }}',
+                confirmButtonColor: '#FF8C42', // Warna oranye sesuai tema kamu
+                confirmButtonText: 'Oke, Mantap!'
+            }).then((result) => {
+                // Opsional: Kalau mau reset form setelah klik Oke
+                if (result.isConfirmed) {
+                    window.location.reload();
+                }
+            });
+        @endif
+
+        @if($errors->any())
+            Swal.fire({
+                icon: 'error',
+                title: 'Waduh!',
+                text: 'Ada isian yang belum lengkap atau salah.',
+                confirmButtonColor: '#d33'
+            });
+        @endif
+</script>
 </body>
 </html>

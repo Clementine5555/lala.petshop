@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Petshop Lala - Your Trusted Pet Care Partner</title>
-    
+
     <style>
         * {
             margin: 0;
@@ -18,6 +18,7 @@
             overflow-x: hidden;
             padding-top: 50px;
             background: #f9f9f9;
+            min-width: 320px;
         }
         /* Navigation */
         nav {
@@ -31,13 +32,13 @@
         }
 
         .nav-container {
-            max-width: 1400px;
+            max-width: 1200px;  /* ← LEBIH KECIL */
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 30px;
-            gap: 30px;
+            padding: 0 20px;  /* ← PADDING LEBIH KECIL */
+            gap: 20px;
         }
 
         .logo {
@@ -193,12 +194,14 @@
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.3s;
+            display: none !important;
         }
 
         .profile-dropdown.active .dropdown-menu {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
+            display: block !important;
         }
 
         .dropdown-item {
@@ -638,7 +641,7 @@
             .nav-links {
                 display: none;
             }
-            
+
             .container {
                 padding: 30px 20px;
             }
@@ -651,6 +654,77 @@
                 flex-direction: column;
             }
         }
+
+            /* --- CSS FOOTER (WARNA COKLAT EMAS) --- */
+        footer {
+            background-color: #bf8c3c; /* Warna sesuai gambar */
+            color: white;
+            padding: 60px 0 20px;
+            margin-top: 50px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 40;
+        }
+
+        /* Bagian Kiri */
+        .footer-logo-area { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .footer-logo-circle { width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .footer-logo-circle img { width: 35px; height: 35px; object-fit: contain; }
+        .footer-brand-name { font-size: 1.5em; font-weight: 800; letter-spacing: 0.5px; }
+        
+        .footer-desc { 
+            line-height: 1.6; margin-bottom: 40px; font-size: 1em; font-weight: 500;
+            max-width: 90%;
+        }
+
+        .footer-heading { 
+            font-weight: 800; font-size: 1.1em; margin-bottom: 15px; display: block; 
+            letter-spacing: 0.5px;
+        }
+
+        .footer-list { list-style: none; padding: 0; margin: 0; }
+        .footer-list li { margin-bottom: 10px; font-size: 0.95em; font-weight: 600; }
+        .footer-list.contact li { display: flex; align-items: flex-start; gap: 12px; font-weight: 600; }
+
+        /* Bagian Kanan */
+        .footer-right-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        /* Bagian Tengah (Follow Us) */
+        .footer-center {
+            text-align: center;
+            margin-top: 50px;
+            margin-bottom: 30px;
+        }
+        
+        /* Garis & Copyright */
+        .footer-line {
+            border: 0;
+            border-top: 3px solid white;
+            margin: 0 40px 25px 40px;
+            opacity: 1;
+        }
+
+        .copyright {
+            text-align: center;
+            font-size: 0.95em;
+            font-weight: 700;
+        }
+
+        @media (max-width: 992px) { 
+            .footer-container { grid-template-columns: 1fr; gap: 40px; } 
+        }
+
     </style>
 </head>
 <body>
@@ -659,10 +733,10 @@
         <div class="nav-container">
             <!-- Logo -->
             <a href="{{ route('dashboard') }}" class="logo">
-                <img src="/images/logoo.png" alt="Petshop Lala">
+                <img src="{{ asset('images/logoo.png') }}" alt="Petshop Lala">
                 <span>Petshop Lala</span>
             </a>
-            
+
             <!-- Navigation Links -->
             <ul class="nav-links">
                 <li><a href="#home" data-section="home">Home</a></li>
@@ -673,22 +747,28 @@
 
             <!-- Right Section -->
             <div class="nav-right">
-                <!-- Cart Icon -->
                 <div class="cart-icon" onclick="window.location.href='{{ route('cart.index') }}'">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    @if(session('cart') && count(session('cart')) > 0)
-                    <span class="cart-badge" id="cartBadge">{{ count(session('cart')) }}</span>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                @auth
+                    @php
+                        $cartCount = \App\Models\Cart::where('user_id', auth()->id())
+                                                    ->where('status', 'active')
+                                                    ->sum('quantity');
+                    @endphp
+                    @if($cartCount > 0)
+                    <span class="cart-badge" id="cartBadge">{{ $cartCount }}</span>
                     @endif
-                </div>
+                @endauth
+            </div>
 
                 @auth
                 <!-- Profile Dropdown (Logged In) -->
                 <div class="profile-dropdown" id="profileDropdown">
                     <div class="profile-trigger" onclick="toggleDropdown()">
-                        <img src="{{ Auth::user()->profile_photo_url ?? 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23FF8C42\'/%3E%3Cpath d=\'M50 45c8 0 15-7 15-15s-7-15-15-15-15 7-15 15 7 15 15 15zm0 5c-13 0-25 6-25 15v10h50V65c0-9-12-15-25-15z\' fill=\'white\'/%3E%3C/svg%3E' }}" 
-                             alt="User" 
+                        <img src="{{ Auth::user()->profile_photo_url ?? 'data:img/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23FF8C42\'/%3E%3Cpath d=\'M50 45c8 0 15-7 15-15s-7-15-15-15-15 7-15 15 7 15 15 15zm0 5c-13 0-25 6-25 15v10h50V65c0-9-12-15-25-15z\' fill=\'white\'/%3E%3C/svg%3E' }}"
+                             alt="User"
                              class="profile-avatar">
                         <span class="profile-name">{{ Auth::user()->name }}</span>
                         <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -737,10 +817,23 @@
                 </svg>
             </div>
 
-            <form id="editProfileForm" method="POST" action="{{ route('profile.update') }}">
+            <form id="editProfileForm" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
                 @csrf
-                @method('PUT')
-                
+                @method('PATCH')
+
+                <!-- Profile Photo Upload -->
+                <div class="form-group">
+                    <label>Profile Photo</label>
+                    <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
+                        <img id="previewPhoto" src="{{ Auth::user()->profile_photo_url ?? 'data:img/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2750%27 fill=%27%23FF8C42%27/%3E%3Cpath d=%27M50 45c8 0 15-7 15-15s-7-15-15-15-15 7-15 15 7 15 15 15zm0 5c-13 0-25 6-25 15v10h50V65c0-9-12-15-25-15z%27 fill=%27white%27/%3E%3C/svg%3E' }}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid #FF8C42;">
+                        <div style="display: flex; gap: 8px; flex-direction: column;">
+                            <button type="button" onclick="document.getElementById('photoUpload').click()" style="background: #FF8C42; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9em;">Upload Photo</button>
+                            <button type="button" onclick="deletePhoto()" style="background: #dc2626; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9em;">Delete Photo</button>
+                        </div>
+                    </div>
+                    <input type="file" id="photoUpload" name="profile_photo" accept="image/*" style="display: none;" onchange="previewProfilePhoto(event)">
+                </div>
+
                 <div class="form-group">
                     <label>Full Name</label>
                     <input type="text" name="name" id="userName" value="{{ Auth::user()->name }}" placeholder="Enter your name">
@@ -756,7 +849,9 @@
                     <input type="tel" name="phone" id="userPhone" value="{{ Auth::user()->phone ?? '' }}" placeholder="Enter your phone">
                 </div>
 
-                <button type="submit" class="btn-register" style="width: 100%; padding: 12px; margin-top: 20px;">Save Changes</button>
+                <button type="submit" class="btn-register" style="width: 100%; padding: 12px; margin-top: 20px;">
+                    Save Changes
+                </button>
             </form>
         </div>
     </div>
@@ -773,14 +868,15 @@
     <script>
         // Toast notification
         function showToast(message, type = 'success') {
+            if (!message) return; // avoid showing empty toast
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
-            
+
             if (toast && toastMessage) {
                 toast.className = `toast ${type}`;
                 toastMessage.textContent = message;
                 toast.classList.add('show');
-                
+
                 setTimeout(() => {
                     hideToast();
                 }, 4000);
@@ -835,7 +931,7 @@
             event.preventDefault();
             const modal = document.getElementById('editProfileModal');
             const dropdown = document.getElementById('profileDropdown');
-            
+
             if (modal) modal.classList.add('active');
             if (dropdown) dropdown.classList.remove('active');
         }
@@ -847,6 +943,68 @@
             }
         }
 
+        // Close dropdowns/modals on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdown = document.getElementById('profileDropdown');
+            const modal = document.getElementById('editProfileModal');
+            
+            if (dropdown) {
+                dropdown.classList.remove('active');
+                const menu = dropdown.querySelector('.dropdown-menu');
+                if (menu) menu.style.display = 'none !important';
+            }
+            if (modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none !important';
+            }
+            
+            // Populate cart badge on load
+            try { updateCartBadge(); } catch (e) { console.warn('updateCartBadge not found', e); }
+
+            // Hide all modals and toasts with inline styles
+            try {
+                document.querySelectorAll('.modal').forEach(m => {
+                    m.classList.remove('active');
+                    m.style.display = 'none !important';
+                });
+            } catch (e) { /* ignore */ }
+
+            try {
+                const toast = document.getElementById('toast');
+                if (toast) {
+                    toast.classList.remove('show');
+                    toast.style.display = 'none !important';
+                }
+            } catch (e) { /* ignore */ }
+        });
+
+        function previewProfilePhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewPhoto').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function deletePhoto() {
+            if (confirm('Are you sure you want to delete your profile photo?')) {
+                // Create a hidden input to indicate deletion
+                const form = document.getElementById('editProfileForm');
+                const deleteInput = document.createElement('input');
+                deleteInput.type = 'hidden';
+                deleteInput.name = 'delete_profile_photo';
+                deleteInput.value = '1';
+                form.appendChild(deleteInput);
+                
+                // Reset file input and preview
+                document.getElementById('photoUpload').value = '';
+                document.getElementById('previewPhoto').src = 'data:img/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2750%27 fill=%27%23FF8C42%27/%3E%3Cpath d=%27M50 45c8 0 15-7 15-15s-7-15-15-15-15 7-15 15 7 15 15 15zm0 5c-13 0-25 6-25 15v10h50V65c0-9-12-15-25-15z%27 fill=%27white%27/%3E%3C/svg%3E';
+            }
+        }
+
         const modal = document.getElementById('editProfileModal');
         if (modal) {
             modal.addEventListener('click', function(event) {
@@ -854,77 +1012,65 @@
             });
         }
 
-        // Smooth Scroll Navigation - FIXED
         document.querySelectorAll('.nav-links a').forEach(link => {
             link.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
                 
-                // Check if it's a hash link (starts with #)
                 if (href && href.startsWith('#')) {
                     e.preventDefault();
                     
-                    const targetId = href.substring(1); // Remove the #
+                    const targetId = href.substring(1); 
                     const target = document.getElementById(targetId);
-                    
+
                     if (target) {
-                        // Remove active class from all links
                         document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
-                        
-                        // Add active class to clicked link
+
                         this.classList.add('active');
-                        
-                        // Smooth scroll to target
+
                         target.scrollIntoView({ 
                             behavior: 'smooth', 
                             block: 'start' 
                         });
                     }
                 }
-                // If it's not a hash link, let it navigate normally
             });
         });
 
-        // Scroll-based active state update
         window.addEventListener('scroll', function() {
             const sections = document.querySelectorAll('main > section');
             const navLinks = document.querySelectorAll('.nav-links a');
-            
+
             let current = '';
-            
+
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
                 const sectionHeight = section.clientHeight;
                 
-                // Check if section is in view (with some offset for navbar)
                 if (pageYOffset >= (sectionTop - 100)) {
                     current = section.getAttribute('id');
                 }
             });
 
-            // Update active state
             navLinks.forEach(link => {
                 link.classList.remove('active');
                 const href = link.getAttribute('href');
-                
+
                 if (href === '#' + current) {
                     link.classList.add('active');
                 }
             });
         });
 
-        // Set initial active state on page load
         window.addEventListener('load', function() {
             const hash = window.location.hash;
-            
+
             if (hash) {
-                // If there's a hash in URL, activate that link
                 const targetLink = document.querySelector(`.nav-links a[href="${hash}"]`);
                 if (targetLink) {
                     document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
                     targetLink.classList.add('active');
                 }
             } else {
-                // Otherwise, activate home
                 const homeLink = document.querySelector('.nav-links a[href="#home"]');
                 if (homeLink) {
                     homeLink.classList.add('active');
@@ -932,7 +1078,6 @@
             }
         });
 
-        // Success/Error messages
         @if(session('success'))
             showToast('{{ session('success') }}', 'success');
         @endif
@@ -941,6 +1086,120 @@
             showToast('{{ session('error') }}', 'error');
         @endif
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script>
+    function saveProfile() {
+        let name = document.getElementById('userName').value;
+        let email = document.getElementById('userEmail').value;
+        let phone = document.getElementById('userPhone').value;
+
+        fetch("{{ route('profile.update') }}", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                phone: phone
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            // 🚀 NOTIF SUKSES
+            Swal.fire({
+                icon: 'success',
+                title: 'Profile Updated!',
+                text: data.message,
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                timer: 2500
+            });
+
+            // 🚀 TUTUP MODAL
+            closeEditProfile();
+        })
+        .catch(err => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Something went wrong!',
+            });
+        });
+    }
+    </script>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-left">
+                <div class="footer-logo-area">
+                    <div class="footer-logo-circle">
+                        <img src="/images/logoo.png" alt="Petshop Lala">
+                    </div>
+                    <span class="footer-brand-name">Petshop Lala</span>
+                </div>
+                
+                <p class="footer-desc">
+                    Your trusted partner in pet care.<br>
+                    Menyediakan layanan grooming profesional<br>
+                    dan produk pet berkualitas sejak 2020.
+                </p>
+
+                <div class="footer-contact-area">
+                    <span class="footer-heading">Contact</span>
+                    <ul class="footer-list contact">
+                        <li><span>📍</span> Jl. Pet Lover No. 123, Medan</li>
+                        <li><span>📞</span> +62 812-3456-7890</li>
+                        <li><span>📧</span> info@petshoplala.com</li>
+                        <li><span>⏰</span> Mon-Sun: 08:00 - 20:00</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-right-grid">
+                <div>
+                    <span class="footer-heading">Services</span>
+                    <ul class="footer-list">
+                        <li>Pet Grooming</li>
+                        <li>Pet Hotel</li>
+                        <li>Health Check</li>
+                        <li>Appointment</li>
+                        <li>Booking</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <span class="footer-heading">Customer Service</span>
+                    <ul class="footer-list">
+                        <li>FAQs</li>
+                        <li>Refund Policy</li>
+                        <li>Payment Methods</li>
+                        <li>Terms & Conditions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-center">
+            <span class="footer-heading">Follow Us</span>
+            <div class="footer-list" style="font-weight: 600;">
+                Instagram @petshoplala<br>
+                Facebook<br>
+                TikTok<br>
+                WhatsApp Business
+            </div>
+        </div>
+
+        <hr class="footer-line">
+
+        <div class="copyright">
+            © 2025 Petshop Lala. All rights reserved. | Trusted by 10,000+ happy pet owners
+        </div>
+    </footer>
+    ```
 </body>
 </html>
