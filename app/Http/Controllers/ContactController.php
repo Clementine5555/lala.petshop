@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ContactMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redirect;
 
 class ContactController extends Controller
 {
@@ -23,10 +24,15 @@ class ContactController extends Controller
             
             Log::info('Contact message saved', $validated);
             
-            return response()->json([
-                'success' => true,
-                'message' => 'Terima kasih telah menghubungi kami. Pesan Anda telah diterima.'
-            ]);
+            // If caller expects JSON (AJAX), return JSON. Otherwise redirect back with flash message.
+            if ($request->wantsJson() || $request->ajax() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Terima kasih telah menghubungi kami. Pesan Anda telah diterima.'
+                ]);
+            }
+
+            return Redirect::back()->with('success', 'Terima kasih telah menghubungi kami. Pesan Anda telah diterima.');
             
         } catch (\Exception $e) {
             Log::error('Contact form error: ' . $e->getMessage(), ['exception' => $e]);
@@ -34,11 +40,16 @@ class ContactController extends Controller
             // Return exception message when app is in debug mode to help diagnose issues locally.
             $debugMessage = config('app.debug') ? $e->getMessage() : 'Failed to send message. Please try again.';
 
-            return response()->json([
-                'success' => false,
-                'message' => $debugMessage,
-                'error' => config('app.debug') ? $e->getMessage() : null,
-            ], 500);
+            // If caller expects JSON (AJAX), return JSON. Otherwise redirect back with error flash.
+            if ($request->wantsJson() || $request->ajax() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $debugMessage,
+                    'error' => config('app.debug') ? $e->getMessage() : null,
+                ], 500);
+            }
+
+            return Redirect::back()->with('error', $debugMessage);
         }
     }
 }

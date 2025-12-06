@@ -167,15 +167,29 @@
         credentials: 'same-origin',
         headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        }
+        },
+        redirect: 'manual' // Prevent automatic redirect; we'll handle it manually
     })
     .then(async response => {
         const contentType = response.headers.get('content-type') || '';
+        
+        // If redirect (3xx), Laravel issued a redirect with flash message
+        if ([301, 302, 303, 307, 308].includes(response.status)) {
+            // Extract flash message from session (we'll manually fetch redirected page to get flash data)
+            // For now, show a generic success message and reload to pick up the flash toast
+            showToast('Terima kasih telah menghubungi kami. Pesan Anda telah diterima.', 'success');
+            this.reset();
+            // Reload to ensure flash message is picked up and rendered
+            setTimeout(() => location.reload(), 500);
+            return;
+        }
+
+        // If response is JSON (AJAX flow)
         let data;
         if (contentType.includes('application/json')) {
             data = await response.json();
         } else {
-            // If server returned HTML (e.g. redirect to login or an error page), capture it for debugging
+            // If server returned HTML (unexpected), capture it for debugging
             const text = await response.text();
             throw new Error('Unexpected server response: ' + text.substring(0, 400));
         }

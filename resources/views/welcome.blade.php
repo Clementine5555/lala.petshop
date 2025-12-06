@@ -784,7 +784,9 @@
                 const toast = document.getElementById('toast');
                 if (toast) {
                     toast.classList.remove('show');
-                    toast.style.display = 'none !important';
+                    // ensure inline display doesn't block the CSS-controlled visibility
+                    toast.style.display = 'none';
+                    toast.removeAttribute('style');
                 }
             } catch (e) { /* ignore */ }
         });

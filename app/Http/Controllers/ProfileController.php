@@ -61,11 +61,15 @@ class ProfileController extends Controller
 
         $user->save();
 
-        // RETURN JSON (WAJIB BIAR GAK RELOAD)
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Mantap! Profile berhasil diupdate.'
-        ]);
+        // If caller expects JSON (AJAX), return JSON. Otherwise redirect back with flash message
+        if ($request->wantsJson() || $request->ajax() || $request->expectsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Mantap! Profile berhasil diupdate.'
+            ]);
+        }
+
+        return Redirect::back()->with('success', 'Mantap! Profile berhasil diupdate.');
     }
 
     /**

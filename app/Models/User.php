@@ -21,6 +21,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'is_admin',
+        'phone',
+        'profile_photo_path',
     ];
 
     protected $hidden = [
@@ -71,6 +73,18 @@ class User extends Authenticatable implements MustVerifyEmail
     public function appointmentDetails(): HasMany
     {
         return $this->hasMany(Appointment_Detail::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Return full URL for the profile photo if set, otherwise null.
+     */
+    public function getProfilePhotoUrlAttribute()
+    {
+        if (!empty($this->profile_photo_path)) {
+            return asset('storage/' . ltrim($this->profile_photo_path, '/'));
+        }
+
+        return null;
     }
 
     // ==========================

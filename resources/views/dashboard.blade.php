@@ -965,7 +965,8 @@
             try {
                 document.querySelectorAll('.modal').forEach(m => {
                     m.classList.remove('active');
-                    m.style.display = 'none !important';
+                        m.style.display = 'none';
+                        m.removeAttribute('style');
                 });
             } catch (e) { /* ignore */ }
 
@@ -973,7 +974,8 @@
                 const toast = document.getElementById('toast');
                 if (toast) {
                     toast.classList.remove('show');
-                    toast.style.display = 'none !important';
+                        toast.style.display = 'none';
+                        toast.removeAttribute('style');
                 }
             } catch (e) { /* ignore */ }
         });
