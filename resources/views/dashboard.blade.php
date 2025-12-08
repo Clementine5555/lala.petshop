@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="user-authenticated" content="{{ auth()->check() ? 'true' : 'false' }}">
     <title>Petshop Lala - Your Trusted Pet Care Partner</title>
 
     <style>
@@ -18,8 +19,8 @@
             overflow-x: hidden;
             padding-top: 50px;
             background: #f9f9f9;
-            min-width: 320px;
         }
+
         /* Navigation */
         nav {
             position: fixed;
@@ -32,13 +33,13 @@
         }
 
         .nav-container {
-            max-width: 1200px;  /* ← LEBIH KECIL */
+            max-width: 1400px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;  /* ← PADDING LEBIH KECIL */
-            gap: 20px;
+            padding: 0 30px;
+            gap: 30px;
         }
 
         .logo {
@@ -283,6 +284,67 @@
             box-shadow: 0 4px 16px rgba(255, 140, 66, 0.4);
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 100px;
+            right: 30px;
+            background: white;
+            padding: 20px 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+            align-items: center;
+            gap: 15px;
+            z-index: 10000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast.show {
+            display: flex;
+        }
+
+        .toast.success {
+            border-left: 5px solid #4caf50;
+        }
+
+        .toast.error {
+            border-left: 5px solid #f44336;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .toast-message {
+            flex: 1;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .toast-close {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            color: #999;
+        }
+
         /* Modal */
         .modal {
             display: none;
@@ -336,270 +398,37 @@
             color: #FF8C42;
         }
 
-        /* Form Container */
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 30px;
-            padding: 50px;
-            max-width: 600px;
-            width: 100%;
-            margin-top: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-        }
-
-        .form-title {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .form-title h2 {
-            font-size: 2em;
-            color: #FF8C42;
-            margin-bottom: 10px;
-        }
-
-        .form-step {
-            display: none;
-        }
-
-        .form-step.active {
-            display: block;
-            animation: fadeIn 0.5s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: #333;
             font-weight: 600;
-            font-size: 0.95em;
+            color: #333;
         }
 
-        .form-group input[type="text"],
-        .form-group input[type="email"],
-        .form-group input[type="tel"],
-        .form-group input[type="number"],
-        .form-group input[type="date"],
-        .form-group input[type="time"],
-        .form-group textarea,
-        .form-group select {
+        .form-group input {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
             font-size: 1em;
-            transition: all 0.3s;
+            transition: border-color 0.3s;
         }
 
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
+        .form-group input:focus {
             outline: none;
             border-color: #FF8C42;
         }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
+        /* Main Content */
+        main {
+            min-height: 100vh;
         }
 
-        .radio-group {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .radio-option input[type="radio"] {
-            width: 20px;
-            height: 20px;
-            accent-color: #FF8C42;
-            cursor: pointer;
-        }
-
-        .radio-option label {
-            cursor: pointer;
-            margin-bottom: 0 !important;
-        }
-
-        .date-time-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .service-checkbox {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .service-checkbox:hover {
-            border-color: #FF8C42;
-            background: #FFF5EB;
-        }
-
-        .service-checkbox input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            accent-color: #FF8C42;
-            margin-top: 2px;
-            cursor: pointer;
-        }
-
-        .service-info {
-            flex: 1;
-        }
-
-        .service-info strong {
-            display: block;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .service-info span {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .link-text {
-            color: #FF8C42;
-            text-decoration: underline;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .summary-row:last-child {
-            border-bottom: none;
-            font-weight: 700;
-            font-size: 1.1em;
-            color: #FF8C42;
-        }
-
-        .summary-row label {
-            color: #666;
-        }
-
-        .summary-row span {
-            color: #333;
-            font-weight: 600;
-        }
-
-        .upload-section {
-            margin-top: 20px;
-        }
-
-        .upload-btn {
-            display: inline-block;
-            padding: 12px 30px;
-            background: #FF8C42;
-            color: white;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .upload-btn:hover {
-            background: #FF6B35;
-        }
-
-        .upload-btn input[type="file"] {
-            display: none;
-        }
-
-        .file-name {
-            display: inline-block;
-            margin-left: 10px;
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1em;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-cancel {
-            background: #e0e0e0;
-            color: #666;
-        }
-
-        .btn-cancel:hover {
-            background: #d0d0d0;
-        }
-
-        .btn-next,
-        .btn-submit {
-            background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 100%);
-            color: white;
-            box-shadow: 0 5px 15px rgba(255, 140, 66, 0.3);
-        }
-
-        .btn-next:hover,
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255, 140, 66, 0.4);
-        }
-
-        .btn-back {
-            background: white;
-            color: #FF8C42;
-            border: 2px solid #FF8C42;
-        }
-
-        .btn-back:hover {
-            background: #FFF5EB;
-        }
-
-        .alert-info {
-            background: #FFF5EB;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            color: #FF8C42;
-            font-weight: 600;
-            text-align: center;
-        }
-
+        /* Responsive */
         @media (max-width: 1200px) {
             .nav-container {
                 padding: 0 30px;
@@ -612,7 +441,7 @@
 
             .nav-links a {
                 font-size: 1.15em;
-            }
+            }}
         }
 
         @media (max-width: 992px) {
@@ -642,126 +471,55 @@
                 display: none;
             }
 
-            .container {
-                padding: 30px 20px;
-            }
-
-            .date-time-row {
-                grid-template-columns: 1fr;
-            }
-
-            .button-group {
-                flex-direction: column;
+            .toast {
+                right: 15px;
+                left: 15px;
+                top: 90px;
             }
         }
-
-            /* --- CSS FOOTER (WARNA COKLAT EMAS) --- */
-        footer {
-            background-color: #bf8c3c; /* Warna sesuai gambar */
-            color: white;
-            padding: 60px 0 20px;
-            margin-top: 50px;
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 40;
-        }
-
-        /* Bagian Kiri */
-        .footer-logo-area { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .footer-logo-circle { width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .footer-logo-circle img { width: 35px; height: 35px; object-fit: contain; }
-        .footer-brand-name { font-size: 1.5em; font-weight: 800; letter-spacing: 0.5px; }
-        
-        .footer-desc { 
-            line-height: 1.6; margin-bottom: 40px; font-size: 1em; font-weight: 500;
-            max-width: 90%;
-        }
-
-        .footer-heading { 
-            font-weight: 800; font-size: 1.1em; margin-bottom: 15px; display: block; 
-            letter-spacing: 0.5px;
-        }
-
-        .footer-list { list-style: none; padding: 0; margin: 0; }
-        .footer-list li { margin-bottom: 10px; font-size: 0.95em; font-weight: 600; }
-        .footer-list.contact li { display: flex; align-items: flex-start; gap: 12px; font-weight: 600; }
-
-        /* Bagian Kanan */
-        .footer-right-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-
-        /* Bagian Tengah (Follow Us) */
-        .footer-center {
-            text-align: center;
-            margin-top: 50px;
-            margin-bottom: 30px;
-        }
-        
-        /* Garis & Copyright */
-        .footer-line {
-            border: 0;
-            border-top: 3px solid white;
-            margin: 0 40px 25px 40px;
-            opacity: 1;
-        }
-
-        .copyright {
-            text-align: center;
-            font-size: 0.95em;
-            font-weight: 700;
-        }
-
-        @media (max-width: 992px) { 
-            .footer-container { grid-template-columns: 1fr; gap: 40px; } 
-        }
-
     </style>
 </head>
 <body>
-    <!-- Navigation - SAME AS DASHBOARD -->
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <svg class="toast-icon" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+        </svg>
+        <span class="toast-message" id="toastMessage"></span>
+        <svg class="toast-close" onclick="hideToast()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+    </div>
+
+    <!-- Navigation -->
     <nav>
         <div class="nav-container">
             <!-- Logo -->
-            <a href="{{ route('dashboard') }}" class="logo">
+            <a href="{{ route('welcome') }}" class="logo">
                 <img src="{{ asset('images/logoo.png') }}" alt="Petshop Lala">
                 <span>Petshop Lala</span>
             </a>
 
             <!-- Navigation Links -->
             <ul class="nav-links">
-                <li><a href="#home" data-section="home">Home</a></li>
-                <li><a href="#appointment" data-section="appointment">Appointment</a></li>
-                <li><a href="#products" data-section="products">Products</a></li>
-                <li><a href="#contact" data-section="contact">Contact Us</a></li>
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#appointment">Appointment</a></li>
+                <li><a href="#products">Products</a></li>
+                <li><a href="#contact">Contact Us</a></li>
             </ul>
 
             <!-- Right Section -->
             <div class="nav-right">
+                <!-- Cart Icon -->
                 <div class="cart-icon" onclick="window.location.href='{{ route('cart.index') }}'">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-                @auth
-                    @php
-                        $cartCount = \App\Models\Cart::where('user_id', auth()->id())
-                                                    ->where('status', 'active')
-                                                    ->sum('quantity');
-                    @endphp
-                    @if($cartCount > 0)
-                    <span class="cart-badge" id="cartBadge">{{ $cartCount }}</span>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    @if(session('cart') && count(session('cart')) > 0)
+                    <span class="cart-badge" id="cartBadge">{{ count(session('cart')) }}</span>
                     @endif
-                @endauth
-            </div>
+                </div>
 
                 @auth
                 <!-- Profile Dropdown (Logged In) -->
@@ -849,9 +607,7 @@
                     <input type="tel" name="phone" id="userPhone" value="{{ Auth::user()->phone ?? '' }}" placeholder="Enter your phone">
                 </div>
 
-                <button type="submit" class="btn-register" style="width: 100%; padding: 12px; margin-top: 20px;">
-                    Save Changes
-                </button>
+                <button type="submit" class="btn-register" style="width: 100%; padding: 12px; margin-top: 20px;">Save Changes</button>
             </form>
         </div>
     </div>
@@ -868,26 +624,21 @@
     <script>
         // Toast notification
         function showToast(message, type = 'success') {
-            if (!message) return; // avoid showing empty toast
+            if (!message) return; // don't show empty toasts
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
 
-            if (toast && toastMessage) {
-                toast.className = `toast ${type}`;
-                toastMessage.textContent = message;
-                toast.classList.add('show');
+            toast.className = toast ${type};
+            toastMessage.textContent = message;
+            toast.classList.add('show');
 
-                setTimeout(() => {
-                    hideToast();
-                }, 4000);
-            }
+            setTimeout(() => {
+                hideToast();
+            }, 4000);
         }
 
         function hideToast() {
-            const toast = document.getElementById('toast');
-            if (toast) {
-                toast.classList.remove('show');
-            }
+            document.getElementById('toast').classList.remove('show');
         }
 
         function updateCartBadge() {
@@ -914,9 +665,7 @@
         // Dropdown
         function toggleDropdown() {
             const dropdown = document.getElementById('profileDropdown');
-            if (dropdown) {
-                dropdown.classList.toggle('active');
-            }
+            dropdown.classList.toggle('active');
         }
 
         document.addEventListener('click', function(event) {
@@ -929,56 +678,13 @@
         // Modal
         function openEditProfile(event) {
             event.preventDefault();
-            const modal = document.getElementById('editProfileModal');
-            const dropdown = document.getElementById('profileDropdown');
-
-            if (modal) modal.classList.add('active');
-            if (dropdown) dropdown.classList.remove('active');
+            document.getElementById('editProfileModal').classList.add('active');
+            document.getElementById('profileDropdown').classList.remove('active');
         }
 
         function closeEditProfile() {
-            const modal = document.getElementById('editProfileModal');
-            if (modal) {
-                modal.classList.remove('active');
-            }
+            document.getElementById('editProfileModal').classList.remove('active');
         }
-
-        // Close dropdowns/modals on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const dropdown = document.getElementById('profileDropdown');
-            const modal = document.getElementById('editProfileModal');
-            
-            if (dropdown) {
-                dropdown.classList.remove('active');
-                const menu = dropdown.querySelector('.dropdown-menu');
-                if (menu) menu.style.display = 'none !important';
-            }
-            if (modal) {
-                modal.classList.remove('active');
-                modal.style.display = 'none !important';
-            }
-            
-            // Populate cart badge on load
-            try { updateCartBadge(); } catch (e) { console.warn('updateCartBadge not found', e); }
-
-            // Hide all modals and toasts with inline styles
-            try {
-                document.querySelectorAll('.modal').forEach(m => {
-                    m.classList.remove('active');
-                        m.style.display = 'none';
-                        m.removeAttribute('style');
-                });
-            } catch (e) { /* ignore */ }
-
-            try {
-                const toast = document.getElementById('toast');
-                if (toast) {
-                    toast.classList.remove('show');
-                        toast.style.display = 'none';
-                        toast.removeAttribute('style');
-                }
-            } catch (e) { /* ignore */ }
-        });
 
         function previewProfilePhoto(event) {
             const file = event.target.files[0];
@@ -1014,26 +720,19 @@
             });
         }
 
+        // Scroll nav highlight — only intercept hash links
         document.querySelectorAll('.nav-links a').forEach(link => {
             link.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                
-                if (href && href.startsWith('#')) {
-                    e.preventDefault();
-                    
-                    const targetId = href.substring(1); 
-                    const target = document.getElementById(targetId);
+                const href = this.getAttribute('href') || '';
+                if (!href.startsWith('#')) return; // allow normal navigation for non-hash links
 
-                    if (target) {
-                        document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
-
-                        this.classList.add('active');
-
-                        target.scrollIntoView({ 
-                            behavior: 'smooth', 
-                            block: 'start' 
-                        });
-                    }
+                e.preventDefault();
+                const targetId = href.substring(1);
+                const target = document.getElementById(targetId);
+                if (target) {
+                    document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
         });
@@ -1043,41 +742,51 @@
             const navLinks = document.querySelectorAll('.nav-links a');
 
             let current = '';
-
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                
-                if (pageYOffset >= (sectionTop - 100)) {
+                if (pageYOffset >= sectionTop - 150) {
                     current = section.getAttribute('id');
                 }
             });
 
             navLinks.forEach(link => {
                 link.classList.remove('active');
-                const href = link.getAttribute('href');
-
-                if (href === '#' + current) {
+                if (link.getAttribute('href') === '#' + current) {
                     link.classList.add('active');
                 }
             });
         });
 
-        window.addEventListener('load', function() {
-            const hash = window.location.hash;
+        // Populate cart badge on load and force hide any UI overlays
+        document.addEventListener('DOMContentLoaded', function() {
+            try { updateCartBadge(); } catch (e) { console.warn('updateCartBadge not found', e); }
 
-            if (hash) {
-                const targetLink = document.querySelector(`.nav-links a[href="${hash}"]`);
-                if (targetLink) {
-                    document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
-                    targetLink.classList.add('active');
+            // Force close profile dropdown with inline style
+            try {
+                const profileDropdown = document.getElementById('profileDropdown');
+                if (profileDropdown) {
+                    profileDropdown.classList.remove('active');
+                    const menu = profileDropdown.querySelector('.dropdown-menu');
+                    if (menu) menu.style.display = 'none !important';
                 }
-            } else {
-                const homeLink = document.querySelector('.nav-links a[href="#home"]');
-                if (homeLink) {
-                    homeLink.classList.add('active');
+            } catch (e) { /* ignore */ }
+
+            // Force close any modal overlays
+            try {
+                document.querySelectorAll('.modal').forEach(m => {
+                    m.classList.remove('active');
+                    m.style.display = 'none !important';
+                });
+            } catch (e) { /* ignore */ }
+
+            // Hide toasts
+            try {
+                const toast = document.getElementById('toast');
+                if (toast) {
+                    toast.classList.remove('show');
+                    toast.style.display = 'none !important';
                 }
-            }
+            } catch (e) { /* ignore */ }
         });
 
         @if(session('success'))
@@ -1088,107 +797,62 @@
             showToast('{{ session('error') }}', 'error');
         @endif
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
-    function saveProfile() {
-        let name = document.getElementById('userName').value;
-        let email = document.getElementById('userEmail').value;
-        let phone = document.getElementById('userPhone').value;
-
-        fetch("{{ route('profile.update') }}", {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-                "Accept": "application/json"
-            },
-            body: JSON.stringify({
-                name: name,
-                email: email,
-                phone: phone
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            // 🚀 NOTIF SUKSES
-            Swal.fire({
-                icon: 'success',
-                title: 'Profile Updated!',
-                text: data.message,
-                toast: true,
-                position: 'top',
-                showConfirmButton: false,
-                timer: 2500
-            });
-
-            // 🚀 TUTUP MODAL
-            closeEditProfile();
-        })
-        .catch(err => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Something went wrong!',
-            });
-        });
-    }
-    </script>
-
-    <footer>
-        <div class="footer-container">
-            <div class="footer-left">
-                <div class="footer-logo-area">
-                    <div class="footer-logo-circle">
-                        <img src="/images/logoo.png" alt="Petshop Lala">
+    <!-- Footer (copied from layouts/app to ensure homepage shows footer) -->
+    <footer style="background-color: #bf8c3c; color: white; padding: 60px 0 20px; margin-top: 50px; font-family: 'Segoe UI', sans-serif;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                    <div style="width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <img src="{{ asset('images/logoo.png') }}" alt="Petshop Lala" style="width: 35px; height: 35px; object-fit: contain;">
                     </div>
-                    <span class="footer-brand-name">Petshop Lala</span>
+                    <span style="font-size: 1.5em; font-weight: 800; letter-spacing: 0.5px;">Petshop Lala</span>
                 </div>
-                
-                <p class="footer-desc">
+
+                <p style="line-height: 1.6; margin-bottom: 40px; font-size: 1em; font-weight: 500; max-width: 90%;">
                     Your trusted partner in pet care.<br>
                     Menyediakan layanan grooming profesional<br>
                     dan produk pet berkualitas sejak 2020.
                 </p>
 
-                <div class="footer-contact-area">
-                    <span class="footer-heading">Contact</span>
-                    <ul class="footer-list contact">
-                        <li><span>📍</span> Jl. Pet Lover No. 123, Medan</li>
-                        <li><span>📞</span> +62 812-3456-7890</li>
-                        <li><span>📧</span> info@petshoplala.com</li>
-                        <li><span>⏰</span> Mon-Sun: 08:00 - 20:00</li>
+                <div>
+                    <span style="font-weight: 800; font-size: 1.1em; margin-bottom: 15px; display: block; letter-spacing: 0.5px;">Contact</span>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600; display: flex; align-items: flex-start; gap: 12px;"><span>📍</span> Jl. Pet Lover No. 123, Medan</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600; display: flex; align-items: flex-start; gap: 12px;"><span>📞</span> +62 812-3456-7890</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600; display: flex; align-items: flex-start; gap: 12px;"><span>📧</span> info@petshoplala.com</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600; display: flex; align-items: flex-start; gap: 12px;"><span>⏰</span> Mon-Sun: 08:00 - 20:00</li>
                     </ul>
                 </div>
             </div>
 
-            <div class="footer-right-grid">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
                 <div>
-                    <span class="footer-heading">Services</span>
-                    <ul class="footer-list">
-                        <li>Pet Grooming</li>
-                        <li>Pet Hotel</li>
-                        <li>Health Check</li>
-                        <li>Appointment</li>
-                        <li>Booking</li>
+                    <span style="font-weight: 800; font-size: 1.1em; margin-bottom: 15px; display: block; letter-spacing: 0.5px;">Services</span>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">Pet Grooming</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">Pet Hotel</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">Health Check</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">Appointment</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">Booking</li>
                     </ul>
                 </div>
 
                 <div>
-                    <span class="footer-heading">Customer Service</span>
-                    <ul class="footer-list">
-                        <li>FAQs</li>
-                        <li>Refund Policy</li>
-                        <li>Payment Methods</li>
-                        <li>Terms & Conditions</li>
+                    <span style="font-weight: 800; font-size: 1.1em; margin-bottom: 15px; display: block; letter-spacing: 0.5px;">Customer Service</span>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">FAQs</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">Refund Policy</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">Payment Methods</li>
+                        <li style="margin-bottom: 10px; font-size: 0.95em; font-weight: 600;">Terms & Conditions</li>
                     </ul>
                 </div>
             </div>
         </div>
 
-        <div class="footer-center">
-            <span class="footer-heading">Follow Us</span>
-            <div class="footer-list" style="font-weight: 600;">
+        <div style="text-align: center; margin-top: 50px; margin-bottom: 30px;">
+            <span style="font-weight: 800; font-size: 1.1em; margin-bottom: 15px; display: block; letter-spacing: 0.5px;">Follow Us</span>
+            <div style="font-weight: 600;">
                 Instagram @petshoplala<br>
                 Facebook<br>
                 TikTok<br>
@@ -1196,12 +860,12 @@
             </div>
         </div>
 
-        <hr class="footer-line">
+        <hr style="border: 0; border-top: 3px solid white; margin: 0 40px 25px 40px; opacity: 1;">
 
-        <div class="copyright">
-            © 2025 Petshop Lala. All rights reserved. | Trusted by 10,000+ happy pet owners
+        <div style="text-align: center; font-size: 0.95em; font-weight: 700;">
+            © 2025 Petshop Lala. All rights reserved. | Trusted by happy pet owners
         </div>
     </footer>
-    ```
+
 </body>
 </html>

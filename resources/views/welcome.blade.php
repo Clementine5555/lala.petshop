@@ -628,7 +628,7 @@
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
 
-            toast.className = `toast ${type}`;
+            toast.className = toast ${type};
             toastMessage.textContent = message;
             toast.classList.add('show');
 
@@ -784,9 +784,7 @@
                 const toast = document.getElementById('toast');
                 if (toast) {
                     toast.classList.remove('show');
-                    // ensure inline display doesn't block the CSS-controlled visibility
-                    toast.style.display = 'none';
-                    toast.removeAttribute('style');
+                    toast.style.display = 'none !important';
                 }
             } catch (e) { /* ignore */ }
         });
@@ -865,7 +863,7 @@
         <hr style="border: 0; border-top: 3px solid white; margin: 0 40px 25px 40px; opacity: 1;">
 
         <div style="text-align: center; font-size: 0.95em; font-weight: 700;">
-            © 2025 Petshop Lala. All rights reserved. | Trusted by 10,000+ happy pet owners
+            © 2025 Petshop Lala. All rights reserved. | Trusted by happy pet owners
         </div>
     </footer>
 
