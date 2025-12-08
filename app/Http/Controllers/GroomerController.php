@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Groomer;
+use App\Models\Appointment_Detail;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class GroomerController extends Controller
@@ -29,7 +31,66 @@ class GroomerController extends Controller
 
 		$groomers = $query->orderBy('name')->paginate(12);
 
-		return view('groomers.index', compact('groomers'));
+		// Load today's appointments (appointment details) for dashboard
+		$today = Carbon::today()->toDateString();
+		$appointments = Appointment_Detail::with(['user','pet','groomer','service'])
+			->whereDate('date', $today)
+			->orderBy('time')
+			->get();
+
+		// If no appointments for today, fallback to upcoming 7 days so dashboard isn't empty
+		if ($appointments->isEmpty()) {
+			$appointments = Appointment_Detail::with(['user','pet','groomer','service'])
+				->whereDate('date', '>=', $today)
+				->whereDate('date', '<=', Carbon::today()->addDays(7)->toDateString())
+				->orderBy('date')
+				->orderBy('time')
+				->get();
+		}
+
+		// Prepare appointments payload for client-side interaction (JS)
+		$appointmentsForJs = $appointments->map(function($d) {
+			$rawTime = $d->time ?? null;
+			$time = '';
+			if ($rawTime) {
+				if ($rawTime instanceof \DateTimeInterface) {
+					$time = $rawTime->format('h:i A');
+				} else {
+					try {
+						$time = date('h:i A', strtotime($rawTime));
+					} catch (\Throwable $e) {
+						$time = (string) $rawTime;
+					}
+				}
+			}
+
+			$petWeight = optional($d->pet)->weight;
+
+			return [
+				'id' => $d->appointment_detail_id,
+				'time' => $time,
+				'customer' => optional($d->user)->name ?: optional($d->user)->email ?: 'Guest',
+				'payment' => '',
+				'petName' => optional($d->pet)->name ?: '-',
+				'petType' => optional($d->pet)->type ?: '-',
+				'weight' => $petWeight ? ($petWeight . ' kg') : '-',
+				'gender' => optional($d->pet)->gender ?: '-',
+				'petIcon' => (optional($d->pet)->type && stripos(optional($d->pet)->type, 'dog') !== false) ? '🐕' : '🐱',
+				'service' => optional($d->service)->name ?: '-',
+				'notes' => $d->note ?: '',
+				'status' => $d->status ?: 'pending',
+				'completedAt' => null,
+			];
+		});
+
+		// compute simple stats to display in the header cards
+		$todayCount = $appointments->count();
+		$pendingCount = $appointments->where('status', 'pending')->count();
+		$inprogressCount = $appointments->where('status', 'inprogress')->count();
+		$completedCount = $appointments->where('status', 'completed')->count();
+
+		// Note: views are located under resources/views/groomer (singular)
+		return view('groomer.index', compact('groomers','appointments','appointmentsForJs','todayCount','pendingCount','inprogressCount','completedCount'));
 	}
 
 	/**
@@ -38,7 +99,7 @@ class GroomerController extends Controller
 	public function create()
 	{
 		$this->authorizeAdmin();
-		return view('groomers.create');
+		return view('groomer.create');
 	}
 
 	/**
@@ -67,7 +128,7 @@ class GroomerController extends Controller
 	 */
 	public function show(Groomer $groomer)
 	{
-		return view('groomers.show', compact('groomer'));
+		return view('groomer.show', compact('groomer'));
 	}
 
 	/**
@@ -76,7 +137,7 @@ class GroomerController extends Controller
 	public function edit(Groomer $groomer)
 	{
 		$this->authorizeAdmin();
-		return view('groomers.edit', compact('groomer'));
+		return view('groomer.edit', compact('groomer'));
 	}
 
 	/**

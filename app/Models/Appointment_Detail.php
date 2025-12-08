@@ -58,6 +58,14 @@ class Appointment_Detail extends Model
     }
 
     /**
+     * AppointmentDetail belongs to Service
+     */
+    public function service(): BelongsTo
+    {
+        return $this->belongsTo(Service::class, 'service_id', 'service_id');
+    }
+
+    /**
      * Relasi ke tabel appointment
      * satu appointment detail memiliki banyak appointment (riwayat)
      */

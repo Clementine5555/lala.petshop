@@ -17,6 +17,10 @@
                 <div class="border rounded p-4">
                     @if($pet->photo)
                         <img src="{{ asset('storage/' . $pet->photo) }}" alt="{{ $pet->name }}" class="w-full h-40 object-cover mb-3 rounded">
+                    @else
+                        <div class="w-full h-40 mb-3 rounded flex items-center justify-center" style="background:#fff8f0;font-size:2.5rem;">
+                            {{ (stripos($pet->type ?? '', 'dog') !== false) ? '🐕' : ((stripos($pet->type ?? '', 'cat') !== false) ? '🐱' : '🐾') }}
+                        </div>
                     @endif
                     <h2 class="text-lg font-semibold">{{ $pet->name }}</h2>
                     <p class="text-sm text-gray-600">Type: {{ $pet->type }} @if($pet->race) • Race: {{ $pet->race }}@endif</p>

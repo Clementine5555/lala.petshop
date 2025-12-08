@@ -648,9 +648,7 @@
                     </p>
 
                     <!-- Add to Cart Form -->
-                    <form action="{{ route('cart.store') }}" method="POST" class="mb-6">
-                        @csrf
-                        <input type="hidden" name="product_id" value="{{ $product->product_id }}">
+                    <div class="mb-6">
 
                         <div class="flex items-center gap-4 mb-6">
                             <label class="font-semibold text-gray-700">Quantity:</label>
@@ -877,55 +875,99 @@
 
     // Add to cart
     function addToCart() {
-        console.log('Add to cart clicked!');
-        
-        const quantity = parseInt(document.getElementById('quantityInput').value);
-        const csrfToken = document.querySelector('meta[name="csrf-token"]');
-        
-        console.log('Quantity:', quantity);
-        console.log('CSRF Token:', csrfToken ? csrfToken.content : 'NOT FOUND');
-        
-        if (!csrfToken) {
-            alert('CSRF token not found!');
+        console.log('[addToCart] clicked');
+
+        // Find quantity input from several possible IDs/names
+        let quantityEl = document.getElementById('quantityInput') || document.getElementById('quantity') || document.querySelector('input[name="quantity"]');
+        let quantity = 1;
+        if (quantityEl) {
+            quantity = parseInt(quantityEl.value) || 1;
+        }
+
+        // CSRF token: prefer meta tag, fallback to hidden input inside form
+        const metaToken = document.querySelector('meta[name="csrf-token"]')?.content;
+        const formToken = document.querySelector('#addToCartForm input[name="_token"]')?.value;
+        const csrf = metaToken || formToken;
+
+        console.log('[addToCart] quantity=', quantity, 'csrf=', !!csrf);
+
+        if (!csrf) {
+            console.error('[addToCart] CSRF token not found');
+            showToast('Error: CSRF token not found', 'error');
             return;
         }
-        
+
         const url = '/cart/add';
-        const data = {
-            product_id: productId,
-            quantity: quantity
-        };
-        
-        console.log('Sending request to:', url);
-        console.log('Data:', data);
-        
+        const payload = { product_id: productId, quantity: quantity };
+
+        // disable button to prevent duplicates
+        const btn = document.querySelector('.btn.btn-primary');
+        if (btn) btn.disabled = true;
+
         fetch(url, {
             method: 'POST',
+            credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken.content,
+                'X-CSRF-TOKEN': csrf,
                 'Accept': 'application/json'
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(payload)
         })
-        .then(function(response) {
-            console.log('Response status:', response.status);
-            console.log('Response OK:', response.ok);
-            return response.json();
-        })
-        .then(function(data) {
-            console.log('Response data:', data);
-            
-            if (data.success) {
-                showToast('Product added to cart successfully!', 'success');
-                updateCartBadge(data.cart_count);
+        .then(async function(response) {
+            // Re-enable button
+            if (btn) btn.disabled = false;
+            const ct = response.headers.get('content-type') || '';
+            let data = null;
+            try {
+                if (ct.includes('application/json')) data = await response.json();
+                else {
+                    // Fallback: try text -> parse JSON
+                    const txt = await response.text();
+                    // detect if server returned an HTML login page (user not authenticated)
+                    const lowerTxt = (txt || '').toLowerCase();
+                    if (lowerTxt.includes('<form') && (lowerTxt.includes('login') || lowerTxt.includes('password') || lowerTxt.includes('csrf-token'))) {
+                        // Likely redirected to login page. Prompt user to login.
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Login required',
+                                text: 'Anda perlu login terlebih dahulu untuk menambahkan produk ke keranjang. Mau menuju halaman login?',
+                                showCancelButton: true,
+                                confirmButtonText: 'Ya, login',
+                                cancelButtonText: 'Batal',
+                                confirmButtonColor: '#FF8C42'
+                            }).then(res => { if (res.isConfirmed) window.location.href = '/login'; });
+                        } else {
+                            if (confirm('Anda perlu login. Buka halaman login sekarang?')) window.location.href = '/login';
+                        }
+                        return;
+                    }
+                    try { data = JSON.parse(txt); } catch(e) { data = { success: false, message: txt }; }
+                }
+            } catch (e) {
+                console.error('[addToCart] parse error', e);
+            }
+
+            console.log('[addToCart] response', response.status, data);
+
+            if (!response.ok) {
+                const msg = (data && data.message) ? data.message : 'Failed to add to cart';
+                showToast(msg, 'error');
+                return;
+            }
+
+            if (data && data.success) {
+                showToast(data.message || 'Produk berhasil ditambahkan ke keranjang!', 'success');
+                if (typeof updateCartBadge === 'function' && data.cart_count !== undefined) updateCartBadge(data.cart_count);
             } else {
-                showToast(data.message || 'Failed to add to cart', 'error');
+                showToast((data && data.message) || 'Gagal menambahkan ke keranjang', 'error');
             }
         })
         .catch(function(error) {
-            console.error('Fetch error:', error);
-            showToast('Failed to add to cart. Error: ' + error.message, 'error');
+            if (btn) btn.disabled = false;
+            console.error('[addToCart] fetch error:', error);
+            showToast('Gagal menambahkan ke keranjang: ' + (error.message || ''), 'error');
         });
     }
 

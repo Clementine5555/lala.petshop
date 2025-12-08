@@ -137,7 +137,15 @@ class AppointmentController extends Controller
             'total_price' => $service->price ?? 0
         ];
 
-        // 5. Redirect to Confirmation Page with Data
+        // 5. Return JSON when requested (AJAX) so the frontend can stay on the same page
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Booking berhasil! Mohon tunggu konfirmasi admin.',
+                'appointment' => $appointmentData,
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Booking berhasil! Mohon tunggu konfirmasi admin.');
     }
 

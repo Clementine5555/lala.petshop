@@ -312,6 +312,63 @@
 <body>
     <button class="logout-btn" onclick="logout()">🚪 Logout</button>
     <div class="container">
+        @php
+            use App\Models\Delivery;
+            use Carbon\Carbon;
+
+            $deliveries = Delivery::with(['transaction.transactionDetails','transaction.user','transaction.payment'])
+                ->whereDate('delivery_date', Carbon::today())
+                ->get();
+
+            if ($deliveries->isEmpty()) {
+                $deliveries = Delivery::with(['transaction.transactionDetails','transaction.user','transaction.payment'])
+                    ->whereDate('delivery_date', '>=', Carbon::today())
+                    ->whereDate('delivery_date', '<=', Carbon::today()->addDays(7))
+                    ->orderBy('delivery_date')
+                    ->get();
+            }
+
+            $ordersForJs = $deliveries->map(function($d) {
+                $t = $d->transaction;
+                $items = [];
+                if ($t && $t->transactionDetails) {
+                    foreach ($t->transactionDetails as $td) {
+                        $items[] = [
+                            'name' => $td->name ?? ($td->product->name ?? 'Item'),
+                            'qty' => $td->quantity ?? ($td->qty ?? 1),
+                            'price' => $td->price ?? 0,
+                        ];
+                    }
+                }
+                $user = $t->user ?? null;
+                $addr = $d->address ?? ($t->delivery_address ?? '');
+                $area = 'unknown';
+                if ($addr && strpos($addr, ',') !== false) {
+                    $parts = explode(',', $addr);
+                    $area = trim(strtolower(str_replace(' ', '-', $parts[1] ?? $parts[0])));
+                }
+
+                return [
+                    'id' => $t ? ('TRX-'.$t->transaction_id) : ('DLV-'.$d->delivery_id),
+                    'customer' => $user->name ?? ($t->customer_name ?? 'Guest'),
+                    'phone' => $user->phone ?? ($t->phone ?? ''),
+                    'address' => $addr,
+                    'area' => $area,
+                    'items' => $items,
+                    'total' => $t ? ($t->total ?? ($t->grand_total ?? 0)) : 0,
+                    'status' => $d->status ?? ($t->status ?? 'pending'),
+                    'date' => $d->delivery_date ? $d->delivery_date->format('d M Y, H:i') : ($t->transaction_date ?? ''),
+                    'notes' => $d->description ?? '',
+                    'paymentMethod' => $t && $t->payment ? ($t->payment->method ?? 'COD') : ($t->payment_method ?? 'COD'),
+                    'paymentStatus' => $t && $t->payment ? ($t->payment->status ?? ($t->payment_status ?? 'Belum Bayar')) : ($t->payment_status ?? 'Belum Bayar'),
+                    'completedAt' => $d->completed_at ?? null,
+                ];
+            });
+
+            $pendingCount = $deliveries->filter(function($x){ return in_array($x->status, ['pending','pickup']); })->count();
+            $deliveringCount = $deliveries->where('status', 'delivering')->count();
+            $completedCount = $deliveries->where('status', 'delivered')->count();
+        @endphp
         <div class="header">
             <div class="header-left">
                 <div class="avatar">🚚</div>
@@ -322,15 +379,15 @@
             </div>
             <div class="header-stats">
                 <div class="stat-box">
-                    <div class="stat-num" id="pendingCount">0</div>
+                    <div class="stat-num" id="pendingCount">{{ $pendingCount ?? 0 }}</div>
                     <div class="stat-label">Menunggu</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-num" id="deliveringCount">0</div>
+                    <div class="stat-num" id="deliveringCount">{{ $deliveringCount ?? 0 }}</div>
                     <div class="stat-label">Dikirim</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-num" id="completedCount">0</div>
+                    <div class="stat-num" id="completedCount">{{ $completedCount ?? 0 }}</div>
                     <div class="stat-label">Selesai</div>
                 </div>
             </div>
@@ -398,14 +455,7 @@
         </div>
     </div>
 <script>
-let orders = [
-    {id:'ORD-2025-001',customer:'Tachyang Cutesy',phone:'0812-3456-7890',address:'Jl. Setia Budi No. 123, Medan Utara',area:'medan-utara',items:[{name:'Whiskas 1kg',qty:2,price:130000},{name:'Royal Canin 500g',qty:1,price:99000}],total:359000,status:'pending',date:'21 Nov 2025, 09:30',notes:'Tolong hubungi sebelum tiba',paymentMethod:'COD',paymentStatus:'Belum Bayar'},
-    {id:'ORD-2025-002',customer:'Budi Santoso',phone:'0813-5678-9012',address:'Jl. Gatot Subroto No. 45, Medan Selatan',area:'medan-selatan',items:[{name:'Premium Dog Food 5kg',qty:1,price:350000},{name:'Pedigree Adult 3kg',qty:1,price:285000}],total:635000,status:'pickup',date:'21 Nov 2025, 08:15',notes:'',paymentMethod:'Transfer',paymentStatus:'Lunas'},
-    {id:'ORD-2025-003',customer:'Siti Aminah',phone:'0821-9876-5432',address:'Jl. Imam Bonjol No. 78, Medan Timur',area:'medan-timur',items:[{name:'Me-O 1.2kg',qty:3,price:99000}],total:297000,status:'delivering',date:'21 Nov 2025, 07:45',notes:'Lantai 3, Apt 305',paymentMethod:'Transfer',paymentStatus:'Lunas'},
-    {id:'ORD-2025-004',customer:'Ahmad Yani',phone:'0822-3456-1234',address:'Jl. Sudirman No. 99, Medan Barat',area:'medan-barat',items:[{name:'Purina Pro Plan 2kg',qty:1,price:425000}],total:425000,status:'pending',date:'21 Nov 2025, 10:00',notes:'',paymentMethod:'COD',paymentStatus:'Belum Bayar'},
-    {id:'ORD-2025-005',customer:'Linda Wijaya',phone:'0813-7890-5678',address:'Jl. Veteran No. 56, Medan Utara',area:'medan-utara',items:[{name:'Cat Choize 2kg',qty:1,price:210000},{name:'Friskies 1kg',qty:2,price:75000}],total:360000,status:'pickup',date:'21 Nov 2025, 09:00',notes:'Pagar warna biru',paymentMethod:'Transfer',paymentStatus:'Lunas'},
-    {id:'ORD-2025-006',customer:'Dewi Lestari',phone:'0856-1234-5678',address:'Jl. Asia No. 12, Medan Timur',area:'medan-timur',items:[{name:'Bolt Cat Food 1kg',qty:2,price:85000}],total:170000,status:'delivered',date:'21 Nov 2025, 07:00',notes:'',paymentMethod:'COD',paymentStatus:'Lunas',completedAt:'08:30'}
-];
+const orders = @json($ordersForJs ?? []);
 let currentOrder = null, currentAction = null;
 const statusMap = {pending:'Menunggu Pickup',pickup:'Siap Diambil',delivering:'Sedang Dikirim',delivered:'Selesai'};
 const statusClass = {pending:'status-pending',pickup:'status-pickup',delivering:'status-delivering',delivered:'status-delivered'};

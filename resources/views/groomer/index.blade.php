@@ -255,6 +255,33 @@
         <span>Logout</span>
     </button>
     <div class="container">
+        @isset($groomers)
+        <!-- Simple Groomers Listing (rendered when controller provides $groomers) -->
+        <div style="background: white; padding: 30px; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.08); margin-bottom:24px;">
+            <h2 style="font-size:1.6em; color:#333; margin-bottom:12px;">Groomers</h2>
+            <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px;">
+                @foreach($groomers as $g)
+                    <div style="padding:14px; border-radius:12px; background:#fff8f4; border:1px solid rgba(0,0,0,0.03);">
+                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+                            <div style="width:48px;height:48px;border-radius:50%;background:#fff;color:#F57C00;display:flex;align-items:center;justify-content:center;font-weight:700;">{{ strtoupper(substr($g->name,0,1)) }}</div>
+                            <div>
+                                <div style="font-weight:700;color:#333">{{ $g->name }}</div>
+                                <div style="font-size:0.9em;color:#666">{{ $g->email }}</div>
+                            </div>
+                        </div>
+                        <div style="font-size:0.9em;color:#666;margin-bottom:10px">{{ $g->address ?? '-' }}</div>
+                        <div style="display:flex; gap:8px;">
+                            <a href="{{ route('groomers.show', $g->groomer_id) }}" style="padding:8px 12px;border-radius:10px;background:#FF8C42;color:white;text-decoration:none;font-weight:700">View</a>
+                            @can('update', $g)
+                                <a href="{{ route('groomers.edit', $g->groomer_id) }}" style="padding:8px 12px;border-radius:10px;background:#eee;color:#333;text-decoration:none;font-weight:700">Edit</a>
+                            @endcan
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            <div style="margin-top:16px">{{ $groomers->links() }}</div>
+        </div>
+        @endisset
         <div class="header">
             <div class="header-content">
                 <div class="header-left">
@@ -268,19 +295,19 @@
             </div>
         </div>
         <div class="stats-grid">
-            <div class="stat-card"><h3>Today's Appointments</h3><div class="number" id="totalCount">5</div><div class="icon">📅</div></div>
-            <div class="stat-card"><h3>Pending</h3><div class="number" id="pendingCount">3</div><div class="icon">⏳</div></div>
-            <div class="stat-card"><h3>In Progress</h3><div class="number" id="progressCount">1</div><div class="icon">🔄</div></div>
-            <div class="stat-card"><h3>Completed</h3><div class="number" id="completedCount">1</div><div class="icon">✅</div></div>
+            <div class="stat-card"><h3>Today's Appointments</h3><div class="number" id="totalCount">{{ $todayCount ?? 0 }}</div><div class="icon">📅</div></div>
+            <div class="stat-card"><h3>Pending</h3><div class="number" id="pendingCount">{{ $pendingCount ?? 0 }}</div><div class="icon">⏳</div></div>
+            <div class="stat-card"><h3>In Progress</h3><div class="number" id="progressCount">{{ $inprogressCount ?? 0 }}</div><div class="icon">🔄</div></div>
+            <div class="stat-card"><h3>Completed</h3><div class="number" id="completedCount">{{ $completedCount ?? 0 }}</div><div class="icon">✅</div></div>
         </div>
         <div class="appointments-section">
             <div class="section-header">
                 <h2>📋 Today's Schedule</h2>
                 <div class="filter-tabs">
-                    <button class="filter-tab active" onclick="filterAppointments('all')">All</button>
-                    <button class="filter-tab" onclick="filterAppointments('pending')">Pending</button>
-                    <button class="filter-tab" onclick="filterAppointments('inprogress')">In Progress</button>
-                    <button class="filter-tab" onclick="filterAppointments('completed')">Completed</button>
+                    <button class="filter-tab active" onclick="filterAppointments(event, 'all')">All</button>
+                    <button class="filter-tab" onclick="filterAppointments(event, 'pending')">Pending</button>
+                    <button class="filter-tab" onclick="filterAppointments(event, 'inprogress')">In Progress</button>
+                    <button class="filter-tab" onclick="filterAppointments(event, 'completed')">Completed</button>
                 </div>
             </div>
             <div class="appointments-list" id="appointmentsList"></div>
@@ -309,13 +336,7 @@
         </div>
     </div>
 <script>
-const appointments = [
-    {id:1,time:"09:00 AM",customer:"John Doe",payment:"Cash",petName:"Max",petType:"Golden Retriever",weight:"25 kg",gender:"Male",petIcon:"🐕",service:"Full Grooming",notes:"Sensitive to loud noises",status:"pending"},
-    {id:2,time:"10:30 AM",customer:"Sarah Smith",payment:"Bank Transfer (Paid)",petName:"Luna",petType:"Persian Cat",weight:"4 kg",gender:"Female",petIcon:"🐱",service:"Bath Only",notes:"",status:"inprogress"},
-    {id:3,time:"08:00 AM",customer:"Mike Johnson",payment:"GoPay (Paid)",petName:"Buddy",petType:"Beagle",weight:"12 kg",gender:"Male",petIcon:"🐕",service:"Full Grooming",notes:"",status:"completed",completedAt:"08:45 AM"},
-    {id:4,time:"01:00 PM",customer:"Emily Brown",payment:"Cash",petName:"Bella",petType:"Poodle",weight:"8 kg",gender:"Female",petIcon:"🐕",service:"Bath Only",notes:"Use warm water",status:"pending"},
-    {id:5,time:"03:00 PM",customer:"David Lee",payment:"Bank Transfer",petName:"Charlie",petType:"Shih Tzu",weight:"6 kg",gender:"Male",petIcon:"🐕",service:"Full Grooming",notes:"Extra fluffy style",status:"pending"}
-];
+const appointments = @json($appointmentsForJs ?? []);
 let currentAppointment = null, timerInterval = null, seconds = 0;
 const checklists = {
     "Full Grooming": ["Brushing","Bathing","Drying","Hair Cutting","Nail Trimming","Ear Cleaning","Perfume"],
@@ -351,14 +372,21 @@ function renderAppointments() {
     updateStats();
 }
 function updateStats() {
-    document.getElementById('totalCount').textContent = appointments.length;
-    document.getElementById('pendingCount').textContent = appointments.filter(a => a.status === 'pending').length;
-    document.getElementById('progressCount').textContent = appointments.filter(a => a.status === 'inprogress').length;
-    document.getElementById('completedCount').textContent = appointments.filter(a => a.status === 'completed').length;
+    // keep UI in sync if appointments are manipulated client-side; otherwise server counts are authoritative
+    const total = appointments.length;
+    if (total === 0) {
+        // show friendly empty state
+        document.getElementById('appointmentsList').innerHTML = '<div style="padding:28px;border-radius:12px;background:#fff8f0;color:#666">No appointments found for the selected period.</div>';
+    }
+    // Only update the numeric badges if they exist in the DOM
+    const t = document.getElementById('totalCount'); if (t) t.textContent = total;
+    const p = document.getElementById('pendingCount'); if (p) p.textContent = appointments.filter(a => a.status === 'pending').length;
+    const pr = document.getElementById('progressCount'); if (pr) pr.textContent = appointments.filter(a => a.status === 'inprogress').length;
+    const c = document.getElementById('completedCount'); if (c) c.textContent = appointments.filter(a => a.status === 'completed').length;
 }
-function filterAppointments(filter) {
-    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-    event.target.classList.add('active');
+function filterAppointments(ev, filter) {
+    try { document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active')); } catch(e){}
+    if (ev && ev.target) ev.target.classList.add('active');
     document.querySelectorAll('.appointment-card').forEach(c => {
         c.classList.toggle('hidden', filter !== 'all' && c.dataset.status !== filter);
     });

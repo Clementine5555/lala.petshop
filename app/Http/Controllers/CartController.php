@@ -6,6 +6,8 @@ use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 
 class CartController extends Controller
 {
@@ -24,57 +26,102 @@ class CartController extends Controller
 
     // 2. TAMBAH ITEM KE CART
     public function store(Request $request) {
-        $request->validate([
-            'product_id' => 'required|exists:products,product_id',
-            'quantity'   => 'required|integer|min:1'
-        ]);
+    $request->validate([
+        'product_id' => 'required|exists:products,product_id',
+        'quantity'   => 'required|integer|min:1'
+    ]);
 
-        $product = Product::findOrFail($request->product_id);
+    $isAjax = $request->ajax() || $request->wantsJson() || $request->expectsJson();
 
-        // Validasi Stok
-        if ($request->quantity > $product->stock) {
+    $product = Product::findOrFail($request->product_id);
+
+    // Validasi stok
+    if ($request->quantity > $product->stock) {
+        if ($isAjax) {
             return response()->json([
                 'success' => false,
                 'message' => "Jumlah melebihi stok ({$product->stock})!"
             ], 400);
         }
 
-        // Cek barang di cart
-        $cartItem = Cart::where('user_id', auth()->id())
+        return back()->with('error', "Jumlah melebihi stok ({$product->stock})!");
+    }
+
+    // Use transaction to avoid race condition when two requests try to insert same cart concurrently
+    try {
+        DB::transaction(function () use ($request, $product) {
+            $cartItem = Cart::where('user_id', auth()->id())
                         ->where('product_id', $request->product_id)
+                        ->where('status', 'active')
+                        ->lockForUpdate()
                         ->first();
 
-        if ($cartItem) {
-            $newQty = $cartItem->quantity + $request->quantity;
+            if ($cartItem) {
+                $newQty = $cartItem->quantity + $request->quantity;
 
-            // Validasi Stok lagi buat update
-            if ($newQty > $product->stock) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Total di keranjang melebihi stok ({$product->stock})!"
-                ], 400);
+                if ($newQty > $product->stock) {
+                    throw new \Exception("Total in cart exceeds available stock ({$product->stock})");
+                }
+
+                $cartItem->update(['quantity' => $newQty]);
+            } else {
+                Cart::create([
+                    'user_id'    => auth()->id(),
+                    'product_id' => $product->product_id,
+                    'quantity'   => $request->quantity,
+                    'status'     => 'active',
+                ]);
             }
+        });
+    } catch (QueryException $e) {
+        // Handle duplicate unique key (race) by finding existing row and updating quantity
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+            $cartItem = Cart::where('user_id', auth()->id())
+                            ->where('product_id', $request->product_id)
+                            ->where('status', 'active')
+                            ->first();
 
-            $cartItem->update(['quantity' => $newQty]);
-        } 
-        else {
-            Cart::create([
-                'user_id'    => auth()->id(),
-                'product_id' => $product->product_id,
-                'quantity'   => $request->quantity,
-                'status'     => 'active',
-            ]);
+            if ($cartItem) {
+                $newQty = $cartItem->quantity + $request->quantity;
+                if ($newQty > $product->stock) {
+                    if ($isAjax) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => "Total di keranjang melebihi stok ({$product->stock})!"
+                        ], 400);
+                    }
+
+                    return back()->with('error', "Total di keranjang melebihi stok ({$product->stock})!");
+                }
+                $cartItem->update(['quantity' => $newQty]);
+            }
+        } else {
+            throw $e; // rethrow other DB exceptions
+        }
+    } catch (\Exception $e) {
+        if ($isAjax) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
         }
 
-        // Ambil jumlah terbaru buat update badge
-        $cartCount = Cart::where('user_id', auth()->id())->sum('quantity');
+        return back()->with('error', $e->getMessage());
+    }
 
+    $cartCount = Cart::where('user_id', auth()->id())->sum('quantity');
+
+    if ($isAjax) {
         return response()->json([
             'success' => true,
             'message' => 'Produk berhasil ditambahkan ke keranjang!',
-            'cart_count' => $cartCount // Ini dipake sama JS buat update badge real-time
+            'cart_count' => $cartCount
         ]);
     }
+
+    return back()->with('success', 'Produk berhasil ditambahkan ke keranjang!');
+}
+
 
     // 3. UPDATE JUMLAH (Saat di halaman Cart)
     public function update(Request $request, $id) {

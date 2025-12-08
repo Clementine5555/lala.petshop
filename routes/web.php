@@ -131,7 +131,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
     Route::post('/cart/add', [CartController::class, 'store'])->name('cart.add');
     Route::resource('pets', PetController::class);
+    // Groomer management (listing for admins and groomer profiles)
+    Route::resource('groomers', \App\Http\Controllers\GroomerController::class);
 });
 
 // contact us routes
 Route::post('/contact/send', [ContactController::class, 'store'])->name('contact.send');
+
+// Quick public courier dashboard route (serves Blade view)
+Route::get('/kurir', function () {
+    return view('kurir.index');
+})->name('kurir.index');

@@ -474,16 +474,17 @@
 
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 30px;
+            /* slightly more compact grid to match shop listing */
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
         }
 
         .product-card {
             background: white;
-            border-radius: 25px;
-            padding: 25px;
+            border-radius: 18px;
+            padding: 18px;
             transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
             cursor: pointer;
         }
 
@@ -494,13 +495,13 @@
 
         .product-image-wrapper {
             width: 100%;
-            height: 220px;
+            height: 160px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: #f9f9f9;
-            border-radius: 20px;
-            margin-bottom: 20px;
+            border-radius: 14px;
+            margin-bottom: 14px;
         }
 
         .product-image-wrapper img {
@@ -510,11 +511,11 @@
         }
 
         .product-info h3 {
-            font-size: 1.4em;
+            font-size: 1.2em;
             color: #333;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-weight: 700;
-            min-height: 60px;
+            min-height: 48px;
         }
 
         .product-rating {
@@ -544,10 +545,10 @@
         }
 
         .product-price {
-            font-size: 1.8em;
+            font-size: 1.4em;
             color: #FF8C42;
             font-weight: 800;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .stock-status {

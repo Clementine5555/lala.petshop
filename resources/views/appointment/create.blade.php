@@ -1121,9 +1121,68 @@
         }
 
             function submitForm() {
-                // Ensure summary is up-to-date then submit
+                // Ensure summary is up-to-date
                 try { updateSummary(); } catch(e) {}
-                document.getElementById('appointmentForm').submit();
+
+                const form = document.getElementById('appointmentForm');
+                const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+
+                if (!paymentMethod) {
+                    Swal.fire({ icon: 'warning', title: 'Pilih metode pembayaran', text: 'Please select a payment method.' , confirmButtonColor: '#FF8C42'});
+                    return false;
+                }
+
+                const method = paymentMethod.value;
+                const paymentProof = document.getElementById('payment_proof');
+                if ((method === 'bank_transfer' || method === 'ewallet') && (!paymentProof || !paymentProof.files.length)) {
+                    Swal.fire({ icon: 'warning', title: 'Upload bukti', text: 'Please upload proof of payment for this method.', confirmButtonColor: '#FF8C42'});
+                    return false;
+                }
+
+                // Build FormData and send via fetch so we can stay on the same page
+                const formData = new FormData(form);
+                const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                fetch(form.action || window.location.pathname, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                })
+                .then(async res => {
+                    const isJson = res.headers.get('content-type')?.includes('application/json');
+                    const payload = isJson ? await res.json() : null;
+                    if (!res.ok) {
+                        // Try to show validation errors from JSON
+                        if (payload && payload.errors) {
+                            const errs = Object.values(payload.errors).flat();
+                            Swal.fire({ icon: 'error', title: 'Waduh!', html: '<div style="text-align:left">' + errs.map(e => '<div>• ' + e + '</div>').join('') + '</div>', confirmButtonColor: '#d33'});
+                        } else if (payload && payload.message) {
+                            Swal.fire({ icon: 'error', title: 'Error', text: payload.message, confirmButtonColor: '#d33'});
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong', confirmButtonColor: '#d33'});
+                        }
+                        throw new Error('Request failed');
+                    }
+
+                    // Success
+                    if (payload && payload.success) {
+                        Swal.fire({ icon: 'success', title: 'Yeay! Berhasil 🎉', text: payload.message || 'Booking berhasil!', confirmButtonColor: '#FF8C42'}).then(() => {
+                            // Optionally reset form or update UI
+                            // form.reset();
+                            // updateSummary();
+                        });
+                    } else {
+                        Swal.fire({ icon: 'success', title: 'Yeay! Berhasil 🎉', text: 'Booking berhasil!', confirmButtonColor: '#FF8C42'});
+                    }
+                })
+                .catch(err => {
+                    console.error('Submit error', err);
+                });
+
+                return false;
             }
 
         function showFileName() {
@@ -1168,28 +1227,7 @@
             }
         }
         
-        function submitForm() {
-            // Check if payment method is selected
-            const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
-            
-            if (!paymentMethod) {
-                alert('Please select a payment method!');
-                return false;
-            }
-            
-            // Check if upload required for non-cash payments
-            const method = paymentMethod.value;
-            const paymentProof = document.getElementById('payment_proof');
-            
-            if ((method === 'bank_transfer' || method === 'ewallet') && !paymentProof.files.length) {
-                alert('Please upload proof of payment!');
-                return false;
-            }
-            
-            // If all validation passed, submit the form
-            console.log('Form is valid, submitting...');
-            document.getElementById('appointmentForm').submit();
-        }
+        // Note: submitForm() is implemented above using fetch() to keep the user on the same page.
         
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
