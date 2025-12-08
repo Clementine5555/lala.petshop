@@ -8,14 +8,20 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Appointment_Detail extends Model
 {
-    protected $table = 'appointment_detail';
+    // Migration creates `appointment_details` (plural) so make model match
+    protected $table = 'appointment_details';
     protected $primaryKey = 'appointment_detail_id';
     public $timestamps = true;
 
     protected $fillable = [
+        'appointment_id',
+        'service_id',
         'user_id',
         'groomer_id',
         'pet_id',
+        'date',
+        'time',
+        'note',
         'status',
         'total_appointments_completed',
     ];

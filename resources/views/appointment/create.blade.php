@@ -788,8 +788,21 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="pet_name">Pet Name</label>
-                    <input type="text" id="pet_name" name="pet_name" required>
+                    <label for="pet_id">Pet</label>
+                    @if(isset($pets) && $pets->count() > 0)
+                    <select id="pet_id" name="pet_id">
+                        <option value="">-- Choose pet --</option>
+                        @foreach($pets as $pet)
+                            <option value="{{ $pet->pet_id }}">{{ $pet->name ?? $pet->pet_name ?? 'Pet' }}</option>
+                        @endforeach
+                        <option value="new">+ Add new pet</option>
+                    </select>
+                    @else
+                    <select id="pet_id" name="pet_id" style="display:none;"></select>
+                    @endif
+
+                    <!-- Manual pet name input (hidden by default when user selects existing pet) -->
+                    <input type="text" id="pet_name" name="pet_name" placeholder="Enter pet name" style="display: none; margin-top:8px;">
                 </div>
 
                 <div class="form-group">
@@ -865,6 +878,21 @@
 
                 <div class="form-group">
     <label>Select Service</label>
+    <div style="margin-bottom:12px;">
+        <label for="groomer_id">Choose Groomer</label>
+        <select id="groomer_id" name="groomer_id" required @if(!isset($groomers) || $groomers->count() == 0) disabled @endif>
+            <option value="">-- Choose groomer --</option>
+            @if(isset($groomers) && $groomers->count() > 0)
+                @foreach($groomers as $gr)
+                    <option value="{{ $gr->groomer_id }}">{{ $gr->name ?? ($gr->groomer_name ?? 'Groomer') }}</option>
+                @endforeach
+            @endif
+        </select>
+        @if(!isset($groomers) || $groomers->count() == 0)
+            <p style="color:#d33; font-weight:600; margin-top:8px;">No groomers available. Please contact admin or try again later.</p>
+        @endif
+    </div>
+
     <div class="service-radio-group">
         @foreach($services as $srv)
         <label class="service-option">
@@ -1057,8 +1085,17 @@
         }
 
         function updateSummary() {
-            // Update pet name
-            const petName = document.getElementById('pet_name').value;
+            // Update pet name (support select OR manual input)
+            let petName = '-';
+            const petInput = document.getElementById('pet_name');
+            const petSelect = document.getElementById('pet_id');
+
+            if (petInput && petInput.value && petInput.value.trim() !== '') {
+                petName = petInput.value.trim();
+            } else if (petSelect && petSelect.value && petSelect.value !== 'new') {
+                const opt = petSelect.options[petSelect.selectedIndex];
+                petName = opt ? opt.text : '-';
+            }
             document.getElementById('summary_pet').textContent = petName || '-';
             
             // Update date
@@ -1069,19 +1106,25 @@
             const time = document.getElementById('appointment_time').value;
             document.getElementById('summary_time').textContent = time || '-';
             
-            // Update selected services and calculate total
-            const services = [];
-            let totalPrice = 0;
-            
-            document.querySelectorAll('input[name="services[]"]:checked').forEach(checkbox => {
-                const serviceText = checkbox.nextElementSibling.querySelector('strong').textContent;
-                services.push(serviceText);
-                totalPrice += parseInt(checkbox.dataset.price);
-            });
-            
-            document.getElementById('summary_service').textContent = services.length > 0 ? services.join(', ') : '-';
-            document.getElementById('summary_price').textContent = 'Rp ' + totalPrice.toLocaleString('id-ID');
+                // Update selected service (radio) and calculate total
+                const selectedService = document.querySelector('input[name="service_id"]:checked');
+                if (selectedService) {
+                    const name = selectedService.dataset.name || selectedService.getAttribute('data-name') || '-' ;
+                    const rawPrice = selectedService.dataset.price || selectedService.getAttribute('data-price') || '0';
+                    const price = parseInt(String(rawPrice).replace(/\D/g, '')) || 0;
+                    document.getElementById('summary_service').textContent = name || '-';
+                    document.getElementById('summary_price').textContent = 'Rp ' + price.toLocaleString('id-ID');
+                } else {
+                    document.getElementById('summary_service').textContent = '-';
+                    document.getElementById('summary_price').textContent = 'Rp 0';
+                }
         }
+
+            function submitForm() {
+                // Ensure summary is up-to-date then submit
+                try { updateSummary(); } catch(e) {}
+                document.getElementById('appointmentForm').submit();
+            }
 
         function showFileName() {
             const input = document.getElementById('payment_proof');
@@ -1160,6 +1203,32 @@
             
             // Check if payment method already selected and show info
             togglePaymentInfo();
+
+            // Toggle pet name input when user chooses "Add new pet" or an existing pet
+            const petSelect = document.getElementById('pet_id');
+            const petInput = document.getElementById('pet_name');
+            if (petSelect && petInput) {
+                const handlePetChange = () => {
+                    if (petSelect.value === 'new' || !petSelect.value) {
+                        petInput.style.display = 'block';
+                        petInput.required = true;
+                        petInput.focus();
+                    } else {
+                        petInput.style.display = 'none';
+                        petInput.required = false;
+                    }
+                    // Keep summary updated when switching
+                    try { updateSummary(); } catch (e) {}
+                };
+
+                petSelect.addEventListener('change', handlePetChange);
+                // Run once to set initial visibility
+                handlePetChange();
+            } else if (petInput) {
+                // If no select (no pets) make sure input visible
+                petInput.style.display = 'block';
+                petInput.required = true;
+            }
         });
     </script>
 
@@ -1182,10 +1251,11 @@
         @endif
 
         @if($errors->any())
+            const laravelErrors = {!! json_encode($errors->all()) !!};
             Swal.fire({
                 icon: 'error',
                 title: 'Waduh!',
-                text: 'Ada isian yang belum lengkap atau salah.',
+                html: '<div style="text-align:left">' + laravelErrors.map(e => '<div>• ' + e + '</div>').join('') + '</div>',
                 confirmButtonColor: '#d33'
             });
         @endif

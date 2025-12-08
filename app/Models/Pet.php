@@ -18,7 +18,6 @@ class Pet extends BaseModel
         'name',
         'type',
         'race',
-        'breed',
         'age',
         'weight',
         'gender',

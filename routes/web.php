@@ -43,7 +43,10 @@ Route::get('/email/verify/{id}/{hash}', function () {
 
 // dashboard route untuk user yang sudah terverifikasi
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    // pass latest products so dashboard sections can render dynamic product info
+    $products = Product::latest()->get();
+
+    return view('dashboard', compact('products'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // shop routes
@@ -114,6 +117,8 @@ Route::middleware('auth')->group(function () {
     Route::redirect('/appointment', '/appointment/create');
 });
 // service routes
+// list all services (shop) and service detail
+Route::get('/services', [ShopServiceController::class, 'index'])->name('services.index');
 Route::get('/services/{id}', [ShopServiceController::class, 'show'])->name('services.show');
 Route::get('/book/{service_id}', [AppointmentController::class, 'createForm'])->name('appointments.form');
 

@@ -151,28 +151,68 @@
             <p>Premium quality products for your beloved pets</p>
         </div>
 
+        @php
+            // pick a featured product: try to find Pedigree, otherwise first dog-food, otherwise first product
+            $featured = null;
+            if (isset($products) && $products->count() > 0) {
+                $featured = $products->firstWhere('name', 'like', '%Pedigree%')
+                            ?? $products->firstWhere('category', 'dog-food')
+                            ?? $products->first();
+            }
+        @endphp
+
         <div class="product-showcase">
             <div class="product-img">
-                <img src="{{ asset('images/makanan.jpeg') }}" alt="Monge">
+                @if($featured && ($featured->image ?? false))
+                    <img src="{{ asset('images/' . ($featured->image ?? 'makanan.jpeg')) }}" alt="{{ $featured->name }}">
+                @else
+                    <img src="{{ asset('images/makanan.jpeg') }}" alt="Product">
+                @endif
             </div>
 
             <div class="product-details">
-                <h3>Pedigree</h3>
-                <p class="product-description">Nutrisi lengkap untuk anjing dewasa, 3kg</p>
+                <h3>{{ $featured->name ?? 'Pedigree' }}</h3>
+                <p class="product-description">{{ $featured->description ?? 'Nutrisi lengkap untuk anjing dewasa, 3kg' }}</p>
 
                 <div class="rating">
-                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    @php
+                        $avg = $featured->average_rating ?? 0;
+                        $full = (int) floor($avg);
+                        $hasHalf = ($avg - $full) >= 0.5;
+                    @endphp
+
+                    @for ($i = 0; $i < $full; $i++)
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    @endfor
+
+                    @if($hasHalf)
+                        <!-- half star: left half filled -->
+                        <svg viewBox="0 0 24 24" style="width:28px;height:28px;">
+                            <defs>
+                                <clipPath id="halfClip">
+                                    <rect x="0" y="0" width="12" height="24" />
+                                </clipPath>
+                            </defs>
+                            <g clip-path="url(#halfClip)">
+                                <path fill="#FFD700" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </g>
+                            <path fill="none" stroke="#FFD700" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    @endif
+
+                    @php $rendered = $full + ($hasHalf ? 1 : 0); @endphp
+                    @for ($i = $rendered; $i < 5; $i++)
+                        <svg viewBox="0 0 24 24" style="opacity:0.25;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    @endfor
+
+                    <span style="margin-left:8px;color:#666;font-weight:700;">{{ number_format($avg, 1) }} ({{ $featured->reviews_count ?? 0 }})</span>
                 </div>
 
-                <div class="product-price">Rp 140.000</div>
+                <div class="product-price">Rp {{ number_format($featured->price ?? 140000, 0, ',', '.') }}</div>
 
                 <form action="{{ route('cart.store') }}" method="POST">
                     @csrf
-                    <input type="hidden" name="product_id" value="1">
+                    <input type="hidden" name="product_id" value="{{ $featured->product_id ?? 1 }}">
                     <input type="hidden" name="quantity" value="1">
                     <button type="submit" class="btn-add-cart">Add to Cart</button>
                 </form>

@@ -444,7 +444,7 @@
                             data-name="{{ $srv->service_name }}"
                             data-price="{{ $srv->price }}"
                             onchange="updateSummary()"
-                            {{ (isset($selectedService) && $selectedService->service_id == $srv->service_id) ? 'checked' : '' }}
+                            {{ (isset($selectedService) && $selectedService->service_id == $srv->service_id) ? 'checked' : (empty($selectedService) && $loop->first ? 'checked' : '') }}
                             required 
                             style="width: 20px; height: 20px; margin-top: 5px;">
                         
@@ -588,43 +588,30 @@
             // Update pet name
             const petName = document.getElementById('pet_name').value;
             document.getElementById('summary_pet').textContent = petName || '-';
-            
+
             // Update date
             const date = document.getElementById('appointment_date').value;
             document.getElementById('summary_date').textContent = date || '-';
-            
+
             // Update time
             const time = document.getElementById('appointment_time').value;
             document.getElementById('summary_time').textContent = time || '-';
-            
-            // Update selected services and calculate total
-            const services = [];
-            let totalPrice = 0;
-            
-            function updateSummary() {
 
-            const petName = document.getElementById('pet_name').value;
-            document.getElementById('summary_pet').textContent = petName || '-';
-            
-            const date = document.getElementById('appointment_date').value;
-            document.getElementById('summary_date').textContent = date || '-';
-            
-            const time = document.getElementById('appointment_time').value;
-            document.getElementById('summary_time').textContent = time || '-';
-           
+            // Update selected service and calculate total
             const selectedService = document.querySelector('input[name="service_id"]:checked');
-            
+
             if (selectedService) {
-                const name = selectedService.dataset.name;
-                const price = parseInt(selectedService.dataset.price);
-                
+                const name = selectedService.dataset.name || '-';
+                // ensure price is numeric (strip non-digits)
+                const rawPrice = selectedService.dataset.price || '0';
+                const price = parseInt(String(rawPrice).replace(/\D/g, '')) || 0;
+
                 document.getElementById('summary_service').textContent = name;
                 document.getElementById('summary_price').textContent = 'Rp ' + price.toLocaleString('id-ID');
             } else {
                 document.getElementById('summary_service').textContent = '-';
                 document.getElementById('summary_price').textContent = 'Rp 0';
             }
-        }
         }
 
         function showFileName() {
@@ -675,8 +662,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('appointment_date').setAttribute('min', today);
-
             togglePaymentInfo();
+            // ensure summary reflects any pre-selected service on load
+            try { updateSummary(); } catch (e) { /* ignore if not present */ }
         });
 
 
