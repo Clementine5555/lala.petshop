@@ -74,7 +74,7 @@ Route::middleware('auth')->group(function () {
 
     // checkout route
     Route::post('/transactions/checkout', [TransactionController::class, 'processCheckout'])
-    ->name('checkout.submit'); 
+    ->name('checkout.submit');
 
     // menampilkan halaman checkout
     Route::get('/checkout', [TransactionController::class, 'showCheckoutPage'])
@@ -95,7 +95,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/checkout/success', [TransactionController::class, 'success'])->name('checkout.success');
 });
 
-// Reviews API 
+// Reviews API
 Route::get('/api/products/reviews', [ReviewController::class, 'getAllReviews']);
 Route::post('/api/products/{productId}/review', [ReviewController::class, 'storeApi']);
 Route::get('/api/products/featured', [ShopProductController::class, 'getFeaturedProducts']);
@@ -113,7 +113,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/appointments/history', [AppointmentController::class, 'history'])->name('appointments.history');
     // Route::get('appointments/edit/{id}', [AppointmentController::class, 'edit'])
         // ->name('appointments.edit');
-        
+
     Route::redirect('/appointment', '/appointment/create');
 });
 // service routes

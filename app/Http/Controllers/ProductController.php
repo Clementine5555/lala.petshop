@@ -13,7 +13,7 @@ class ProductController extends Controller
     public function shop()
     {
         $products = Product::with('reviews')->get();
-        
+
         // Add average_rating and reviews_count as attributes for the view
         $productsData = $products->map(function ($product) {
             return [
@@ -75,7 +75,7 @@ class ProductController extends Controller
     public function getProductsJson()
     {
         $products = Product::with('reviews')->get();
-        
+
         $data = $products->map(function ($product) {
             return [
                 'product_id'       => $product->product_id,
@@ -85,7 +85,7 @@ class ProductController extends Controller
                 'stock'            => $product->stock,
                 'average_rating'   => $product->getAverageRatingAttribute(),
                 'reviews_count'    => $product->getReviewsCountAttribute(),
-                'image_url'        => $product->image 
+                'image_url'        => $product->image
                                         ? asset('images/' . $product->image)
                                         : asset('images/default.png'),
 
