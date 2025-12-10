@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Transaction_Detail extends Model
+class TransactionDetail extends Model
 {
-    protected $table = 'transaction_detail';
+    protected $table = 'transaction_details';
     protected $primaryKey = 'transaction_detail_id';
     public $timestamps = true;
 

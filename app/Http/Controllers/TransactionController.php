@@ -12,43 +12,36 @@ use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
+    // ... method history, show, showCheckoutPage biarkan sama ...
     public function history()
     {
         $transactions = Transaction::where('user_id', Auth::id())
             ->with('transactionDetails.product')
             ->orderBy('created_at', 'desc')
             ->get();
-
         return view('transactions.history', compact('transactions'));
     }
 
     public function show($id)
     {
-        // Use 'id' unless you are 100% sure your DB uses 'transaction_id'
         $transaction = Transaction::where('user_id', Auth::id())
-            ->where('id', $id) 
+            ->where('transaction_id', $id)
             ->with('transactionDetails.product')
             ->firstOrFail();
-            
         return view('transactions.show', compact('transaction'));
     }
 
     public function showCheckoutPage()
-    {       
+    {
         $cartItems = Cart::where('user_id', Auth::id())->with('product')->get();
-        
         if ($cartItems->isEmpty()) {
-            return redirect()->route('products.shop')
-                ->with('error', 'Keranjang belanja kosong, silakan belanja dulu.');
+            return redirect()->route('products.shop')->with('error', 'Keranjang kosong.');
         }
-
-        $total = $cartItems->sum(function($item) {
-            return $item->product->price * $item->quantity;
-        });
-        
-        return view('transactions.checkout', compact('cartItems', 'total')); 
+        $total = $cartItems->sum(function($item) { return $item->product->price * $item->quantity; });
+        return view('transactions.checkout', compact('cartItems', 'total'));
     }
 
+    // UPDATE PENTING DI BAWAH INI
     public function processCheckout(Request $request)
     {
         $request->validate([
@@ -69,59 +62,60 @@ class TransactionController extends Controller
                 return back()->with('error', 'Keranjang kosong.');
             }
 
-            // Construct full address
             $fullAddress = $request->address . ', ' . $request->city . ', ' . $request->postal_code;
 
-            // Create Transaction
-            // FIX: Removed 'transaction_date' (uses created_at)
-            // FIX: Changed 'total_amount' to 'total_price' (standard convention)
+            // 1. Buat Transaksi
             $transaction = Transaction::create([
                 'user_id'          => Auth::id(),
                 'status'           => 'pending',
-                'total_price'      => 0, 
+                'total_price'      => 0,
                 'receiver_name'    => $request->first_name . ' ' . $request->last_name,
                 'receiver_address' => $fullAddress,
                 'receiver_phone'   => $request->phone,
+                // payment_id otomatis null, aman sesuai migrasi awal
             ]);
 
             $totalAmount = 0;
 
             foreach ($cartItems as $item) {
-                if ($item->quantity > $item->product->stock) {
-                    throw new \Exception("Stok produk {$item->product->name} tidak mencukupi.");
+                $currentProduct = Product::where('product_id', $item->product_id)->first();
+
+                if ($item->quantity > $currentProduct->stock) {
+                    throw new \Exception("Stok produk {$currentProduct->name} tidak mencukupi (Sisa: {$currentProduct->stock}).");
                 }
 
-                $subtotal = $item->product->price * $item->quantity;
+                $subtotal = $currentProduct->price * $item->quantity;
                 $totalAmount += $subtotal;
 
+                // 2. Buat Detail (Perbaikan di transaction_id)
                 TransactionDetail::create([
-                    'transaction_id' => $transaction->id, // FIX: Use ->id
+                    'transaction_id' => $transaction->transaction_id,
                     'product_id'     => $item->product_id,
                     'quantity'       => $item->quantity,
-                    'price'          => $item->product->price,
+                    'price'          => $currentProduct->price,
                 ]);
-                
-                $item->product->decrement('stock', $item->quantity);
+
+                Product::where('product_id', $item->product_id)
+                    ->decrement('stock', $item->quantity);
             }
 
-            // FIX: Update 'total_price'
-            $grandTotal = $totalAmount + 15000; // Add shipping
+            $grandTotal = $totalAmount + 15000;
             $transaction->update(['total_price' => $grandTotal]);
 
             Cart::where('user_id', Auth::id())->delete();
 
             DB::commit();
 
-            // Redirect to success page
-            return redirect()->route('checkout.success', ['id' => $transaction->id]);
+            // 3. Redirect membawa transaction_id
+            return redirect()->route('payment.show', ['id' => $transaction->transaction_id]);
 
         } catch (\Exception $e) {
             DB::rollBack();
+            dd($e->getMessage());
             return back()->with('error', 'Checkout gagal: ' . $e->getMessage());
         }
     }
-    
-    // Add the success method
+
     public function success($id)
     {
         return view('transactions.success');

@@ -10,14 +10,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Cart extends BaseModel
 {
     use HasFactory, SoftDeletes;
-    
+
     protected $primaryKey = 'cart_id';
-    // protected $fillable = [
-    //     'user_id',
-    //     'product_id',
-    //     'quantity',
-    //     'status', // active, converted
-    // ];
+     protected $fillable = [
+         'user_id',
+         'product_id',
+         'quantity',
+         'status', // active, converted
+     ];
 
     public function user(): BelongsTo
     {

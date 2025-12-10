@@ -113,7 +113,7 @@
         let name = document.getElementById("profileName").value;
         let email = document.getElementById("profileEmail").value;
 
-        fetch("{{ route('profile.update') }}", {
+            fetch("{{ route('profile.update') }}", {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
