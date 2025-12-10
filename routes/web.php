@@ -9,7 +9,7 @@ use App\Http\Controllers\PetController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Shop\CourierController;
 use App\Http\Controllers\Shop\GroomerController;
-use App\Http\Controllers\Shop\PaymentController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Shop\RefundDetailController;
 use App\Http\Controllers\Shop\RefundHeaderController;
 use App\Http\Controllers\Shop\ServiceController;
@@ -71,28 +71,11 @@ Route::delete('/admin/products/{product}', [ProductController::class, 'destroy']
 
 // transaction routes
 Route::middleware('auth')->group(function () {
-
-    // checkout route
-    Route::post('/transactions/checkout', [TransactionController::class, 'processCheckout'])
-    ->name('checkout.submit');
-
-    // menampilkan halaman checkout
-    Route::get('/checkout', [TransactionController::class, 'showCheckoutPage'])
-    ->name('checkout.process');
-
-    // halaman sukses checkout
-    Route::get('/transactions/success/{id}', [TransactionController::class, 'success'])
-    ->name('transactions.success');
-
-    // riwayat transaksi
-    Route::get('/transactions', [TransactionController::class, 'history'])
-        ->name('transactions.history');
-
-    // deatil transaksi
-    Route::get('/transactions/{id}', [TransactionController::class, 'show'])
-        ->name('transactions.show');
-
-    Route::get('/checkout/success', [TransactionController::class, 'success'])->name('checkout.success');
+    Route::get('/checkout', [TransactionController::class, 'showCheckoutPage'])->name('checkout');
+    Route::post('/checkout', [TransactionController::class, 'processCheckout'])->name('checkout.process');
+    Route::get('/checkout/success/{id}', [TransactionController::class, 'success'])->name('checkout.success');
+    Route::get('/transactions', [TransactionController::class, 'history'])->name('transactions.history');
+    Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
 });
 
 // Reviews API
@@ -134,6 +117,10 @@ Route::middleware('auth')->group(function () {
     // Groomer management (listing for admins and groomer profiles)
     Route::resource('groomers', \App\Http\Controllers\GroomerController::class);
 });
+
+// Halaman Pembayaran
+Route::get('/payment/{id}', [PaymentController::class, 'show'])->name('payment.show');
+Route::post('/payment/{id}', [PaymentController::class, 'process'])->name('payment.process');
 
 // contact us routes
 Route::post('/contact/send', [ContactController::class, 'store'])->name('contact.send');

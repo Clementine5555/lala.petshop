@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Success</title>
+    <title>Order Success - Petshop Lala</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -40,7 +40,7 @@
         }
         h1 { color: #333; margin-bottom: 10px; font-size: 24px; }
         p { color: #666; line-height: 1.6; margin-bottom: 30px; }
-        
+
         .btn-home {
             background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 100%);
             color: white;
@@ -56,24 +56,31 @@
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(255, 140, 66, 0.4);
         }
+        .trx-id {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #aaa;
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <div class="icon-container">
-            <span class="icon-check">✓</span>
-        </div>
-        <h1>Pesanan Berhasil!</h1>
-        <p>
-            Terima kasih telah berbelanja di Petshop Lala.<br>
-            Pesanan kamu sedang kami proses.
-        </p>
-        
-        <a href="{{ route('products.shop') }}" class="btn-home">
-            Kembali Belanja
-        </a>
+<div class="card">
+    <div class="icon-container">
+        <span class="icon-check">✓</span>
     </div>
+    <h1>Pesanan Berhasil!</h1>
+    <p>
+        Terima kasih telah berbelanja di Petshop Lala.<br>
+        Pesanan kamu sedang kami proses.
+        <span class="trx-id">ID Transaksi: #{{ request()->route('id') }}</span>
+    </p>
+
+    <a href="{{ route('products.shop') }}" class="btn-home">
+        Kembali Belanja
+    </a>
+</div>
 
 </body>
 </html>

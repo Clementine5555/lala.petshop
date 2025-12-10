@@ -11,14 +11,20 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Transaction extends BaseModel
 {
     use HasFactory, SoftDeletes;
-    
+
+    // INI KUNCI UTAMANYA AGAR TIDAK ERROR ROLLBACK
     protected $primaryKey = 'transaction_id';
-    // protected $fillable = [
-    //     'user_id',
-    //     'payment_id',
-    //     'delivery_method', // pickup, delivery
-    //     'status', // pending, waiting_for_payment, Ready_for_pickup, completed, cancelled
-    // ];
+
+    protected $fillable = [
+        'user_id',
+        'payment_id',
+        'delivery_method',
+        'status',
+        'total_price',
+        'receiver_name',
+        'receiver_address',
+        'receiver_phone',
+    ];
 
     public function user(): BelongsTo
     {
@@ -39,7 +45,7 @@ class Transaction extends BaseModel
     {
         return $this->hasMany(TransactionDetail::class, 'transaction_id', 'transaction_id');
     }
-    
+
     public function refundHeader(): HasOne
     {
         return $this->hasOne(RefundHeader::class, 'transaction_id', 'transaction_id');
