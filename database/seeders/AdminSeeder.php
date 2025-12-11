@@ -22,7 +22,7 @@ class AdminSeeder extends Seeder
                 'email' => 'admin@petshop.com',
                 'password' => Hash::make('admin@123456'),
                 'email_verified_at' => now(),
-                'is_admin' => true,
+                'role' => 'admin',
             ]
         );
 

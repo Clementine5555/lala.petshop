@@ -263,7 +263,6 @@
         // 1. Inisialisasi Toast & Gambar
         initHelpers();
 
-        // 2. BERSIHKAN TOMBOL DARI GANGGUAN (Jurus Utama)
         cleanAndAttachListener();
     });
 
