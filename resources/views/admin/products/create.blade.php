@@ -33,6 +33,9 @@
         <a href="{{ route('admin.products.index') }}" class="nav-item"><span class="nav-icon">🛒</span> Products</a>
         <a href="{{ route('admin.appointments.index') }}" class="nav-item"><span class="nav-icon">📅</span> Appointment</a>
         <a href="{{ route('admin.messages.index') }}" class="nav-item"><span class="nav-icon">📞</span> Contact Us</a>
+        <a href="{{ route('admin.reports.index') }}" class="nav-item {{ request()->routeIs('admin.reports.index') ? 'active' : '' }}">
+            <span class="nav-icon">📊</span> Laporan
+        </a>
     </aside>
 
     <main class="main-content">

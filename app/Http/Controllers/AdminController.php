@@ -10,6 +10,7 @@ use App\Models\Delivery;
 use App\Models\Appointment;
 use App\Models\ContactMessage;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf; // Pastikan baris ini ada
 
 class AdminController extends Controller
 {
@@ -18,14 +19,10 @@ class AdminController extends Controller
     // =================================================================
     public function index()
     {
-        // Hitung Statistik
         $totalUsers = User::where('role', 'user')->count();
         $totalProducts = Product::count();
         $totalOrders = Transaction::count();
-
-        // Hitung Pendapatan (Hanya yang statusnya sukses/proses)
-        $totalRevenue = Transaction::whereNotIn('status', ['pending', 'cancelled'])
-            ->sum('total_price');
+        $totalRevenue = Transaction::whereNotIn('status', ['pending', 'cancelled'])->sum('total_price');
 
         return view('admin.dashboard', compact('totalUsers', 'totalProducts', 'totalOrders', 'totalRevenue'));
     }
@@ -35,7 +32,6 @@ class AdminController extends Controller
     // =================================================================
     public function orders()
     {
-        // Ambil transaksi yang statusnya 'waiting_confirmation'
         $orders = Transaction::with(['user', 'payment', 'transactionDetails'])
             ->where('status', 'waiting_confirmation')
             ->orderBy('created_at', 'asc')
@@ -49,16 +45,12 @@ class AdminController extends Controller
         DB::beginTransaction();
         try {
             $transaction = Transaction::findOrFail($id);
-
-            // 1. Ubah status Transaksi jadi 'confirmed'
             $transaction->update(['status' => 'confirmed']);
 
-            // 2. Buat data PENGIRIMAN (Delivery) agar muncul di Dashboard Kurir
             Delivery::create([
                 'transaction_id' => $transaction->transaction_id,
-                'status' => 'pending', // Status awal pengiriman
+                'status' => 'pending',
                 'address' => $transaction->receiver_address ?? 'Alamat tidak tersedia',
-                // courier_id biarkan NULL dulu, nanti kurir yang "Ambil Pesanan"
             ]);
 
             DB::commit();
@@ -71,12 +63,10 @@ class AdminController extends Controller
     }
 
     // =================================================================
-    // 3. MANAJEMEN APPOINTMENT (BARU)
+    // 3. MANAJEMEN APPOINTMENT
     // =================================================================
     public function appointments()
     {
-        // Ambil data appointment beserta detail tanggal & groomer
-        // Diurutkan dari yang terbaru
         $appointments = Appointment::with(['detail', 'detail.groomer'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -92,23 +82,18 @@ class AdminController extends Controller
         ]);
 
         $appointment = Appointment::findOrFail($id);
-
-        // Update Status Utama
         $appointment->status = $request->status;
 
-        // Jika ada catatan tambahan, update
         if ($request->filled('notes')) {
             $appointment->notes = $request->notes;
         }
 
-        // Logika tambahan: Jika status completed, isi timestamp
         if ($request->status == 'completed') {
             $appointment->completed_at = now();
         }
 
         $appointment->save();
 
-        // Update juga status di tabel Detail agar sinkron
         if ($appointment->detail) {
             $appointment->detail->update(['status' => $request->status]);
         }
@@ -116,11 +101,12 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Status appointment berhasil diperbarui.');
     }
 
+    // =================================================================
+    // 4. MANAJEMEN PESAN (CONTACT US)
+    // =================================================================
     public function messages()
     {
-        // Get messages ordered by newest first
         $messages = ContactMessage::orderBy('created_at', 'desc')->paginate(10);
-
         return view('admin.messages.index', compact('messages'));
     }
 
@@ -128,7 +114,50 @@ class AdminController extends Controller
     {
         $message = ContactMessage::findOrFail($id);
         $message->delete();
-
         return redirect()->back()->with('success', 'Pesan berhasil dihapus.');
+    }
+
+    // =================================================================
+    // 5. LAPORAN PENDAPATAN (REPORT & PDF)
+    // =================================================================
+    public function reports(Request $request)
+    {
+        // PERBAIKAN: Tambahkan (int) agar tidak error di Carbon
+        $month = (int) $request->input('month', date('m'));
+        $year = (int) $request->input('year', date('Y'));
+
+        $transactions = Transaction::with(['transactionDetails', 'user'])
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->whereIn('status', ['confirmed', 'shipped', 'delivered', 'completed'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $totalRevenue = $transactions->sum('total_price');
+
+        return view('admin.reports.index', compact('transactions', 'totalRevenue', 'month', 'year'));
+    }
+
+    public function exportPdf(Request $request)
+    {
+        // PERBAIKAN: Tambahkan (int) di sini juga
+        $month = (int) $request->input('month', date('m'));
+        $year = (int) $request->input('year', date('Y'));
+
+        $transactions = Transaction::with(['transactionDetails', 'user'])
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->whereIn('status', ['confirmed', 'shipped', 'delivered', 'completed'])
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $totalRevenue = $transactions->sum('total_price');
+
+        // Carbon butuh integer, bukan string
+        $monthName = \Carbon\Carbon::create()->month($month)->format('F');
+
+        $pdf = Pdf::loadView('admin.reports.pdf', compact('transactions', 'totalRevenue', 'monthName', 'year'));
+
+        return $pdf->download('Laporan-Bulanan-Petshop-'.$monthName.'-'.$year.'.pdf');
     }
 }
