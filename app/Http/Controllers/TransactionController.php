@@ -2,122 +2,94 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
-use App\Models\Transaction;
-use App\Models\TransactionDetail;
-use App\Models\Cart;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Models\Transaction;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
-    // ... method history, show, showCheckoutPage biarkan sama ...
-    public function history()
+    public function index()
     {
-        $transactions = Transaction::where('user_id', Auth::id())
-            ->with('transactionDetails.product')
+        $userId = Auth::id();
+
+        // Ambil transaksi milik user, lengkap dengan detail produk, pembayaran, dan pengiriman
+        $transactions = Transaction::with([
+            'transactionDetails.product',
+            'payment',
+            'delivery.courier' // Ambil data kurir juga untuk tombol "Hubungi Kurir"
+        ])
+            ->where('user_id', $userId)
             ->orderBy('created_at', 'desc')
             ->get();
-        return view('transactions.history', compact('transactions'));
-    }
 
-    public function show($id)
-    {
-        $transaction = Transaction::where('user_id', Auth::id())
-            ->where('transaction_id', $id)
-            ->with('transactionDetails.product')
-            ->firstOrFail();
-        return view('transactions.show', compact('transaction'));
-    }
+        // Format Data untuk JS (Mirip CourierController tapi disesuaikan untuk User)
+        $ordersForJs = $transactions->map(function($t) {
 
-    public function showCheckoutPage()
-    {
-        $cartItems = Cart::where('user_id', Auth::id())->with('product')->get();
-        if ($cartItems->isEmpty()) {
-            return redirect()->route('products.shop')->with('error', 'Keranjang kosong.');
-        }
-        $total = $cartItems->sum(function($item) { return $item->product->price * $item->quantity; });
-        return view('transactions.checkout', compact('cartItems', 'total'));
-    }
+            // Siapkan Item List
+            $items = $t->transactionDetails->map(function($detail) {
+                return [
+                    'name' => $detail->product->name ?? 'Produk',
+                    'qty' => $detail->quantity,
+                    'price' => $detail->price
+                ];
+            });
 
-    // UPDATE PENTING DI BAWAH INI
-    public function processCheckout(Request $request)
-    {
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name'  => 'required|string|max:255',
-            'address'    => 'required|string',
-            'phone'      => 'required|numeric',
-            'city'       => 'required|string',
-            'postal_code'=> 'required|numeric',
-        ]);
+            // Tentukan Status untuk Tampilan
+            // Priority: Delivery Status -> Transaction Status
+            $status = $t->status; // waiting_confirmation, confirmed, etc.
 
-        DB::beginTransaction();
-
-        try {
-            $cartItems = Cart::where('user_id', Auth::id())->with('product')->get();
-
-            if ($cartItems->isEmpty()) {
-                return back()->with('error', 'Keranjang kosong.');
+            // Jika sudah ada pengiriman, pakailah status pengiriman
+            if ($t->delivery) {
+                if ($t->delivery->status == 'shipped') $status = 'shipped'; // Sedang dikirim
+                if ($t->delivery->status == 'delivered') $status = 'delivered'; // Selesai
             }
 
-            $fullAddress = $request->address . ', ' . $request->city . ', ' . $request->postal_code;
-
-            // 1. Buat Transaksi
-            $transaction = Transaction::create([
-                'user_id'          => Auth::id(),
-                'status'           => 'pending',
-                'total_price'      => 0,
-                'receiver_name'    => $request->first_name . ' ' . $request->last_name,
-                'receiver_address' => $fullAddress,
-                'receiver_phone'   => $request->phone,
-                // payment_id otomatis null, aman sesuai migrasi awal
-            ]);
-
-            $totalAmount = 0;
-
-            foreach ($cartItems as $item) {
-                $currentProduct = Product::where('product_id', $item->product_id)->first();
-
-                if ($item->quantity > $currentProduct->stock) {
-                    throw new \Exception("Stok produk {$currentProduct->name} tidak mencukupi (Sisa: {$currentProduct->stock}).");
-                }
-
-                $subtotal = $currentProduct->price * $item->quantity;
-                $totalAmount += $subtotal;
-
-                // 2. Buat Detail (Perbaikan di transaction_id)
-                TransactionDetail::create([
-                    'transaction_id' => $transaction->transaction_id,
-                    'product_id'     => $item->product_id,
-                    'quantity'       => $item->quantity,
-                    'price'          => $currentProduct->price,
-                ]);
-
-                Product::where('product_id', $item->product_id)
-                    ->decrement('stock', $item->quantity);
+            // Ambil Info Kurir (jika ada)
+            $courierName = '-';
+            $courierPhone = '';
+            if ($t->delivery && $t->delivery->courier) {
+                $courierName = $t->delivery->courier->name;
+                $courierPhone = $t->delivery->courier->phone;
             }
 
-            $grandTotal = $totalAmount + 15000;
-            $transaction->update(['total_price' => $grandTotal]);
+            return [
+                'id' => 'TRX-' . $t->transaction_id,
+                'raw_id' => $t->transaction_id,
+                'date' => $t->created_at->format('d M Y, H:i'),
+                'total' => $t->total_price,
+                'status' => $status,
+                'items' => $items,
+                'address' => $t->receiver_address,
+                'payment_method' => $t->payment ? $t->payment->payment_method : 'Transfer',
+                'payment_status' => $t->payment ? $t->payment->status : 'Unpaid',
+                'courier_name' => $courierName,
+                'courier_phone' => $courierPhone,
+                'notes' => $t->delivery ? $t->delivery->description : '-'
+            ];
+        });
 
-            Cart::where('user_id', Auth::id())->delete();
-
-            DB::commit();
-
-            // 3. Redirect membawa transaction_id
-            return redirect()->route('payment.show', ['id' => $transaction->transaction_id]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            dd($e->getMessage());
-            return back()->with('error', 'Checkout gagal: ' . $e->getMessage());
-        }
+        return view('user.orders', compact('ordersForJs'));
     }
 
-    public function success($id)
-    {
-        return view('transactions.success');
+    // (Optional) Fungsi detail, history, dll bisa ditambahkan di sini
+    public function history() {
+        return redirect()->route('user.orders');
+    }
+
+    public function show($id) {
+        // Logic show detail jika tidak pakai modal
+    }
+
+    public function showCheckoutPage() {
+        // Logic checkout (jika sebelumnya ada di controller lain, pindahkan kesini atau biarkan)
+        return view('checkout');
+    }
+
+    public function processCheckout(Request $request) {
+        // Logic proses checkout
+    }
+
+    public function success($id) {
+        return view('checkout.success', compact('id'));
     }
 }

@@ -4,70 +4,68 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class Appointment extends Model
 {
-    // PERBAIKAN 1: Sesuaikan nama tabel dengan Migration (biasanya jamak)
     protected $table = 'appointments';
 
     protected $primaryKey = 'appointment_id';
     public $timestamps = true;
 
-    // PERBAIKAN 2: Masukkan semua kolom baru ke sini agar bisa disimpan
+    // Sesuai dengan screenshot database kamu (image_4587fc.png)
     protected $fillable = [
-        'groomer_id',
-        'appointment_detail_id', // Jika masih pakai relasi ini
-        'service_id',            // Jika masih pakai relasi ini
-        'payment_id',            // Tambahan dari migration awal
-        'appointment_date',      // Sesuaikan dengan nama di migration (bukan 'date')
-        'status',
+        'payment_id',      // Ada di DB
+        'status',          // Ada di DB
+        'customer_name',   // Ada di DB
+        'pet_name',        // Ada di DB
+        'pet_type',        // Ada di DB
+        'pet_gender',      // Ada di DB
+        'pet_weight',      // Ada di DB
+        'service_type',    // Ada di DB
+        'notes',           // Ada di DB
+        'completed_at',    // Ada di DB
+        'duration',        // Ada di DB
 
-        // Kolom Detail Groomer yang baru kita tambah lewat Migration
-        'customer_name',
-        'pet_name',
-        'pet_type',
-        'pet_gender',
-        'pet_weight',
-        'service_type', // String manual (Full Grooming/Bath Only)
-        'notes',
-        'completed_at',
-        'duration',
+        // HAPUS kolom yang TIDAK ADA di tabel appointments:
+        // 'groomer_id',
+        // 'appointment_detail_id',
+        // 'service_id',
+        // 'appointment_date',
     ];
 
     protected $casts = [
-        'appointment_date' => 'datetime', // Ubah 'date' jadi 'appointment_date'
         'completed_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
-    /**
-     * Helper: Menentukan Icon Hewan secara otomatis
-     * Dipanggil di View dengan cara: $appointment->pet_icon
-     */
+    // Helper icon
     public function getPetIconAttribute()
     {
-        // Cek apakah jenis hewan mengandung kata 'cat' atau 'kucing'
         if (stripos($this->pet_type, 'cat') !== false || stripos($this->pet_type, 'kucing') !== false) {
             return '🐱';
         }
-        return '🐕'; // Default anjing
+        return '🐕';
     }
 
-    // --- RELASI (Biarkan saja jika memang dipakai di fitur lain) ---
+    // --- RELASI ---
 
-    public function groomer(): BelongsTo
+    // Ambil detail teknis (tanggal/jam) lewat relasi ini
+    public function detail(): HasOne
     {
-        return $this->belongsTo(Groomer::class, 'groomer_id', 'groomer_id');
+        return $this->hasOne(AppointmentDetail::class, 'appointment_id', 'appointment_id');
     }
 
-    public function service(): BelongsTo
+    // Ambil Groomer lewat detail
+    public function groomer()
     {
-        return $this->belongsTo(Service::class, 'service_id', 'service_id');
-    }
-
-    public function appointmentDetail(): BelongsTo
-    {
-        return $this->belongsTo(Appointment_Detail::class, 'appointment_detail_id', 'appointment_detail_id');
+        return $this->hasOneThrough(
+            User::class,
+            AppointmentDetail::class,
+            'appointment_id',
+            'user_id',
+            'appointment_id',
+            'groomer_id'
+        );
     }
 }
