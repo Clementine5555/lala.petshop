@@ -234,6 +234,9 @@
         <a href="{{ route('admin.messages.index') }}" class="nav-item {{ request()->routeIs('admin.messages.index') ? 'active' : '' }}">
             <span class="nav-icon">📞</span> Contact Us
         </a>
+        <a href="{{ route('admin.reports.index') }}" class="nav-item {{ request()->routeIs('admin.reports.index') ? 'active' : '' }}">
+            <span class="nav-icon">📊</span> Laporan
+        </a>
     </aside>
 
     <main class="main-content">

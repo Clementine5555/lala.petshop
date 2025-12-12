@@ -135,5 +135,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
         Route::get('/messages', [AdminController::class, 'messages'])->name('messages.index');
         Route::delete('/messages/{id}', [AdminController::class, 'deleteMessage'])->name('messages.destroy');
+
+        Route::get('/reports', [AdminController::class, 'reports'])->name('reports.index');
+        Route::get('/reports/export', [AdminController::class, 'exportPdf'])->name('reports.export');
     });
 });
