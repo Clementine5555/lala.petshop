@@ -3,91 +3,105 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ProductRequest;
 use App\Models\Product;
-use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // Menampilkan Daftar Produk
     public function index(Request $request)
     {
         $query = Product::query();
 
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where('name', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%");
+            $query->where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('category', 'like', '%' . $request->search . '%');
         }
-
-        $sort = $request->get('sort', 'name');
-        $direction = $request->get('direction', 'asc');
-        $query->orderBy($sort, $direction);
 
         $products = $query->paginate(10);
 
         return view('admin.products.index', compact('products'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    // Form Tambah Produk
     public function create()
     {
-        $suppliers = Supplier::orderBy('name')->get();
-        return view('admin.products.create', compact('suppliers'));
+        return view('admin.products.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(ProductRequest $request)
+    // Proses Simpan Produk Baru (SUDAH DIPERBAIKI)
+    public function store(Request $request)
     {
-        Product::create($request->validated());
+        // 1. Validasi & Ambil Data Bersih (Tanpa _token)
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'category' => 'nullable|string',
+            'price' => 'required|numeric',
+            'stock' => 'required|integer',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|max:2048', // Max 2MB
+        ]);
 
-        return redirect()->route('admin.products.index')
-                         ->with('success', 'Product created successfully.');
+        // 2. Upload Gambar jika ada
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        // 3. Simpan (Sekarang aman karena $data tidak mengandung _token)
+        Product::create($data);
+
+        return redirect()->route('admin.products.index')->with('success', 'Produk berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Product $product)
-    {
-        return view('admin.products.show', compact('product'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
+    // Form Edit Produk
     public function edit(Product $product)
     {
-        $suppliers = Supplier::orderBy('name')->get();
-        return view('admin.products.edit', compact('product', 'suppliers'));
+        return view('admin.products.edit', compact('product'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(ProductRequest $request, Product $product)
+    // Proses Update Produk (SUDAH DIPERBAIKI)
+    public function update(Request $request, Product $product)
     {
-        $product->update($request->validated());
+        // 1. Validasi & Ambil Data Bersih
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'category' => 'nullable|string',
+            'price' => 'required|numeric',
+            'stock' => 'required|integer',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|max:2048',
+        ]);
 
-        return redirect()->route('admin.products.index')
-                         ->with('success', 'Product updated successfully.');
+        // 2. Cek jika ada gambar baru
+        if ($request->hasFile('image')) {
+            // Hapus gambar lama jika ada
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        // 3. Update Data
+        $product->update($data);
+
+        return redirect()->route('admin.products.index')->with('success', 'Produk berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // Hapus Produk
     public function destroy(Product $product)
     {
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
+        }
+
         $product->delete();
 
-        return redirect()->route('admin.products.index')
-                         ->with('success', 'Product deleted successfully.');
+        return redirect()->route('admin.products.index')->with('success', 'Produk berhasil dihapus.');
+    }
+
+    public function show(Product $product)
+    {
+        return view('admin.products.edit', compact('product'));
     }
 }

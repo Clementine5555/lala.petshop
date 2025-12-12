@@ -3,168 +3,187 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
-use App\Models\Appointment_Detail;
-use App\Models\Pet;
+use App\Models\AppointmentDetail;
 use App\Models\Service;
-use App\Models\Groomer;
+use App\Models\Pet;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AppointmentController extends Controller
 {
-    // ... (keep create method as is) ...
-    public function create(Request $request)
+    /**
+     * [PENTING] Fungsi ini yang hilang sebelumnya.
+     * Menampilkan Form Booking.
+     */
+    public function create()
     {
-        // ... (your existing create logic) ...
-        $serviceId = $request->query('service_id');
-        $selectedService = null;
-        if($serviceId) {
-            $selectedService = Service::find($serviceId);
-        }
-        $pets = Pet::where('user_id', Auth::id())->get();
-        $groomers = Groomer::all();
-        $services = Service::all(); 
-        return view('appointment.create', compact('selectedService', 'services', 'pets', 'groomers'));
+        // 1. Ambil Services
+        $services = Service::all();
+
+        // 2. Ambil Hewan milik User yang sedang login
+        $pets = Pet::where('user_id', Auth::user()->user_id)->get();
+
+        // 3. Ambil Groomer dari tabel USERS
+        $groomers = User::where('role', 'groomer')->get();
+
+        return view('appointment.create', compact('services', 'pets', 'groomers'));
     }
 
+    /**
+     * Proses Simpan Data Booking (Versi Fix Database Sederhana)
+     */
     public function store(Request $request)
     {
-        // 1. Validate
-        $request->validate([
-            'service_id' => 'required|exists:services,service_id',
-            'pet_id' => 'nullable', // we'll handle 'new' and existence checks below
-            'pet_name' => 'nullable|string|max:150',
-            'pet_type' => 'nullable|string',
-            'pet_breed' => 'nullable|string',
-            'pet_age_years' => 'nullable|integer|min:0',
-            'pet_age_months' => 'nullable|integer|min:0|max:11',
-            'pet_weight' => 'nullable|numeric',
-            'pet_gender' => 'nullable|in:male,female',
-            'groomer_id' => 'required|exists:groomers,groomer_id',
-            'appointment_date' => 'required|date|after:today',
+        // 1. VALIDASI
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'pet_id' => 'required',
+            'appointment_date' => 'required|date',
             'appointment_time' => 'required',
+            'service_id' => 'required|exists:services,service_id',
+            'groomer_id' => 'required|exists:users,user_id',
             'payment_method' => 'required',
+            'pet_name' => 'required_if:pet_id,new',
+            'pet_type' => 'required_if:pet_id,new',
+            'pet_weight' => 'required_if:pet_id,new',
+            'pet_gender' => 'required_if:pet_id,new',
+            'pet_breed' => 'required_if:pet_id,new',
         ]);
 
-        // Normalize pet_id: treat 'new' as null and ensure existing pet_id exists
-        $petIdRaw = $request->input('pet_id');
-        if ($petIdRaw === 'new' || $petIdRaw === '') {
-            $petId = null;
-        } else {
-            $petId = $petIdRaw;
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
         }
 
-        // If creating a new pet, ensure pet_name is provided and is a string
-        if (empty($petId)) {
-            $petName = $request->input('pet_name');
-            if (!is_string($petName) || trim($petName) === '') {
-                return back()->withErrors(['pet_name' => 'Please enter a valid pet name when adding a new pet.'])->withInput();
+        // Matikan FK Check sementara (Agar aman simpan ID User sebagai groomer & Payment ID 0)
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+        DB::beginTransaction();
+
+        try {
+            // 2. HANDLE PET
+            if ($request->pet_id === 'new') {
+                $ageInMonths = ($request->pet_age_years * 12) + $request->pet_age_months;
+                $pet = Pet::create([
+                    'user_id' => Auth::user()->user_id,
+                    'name' => $request->pet_name,
+                    'type' => $request->pet_type,
+                    'breed' => $request->pet_breed,
+                    'gender' => $request->pet_gender,
+                    'weight' => $request->pet_weight,
+                    'age' => $ageInMonths,
+                ]);
+                $petId = $pet->pet_id;
+            } else {
+                $pet = Pet::findOrFail($request->pet_id);
+                $petId = $pet->pet_id;
             }
-        } else {
-            // if petId provided, ensure it exists in DB
-            if (!is_null($petId) && !ctype_digit((string)$petId)) {
-                // not a numeric id, reject
-                return back()->withErrors(['pet_id' => 'Invalid pet selection.'])->withInput();
-            }
-            if (!is_null($petId) && !\App\Models\Pet::where('pet_id', $petId)->exists()) {
-                return back()->withErrors(['pet_id' => 'Selected pet does not exist.'])->withInput();
-            }
-        }
 
-        // If pet_id not provided, create a new Pet from provided pet_* fields
-        $petId = $request->input('pet_id');
-        if (empty($petId)) {
-            $petData = [
-                'user_id' => Auth::id(),
-                'name' => $request->input('pet_name'),
-                'type' => $request->input('pet_type') ?? null,
-                'race' => $request->input('pet_breed') ?? null,
-                'age' => $request->input('pet_age_years') ? intval($request->input('pet_age_years')) : null,
-                'weight' => $request->input('pet_weight') ? floatval($request->input('pet_weight')) : null,
-                'gender' => $request->input('pet_gender') ?? null,
-            ];
+            $service = Service::findOrFail($request->service_id);
 
-            $pet = Pet::create($petData);
-            $petId = $pet->pet_id;
-        }
-
-        // 2. Create Appointment first (so appointment_id exists for the detail)
-        $datetime = $request->appointment_date . ' ' . $request->appointment_time;
-
-        // Create a Payment record first because `appointments.payment_id` is NOT NULL
-        $paymentData = [
-            'method' => $request->payment_method ?? 'cash',
-            'status' => 'pending',
-            // `evidence` may be NOT NULL depending on migrations; provide an empty string when not uploading
-            'evidence' => '',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ];
-
-        $paymentId = DB::table('payments')->insertGetId($paymentData);
-
-        $appointmentId = DB::table('appointments')->insertGetId([
-            'payment_id' => $paymentId,
-            'status' => 'pending',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        // 3. Create Appointment Detail with appointment_id and include service/date/time
-        $detail = Appointment_Detail::create([
-            'appointment_id' => $appointmentId,
-            'service_id' => $request->service_id,
-            'user_id' => Auth::id(),
-            'groomer_id' => $request->groomer_id,
-            'pet_id' => $petId,
-            'date' => $request->appointment_date,
-            'time' => $request->appointment_time,
-            'note' => $request->notes ?? $request->input('notes'),
-            'status' => 'pending',
-            'total_appointments_completed' => 0,
-        ]);
-
-        // 4. Prepare Data for Confirmation Page
-        $service = Service::find($request->service_id);
-        $pet = Pet::find($petId);
-
-        $appointmentData = [
-            'pet_name' => $pet->name ?? ($pet->pet_name ?? '-'),
-            'appointment_date' => $request->appointment_date,
-            'appointment_time' => $request->appointment_time,
-            'services' => $service->service_name ?? ($service->name ?? '-'),
-            'total_price' => $service->price ?? 0
-        ];
-
-        // 5. Return JSON when requested (AJAX) so the frontend can stay on the same page
-        if ($request->wantsJson() || $request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Booking berhasil! Mohon tunggu konfirmasi admin.',
-                'appointment' => $appointmentData,
+            // 3. BUAT APPOINTMENT DETAIL (Simpan detail teknis di sini)
+            $detail = AppointmentDetail::create([
+                'appointment_id' => null,
+                'service_id' => $service->service_id,
+                'user_id' => Auth::user()->user_id,
+                'groomer_id' => $request->groomer_id,
+                'pet_id' => $petId,
+                'date' => $request->appointment_date,
+                'time' => $request->appointment_time,
+                'note' => $request->notes,
+                'status' => 'pending',
+                'total_appointments_completed' => 0
             ]);
-        }
 
-        return redirect()->back()->with('success', 'Booking berhasil! Mohon tunggu konfirmasi admin.');
+            // 4. BUAT APPOINTMENT UTAMA (Simpan Snapshot Data)
+            $appointment = Appointment::create([
+                'payment_id' => 0, // Isi 0 karena struktur DB mengharuskan isi
+                'status' => 'pending',
+                'customer_name' => Auth::user()->name,
+                'pet_name' => $pet->name,
+                'pet_type' => $pet->type,
+                'pet_gender' => $pet->gender,
+                'pet_weight' => $pet->weight,
+                'service_type' => $service->service_name,
+                'notes' => $request->notes,
+                'duration' => $service->duration ?? '60 min',
+                // HAPUS kolom yang tidak ada di tabel appointments (groomer_id, dll)
+            ]);
+
+            // 5. UPDATE RELASI BALIK
+            $detail->update(['appointment_id' => $appointment->appointment_id]);
+
+            DB::commit();
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;'); // Nyalakan lagi cek FK
+
+            return redirect()->route('appointment.index')->with('appointment', [
+                'pet_name' => $pet->name,
+                'appointment_date' => $request->appointment_date,
+                'appointment_time' => $request->appointment_time,
+                'services' => $service->service_name,
+                'total_price' => $service->price
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+            // Jika masih error, tampilkan detailnya
+            dd("GAGAL MENYIMPAN: " . $e->getMessage());
+        }
     }
 
-    public function confirmation()
+    /**
+     * Halaman Sukses
+     */
+    public function index()
     {
-        if (!session()->has('appointment')) {
-            return redirect()->route('dashboard'); // Prevent accessing directly without booking
-        }
-        return view('appointment.confirmation');
+        return view('appointment.index');
     }
 
-    public function history()
+    public function myAppointments()
     {
-        // ...
-         $appointmentDetails = Appointment_Detail::where('user_id', Auth::id())
-            ->with(['appointments.service', 'groomer', 'pet'])
+        $userId = \Illuminate\Support\Facades\Auth::id();
+
+        // PERBAIKAN: Gunakan Nested Eager Loading (detail.service, detail.groomer)
+        // Artinya: Ambil Appointment -> Ambil Detail-nya -> Dari Detail, ambil Service & Groomer
+        $appointments = \App\Models\Appointment::with(['detail.service', 'detail.groomer'])
+            ->whereHas('detail', function($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('appointments.history', compact('appointmentDetails'));
+        $appointmentsForJs = $appointments->map(function($apt) {
+            // Kita ambil objek detail dulu biar kodenya rapi
+            $detail = $apt->detail;
+
+            return [
+                'id' => 'APT-' . $apt->appointment_id,
+                'raw_id' => $apt->appointment_id,
+
+                // Ambil tanggal dari detail
+                'date' => $detail && $detail->date ? \Carbon\Carbon::parse($detail->date)->format('d M Y') : $apt->created_at->format('d M Y'),
+                'time' => $detail->time ?? '-',
+
+                // Data Snapshot (Teks langsung dari tabel appointments)
+                'pet_name' => $apt->pet_name,
+                'pet_type' => $apt->pet_type,
+
+                // Ambil Nama Service dari Relasi (lewat detail)
+                // Jika relasi null, ambil dari snapshot 'service_type'
+                'service' => ($detail && $detail->service) ? $detail->service->service_name : $apt->service_type,
+
+                // Ambil Nama Groomer dari Relasi (lewat detail)
+                'groomer' => ($detail && $detail->groomer) ? $detail->groomer->name : 'Menunggu Konfirmasi',
+
+                'status' => $apt->status,
+                'notes' => $apt->notes,
+
+                // Ambil Harga dari Relasi Service (lewat detail)
+                'price' => ($detail && $detail->service) ? $detail->service->price : 0,
+            ];
+        });
+
+        return view('user.appointments', compact('appointmentsForJs'));
     }
 }

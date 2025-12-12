@@ -216,21 +216,24 @@
         <div class="sidebar-logo">
             @include('filament.admin.logo')
         </div>
-
         <a href="#" class="nav-item active">
             <span class="nav-icon">🏠</span> Home
         </a>
-
         <a href="{{ route('admin.staff.index') }}" class="nav-item">
             <span class="nav-icon">👥</span> Kelola Staff
         </a>
-
+        <a href="{{ route('admin.orders.index') }}" class="nav-item {{ request()->routeIs('admin.orders.index') ? 'active' : '' }}">
+            <span class="nav-icon">📦</span> Approve Pesanan
+        </a>
         <a href="{{ route('admin.products.index') }}" class="nav-item">
             <span class="nav-icon">🛒</span> Products
         </a>
-
-        <a href="#" class="nav-item"><span class="nav-icon">📅</span> Appointment</a>
-        <a href="#" class="nav-item"><span class="nav-icon">📞</span> Contact Us</a>
+        <a href="{{ route('admin.appointments.index') }}" class="nav-item {{ request()->routeIs('admin.appointments.index') ? 'active' : '' }}">
+            <span class="nav-icon">📅</span> Appointment
+        </a>
+        <a href="{{ route('admin.messages.index') }}" class="nav-item {{ request()->routeIs('admin.messages.index') ? 'active' : '' }}">
+            <span class="nav-icon">📞</span> Contact Us
+        </a>
     </aside>
 
     <main class="main-content">

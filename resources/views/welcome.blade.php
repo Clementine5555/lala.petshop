@@ -493,76 +493,7 @@
     </div>
 
     <!-- Navigation -->
-    <nav>
-        <div class="nav-container">
-            <!-- Logo -->
-            <a href="{{ route('welcome') }}" class="logo">
-                <img src="{{ asset('images/logoo.png') }}" alt="Petshop Lala">
-                <span>Petshop Lala</span>
-            </a>
-
-            <!-- Navigation Links -->
-            <ul class="nav-links">
-                <li><a href="#home" class="active">Home</a></li>
-                <li><a href="#appointment">Appointment</a></li>
-                <li><a href="#products">Products</a></li>
-                <li><a href="#contact">Contact Us</a></li>
-            </ul>
-
-            <!-- Right Section -->
-            <div class="nav-right">
-                <!-- Cart Icon -->
-                <div class="cart-icon" onclick="window.location.href='{{ route('cart.index') }}'">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    @if(session('cart') && count(session('cart')) > 0)
-                    <span class="cart-badge" id="cartBadge">{{ count(session('cart')) }}</span>
-                    @endif
-                </div>
-
-                @auth
-                <!-- Profile Dropdown (Logged In) -->
-                <div class="profile-dropdown" id="profileDropdown">
-                    <div class="profile-trigger" onclick="toggleDropdown()">
-                        <img src="{{ Auth::user()->profile_photo_url ?? 'data:img/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23FF8C42\'/%3E%3Cpath d=\'M50 45c8 0 15-7 15-15s-7-15-15-15-15 7-15 15 7 15 15 15zm0 5c-13 0-25 6-25 15v10h50V65c0-9-12-15-25-15z\' fill=\'white\'/%3E%3C/svg%3E' }}"
-                             alt="User"
-                             class="profile-avatar">
-                        <span class="profile-name">{{ Auth::user()->name }}</span>
-                        <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </div>
-
-                    <div class="dropdown-menu">
-                        <a href="#" class="dropdown-item" onclick="openEditProfile(event)">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                            </svg>
-                            Edit Profile
-                        </a>
-
-                        <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
-                            @csrf
-                            <a href="#" class="dropdown-item logout" onclick="event.preventDefault(); this.closest('form').submit();">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                                </svg>
-                                Logout
-                            </a>
-                        </form>
-                    </div>
-                </div>
-                @else
-                <!-- Auth Buttons (Not Logged In) -->
-                <div class="auth-buttons">
-                    <a href="{{ route('login') }}" class="btn-login">Login</a>
-                    <a href="{{ route('register') }}" class="btn-register">Register</a>
-                </div>
-                @endauth
-            </div>
-        </div>
-    </nav>
+    @include('components.navbar')
 
     <!-- Edit Profile Modal -->
     @auth

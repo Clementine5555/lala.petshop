@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Groomer Dashboard - Pet Care Pro</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
@@ -13,10 +14,13 @@
             min-height: 100vh;
             padding: 20px;
         }
-        .logout-btn {
+        .logout-form-container {
             position: fixed;
             top: 30px;
             left: 30px;
+            z-index: 1000;
+        }
+        .logout-btn {
             background: rgba(255,255,255,0.95);
             padding: 12px 28px;
             border-radius: 50px;
@@ -25,7 +29,6 @@
             font-weight: 700;
             color: #F57C00;
             box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-            z-index: 1000;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -239,7 +242,8 @@
             .action-buttons { flex-direction: row; flex-wrap: wrap; }
         }
         @media (max-width: 768px) {
-            .logout-btn { top: 15px; left: 15px; padding: 10px 20px; font-size: 0.85em; }
+            .logout-form-container { top: 15px; left: 15px; }
+            .logout-btn { padding: 10px 20px; font-size: 0.85em; }
             .container { margin-top: 70px; }
             .header { padding: 25px; }
             .header-left h1 { font-size: 1.8em; }
@@ -250,106 +254,125 @@
     </style>
 </head>
 <body>
-    <button class="logout-btn" onclick="logout()">
-        <span>🚪</span>
-        <span>Logout</span>
-    </button>
-    <div class="container">
-        @isset($groomers)
-        <!-- Simple Groomers Listing (rendered when controller provides $groomers) -->
-        <div style="background: white; padding: 30px; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.08); margin-bottom:24px;">
-            <h2 style="font-size:1.6em; color:#333; margin-bottom:12px;">Groomers</h2>
-            <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px;">
-                @foreach($groomers as $g)
-                    <div style="padding:14px; border-radius:12px; background:#fff8f4; border:1px solid rgba(0,0,0,0.03);">
-                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-                            <div style="width:48px;height:48px;border-radius:50%;background:#fff;color:#F57C00;display:flex;align-items:center;justify-content:center;font-weight:700;">{{ strtoupper(substr($g->name,0,1)) }}</div>
-                            <div>
-                                <div style="font-weight:700;color:#333">{{ $g->name }}</div>
-                                <div style="font-size:0.9em;color:#666">{{ $g->email }}</div>
-                            </div>
-                        </div>
-                        <div style="font-size:0.9em;color:#666;margin-bottom:10px">{{ $g->address ?? '-' }}</div>
-                        <div style="display:flex; gap:8px;">
-                            <a href="{{ route('groomers.show', $g->groomer_id) }}" style="padding:8px 12px;border-radius:10px;background:#FF8C42;color:white;text-decoration:none;font-weight:700">View</a>
-                            @can('update', $g)
-                                <a href="{{ route('groomers.edit', $g->groomer_id) }}" style="padding:8px 12px;border-radius:10px;background:#eee;color:#333;text-decoration:none;font-weight:700">Edit</a>
-                            @endcan
-                        </div>
+
+<div class="logout-form-container">
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="logout-btn">
+            <span>🚪</span>
+            <span>Logout</span>
+        </button>
+    </form>
+</div>
+
+<div class="container">
+
+    @if(isset($groomers) && count($groomers) > 0)
+    <div style="background: white; padding: 30px; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.08); margin-bottom:24px;">
+        <h2 style="font-size:1.6em; color:#333; margin-bottom:12px;">Team Groomers</h2>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px;">
+            @foreach($groomers as $g)
+            <div style="padding:14px; border-radius:12px; background:#fff8f4; border:1px solid rgba(0,0,0,0.03);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+                    <div style="width:48px;height:48px;border-radius:50%;background:#fff;color:#F57C00;display:flex;align-items:center;justify-content:center;font-weight:700;">{{ strtoupper(substr($g->name,0,1)) }}</div>
+                    <div>
+                        <div style="font-weight:700;color:#333">{{ $g->name }}</div>
+                        <div style="font-size:0.9em;color:#666">{{ $g->email }}</div>
                     </div>
-                @endforeach
-            </div>
-            <div style="margin-top:16px">{{ $groomers->links() }}</div>
-        </div>
-        @endisset
-        <div class="header">
-            <div class="header-content">
-                <div class="header-left">
-                    <h1>Welcome Back! 👋</h1>
-                    <p>Ready to make some pets look amazing today?</p>
                 </div>
-                <div class="user-info">
-                    <div class="user-avatar">G</div>
-                    <span class="user-name">Groomer Pro</span>
+                <div style="font-size:0.9em;color:#666;margin-bottom:10px">{{ $g->phone ?? '-' }}</div>
+                <div style="display:flex; gap:8px;">
+                    <a href="{{ route('groomers.show', $g->user_id) }}" style="padding:8px 12px;border-radius:10px;background:#FF8C42;color:white;text-decoration:none;font-weight:700; font-size:0.8em;">View</a>
                 </div>
             </div>
+            @endforeach
         </div>
-        <div class="stats-grid">
-            <div class="stat-card"><h3>Today's Appointments</h3><div class="number" id="totalCount">{{ $todayCount ?? 0 }}</div><div class="icon">📅</div></div>
-            <div class="stat-card"><h3>Pending</h3><div class="number" id="pendingCount">{{ $pendingCount ?? 0 }}</div><div class="icon">⏳</div></div>
-            <div class="stat-card"><h3>In Progress</h3><div class="number" id="progressCount">{{ $inprogressCount ?? 0 }}</div><div class="icon">🔄</div></div>
-            <div class="stat-card"><h3>Completed</h3><div class="number" id="completedCount">{{ $completedCount ?? 0 }}</div><div class="icon">✅</div></div>
-        </div>
-        <div class="appointments-section">
-            <div class="section-header">
-                <h2>📋 Today's Schedule</h2>
-                <div class="filter-tabs">
-                    <button class="filter-tab active" onclick="filterAppointments(event, 'all')">All</button>
-                    <button class="filter-tab" onclick="filterAppointments(event, 'pending')">Pending</button>
-                    <button class="filter-tab" onclick="filterAppointments(event, 'inprogress')">In Progress</button>
-                    <button class="filter-tab" onclick="filterAppointments(event, 'completed')">Completed</button>
-                </div>
-            </div>
-            <div class="appointments-list" id="appointmentsList"></div>
-        </div>
+        <div style="margin-top:16px">{{ $groomers->links() }}</div>
     </div>
-    <div class="modal" id="progressModal">
-        <div class="modal-content">
-            <div class="modal-header"><h2>🐾 Grooming in Progress</h2><button class="close-modal" onclick="closeModal('progressModal')">×</button></div>
-            <div class="modal-body">
-                <div class="info-row"><span class="info-label">Pet Name</span><span class="info-value" id="progPetName">-</span></div>
-                <div class="info-row"><span class="info-label">Service</span><span class="info-value" id="progService">-</span></div>
-                <div class="progress-section"><h3>Progress</h3><div class="timer" id="timerDisplay">00:00</div><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div></div>
-                <div class="checklist"><h3>✅ Checklist</h3><div id="checklistItems"></div></div>
+    @endif
+
+    <div class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1>Welcome Back, {{ Auth::user()->name }}! 👋</h1>
+                <p>Ready to make some pets look amazing today?</p>
             </div>
-            <div class="modal-footer">
-                <button class="btn-modal btn-cancel" onclick="closeModal('progressModal')">Cancel</button>
-                <button class="btn-modal btn-finish" onclick="finishGrooming()">✓ Complete Grooming</button>
+            <div class="user-info">
+                <div class="user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
+                <span class="user-name">{{ Auth::user()->name }}</span>
             </div>
         </div>
     </div>
-    <div class="modal" id="viewModal">
-        <div class="modal-content">
-            <div class="modal-header"><h2>📋 Appointment Details</h2><button class="close-modal" onclick="closeModal('viewModal')">×</button></div>
-            <div class="modal-body" id="viewDetails"></div>
-            <div class="modal-footer"><button class="btn-modal btn-cancel" onclick="closeModal('viewModal')">Close</button></div>
+
+    <div class="stats-grid">
+        <div class="stat-card"><h3>Today's Appointments</h3><div class="number" id="totalCount">{{ $todayCount ?? 0 }}</div><div class="icon">📅</div></div>
+        <div class="stat-card"><h3>Pending</h3><div class="number" id="pendingCount">{{ $pendingCount ?? 0 }}</div><div class="icon">⏳</div></div>
+        <div class="stat-card"><h3>In Progress</h3><div class="number" id="progressCount">{{ $inprogressCount ?? 0 }}</div><div class="icon">🔄</div></div>
+        <div class="stat-card"><h3>Completed</h3><div class="number" id="completedCount">{{ $completedCount ?? 0 }}</div><div class="icon">✅</div></div>
+    </div>
+
+    <div class="appointments-section">
+        <div class="section-header">
+            <h2>📋 Today's Schedule</h2>
+            <div class="filter-tabs">
+                <button class="filter-tab active" onclick="filterAppointments(event, 'all')">All</button>
+                <button class="filter-tab" onclick="filterAppointments(event, 'pending')">Pending</button>
+                <button class="filter-tab" onclick="filterAppointments(event, 'inprogress')">In Progress</button>
+                <button class="filter-tab" onclick="filterAppointments(event, 'completed')">Completed</button>
+            </div>
+        </div>
+        <div class="appointments-list" id="appointmentsList"></div>
+    </div>
+</div>
+
+<div class="modal" id="progressModal">
+    <div class="modal-content">
+        <div class="modal-header"><h2>🐾 Grooming in Progress</h2><button class="close-modal" onclick="closeModal('progressModal')">×</button></div>
+        <div class="modal-body">
+            <div class="info-row"><span class="info-label">Pet Name</span><span class="info-value" id="progPetName">-</span></div>
+            <div class="info-row"><span class="info-label">Service</span><span class="info-value" id="progService">-</span></div>
+            <div class="progress-section"><h3>Progress</h3><div class="timer" id="timerDisplay">00:00</div><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div></div>
+            <div class="checklist"><h3>✅ Checklist</h3><div id="checklistItems"></div></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal btn-cancel" onclick="closeModal('progressModal')">Cancel</button>
+            <button class="btn-modal btn-finish" onclick="finishGrooming()">✓ Complete Grooming</button>
         </div>
     </div>
+</div>
+
+<div class="modal" id="viewModal">
+    <div class="modal-content">
+        <div class="modal-header"><h2>📋 Appointment Details</h2><button class="close-modal" onclick="closeModal('viewModal')">×</button></div>
+        <div class="modal-body" id="viewDetails"></div>
+        <div class="modal-footer"><button class="btn-modal btn-cancel" onclick="closeModal('viewModal')">Close</button></div>
+    </div>
+</div>
+
 <script>
-const appointments = @json($appointmentsForJs ?? []);
-let currentAppointment = null, timerInterval = null, seconds = 0;
-const checklists = {
-    "Full Grooming": ["Brushing","Bathing","Drying","Hair Cutting","Nail Trimming","Ear Cleaning","Perfume"],
-    "Bath Only": ["Brushing","Bathing","Drying","Perfume"]
-};
-function renderAppointments() {
-    const list = document.getElementById('appointmentsList');
-    list.innerHTML = appointments.map(a => `
+    // PERBAIKAN: Gunakan json_encode dengan raw tag agar tidak error parsing
+    const appointments = {!! json_encode($appointmentsForJs ?? []) !!};
+    let currentAppointment = null, timerInterval = null, seconds = 0;
+
+    const checklists = {
+        "Full Grooming": ["Brushing","Bathing","Drying","Hair Cutting","Nail Trimming","Ear Cleaning","Perfume"],
+        "Bath Only": ["Brushing","Bathing","Drying","Perfume"],
+        "Health Check": ["Physical Exam", "Weight Check", "Temperature Check", "Ear & Eye Check"]
+    };
+
+    function renderAppointments() {
+        const list = document.getElementById('appointmentsList');
+        if (appointments.length === 0) {
+            list.innerHTML = '<div style="padding:28px;border-radius:12px;background:#fff8f0;color:#666;text-align:center;">No appointments found for today.</div>';
+            return;
+        }
+
+        list.innerHTML = appointments.map(a => `
         <div class="appointment-card" data-status="${a.status}" data-id="${a.id}">
             <div class="appointment-info">
                 <h4>🕐 ${a.time}</h4>
                 <p>👤 ${a.customer}</p>
-                <p style="color:#F57C00;font-weight:600">💰 ${a.payment}</p>
+                <p style="color:#F57C00;font-weight:600">💰 ${a.payment || '-'}</p>
             </div>
             <div class="pet-details">
                 <h4>${a.petName} ${a.petIcon}</h4>
@@ -369,73 +392,131 @@ function renderAppointments() {
             </div>
         </div>
     `).join('');
-    updateStats();
-}
-function updateStats() {
-    // keep UI in sync if appointments are manipulated client-side; otherwise server counts are authoritative
-    const total = appointments.length;
-    if (total === 0) {
-        // show friendly empty state
-        document.getElementById('appointmentsList').innerHTML = '<div style="padding:28px;border-radius:12px;background:#fff8f0;color:#666">No appointments found for the selected period.</div>';
+        updateStats();
     }
-    // Only update the numeric badges if they exist in the DOM
-    const t = document.getElementById('totalCount'); if (t) t.textContent = total;
-    const p = document.getElementById('pendingCount'); if (p) p.textContent = appointments.filter(a => a.status === 'pending').length;
-    const pr = document.getElementById('progressCount'); if (pr) pr.textContent = appointments.filter(a => a.status === 'inprogress').length;
-    const c = document.getElementById('completedCount'); if (c) c.textContent = appointments.filter(a => a.status === 'completed').length;
-}
-function filterAppointments(ev, filter) {
-    try { document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active')); } catch(e){}
-    if (ev && ev.target) ev.target.classList.add('active');
-    document.querySelectorAll('.appointment-card').forEach(c => {
-        c.classList.toggle('hidden', filter !== 'all' && c.dataset.status !== filter);
-    });
-}
-function startGrooming(id) {
-    const a = appointments.find(x => x.id === id);
-    if (a) { a.status = 'inprogress'; renderAppointments(); openProgressModal(id); }
-}
-function openProgressModal(id) {
-    currentAppointment = appointments.find(a => a.id === id);
-    if (!currentAppointment) return;
-    document.getElementById('progPetName').textContent = currentAppointment.petName;
-    document.getElementById('progService').textContent = currentAppointment.service;
-    const items = checklists[currentAppointment.service] || checklists["Bath Only"];
-    document.getElementById('checklistItems').innerHTML = items.map((item, i) => `
+
+    function updateStats() {
+        const t = document.getElementById('totalCount'); if (t) t.textContent = appointments.length;
+        const p = document.getElementById('pendingCount'); if (p) p.textContent = appointments.filter(a => a.status === 'pending').length;
+        const pr = document.getElementById('progressCount'); if (pr) pr.textContent = appointments.filter(a => a.status === 'inprogress').length;
+        const c = document.getElementById('completedCount'); if (c) c.textContent = appointments.filter(a => a.status === 'completed').length;
+    }
+
+    function filterAppointments(ev, filter) {
+        try { document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active')); } catch(e){}
+        if (ev && ev.target) ev.target.classList.add('active');
+        document.querySelectorAll('.appointment-card').forEach(c => {
+            c.classList.toggle('hidden', filter !== 'all' && c.dataset.status !== filter);
+        });
+    }
+
+    // --- FUNGSI UPDATE STATUS: KIRIM DATA KE DATABASE ---
+    function startGrooming(id) {
+        const a = appointments.find(x => x.id === id);
+        if (!a) return;
+
+        // AJAX Request ke Server
+        fetch(`/groomer/appointment/${id}/update`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ status: 'inprogress' })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update UI hanya jika Database sukses
+                    a.status = 'inprogress';
+                    renderAppointments();
+                    openProgressModal(id);
+                } else {
+                    alert('Failed to update status.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Connection error.');
+            });
+    }
+
+    function openProgressModal(id) {
+        currentAppointment = appointments.find(a => a.id === id);
+        if (!currentAppointment) return;
+        document.getElementById('progPetName').textContent = currentAppointment.petName;
+        document.getElementById('progService').textContent = currentAppointment.service;
+
+        const items = checklists[currentAppointment.service] || checklists["Bath Only"];
+
+        document.getElementById('checklistItems').innerHTML = items.map((item, i) => `
         <div class="checklist-item"><input type="checkbox" id="check${i}" onchange="updateProgress()"><label for="check${i}">${item}</label></div>
     `).join('');
-    seconds = 0; updateTimer();
-    if (timerInterval) clearInterval(timerInterval);
-    timerInterval = setInterval(() => { seconds++; updateTimer(); }, 1000);
-    document.getElementById('progressModal').classList.add('active');
-}
-function updateTimer() {
-    const m = Math.floor(seconds / 60), s = seconds % 60;
-    document.getElementById('timerDisplay').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-}
-function updateProgress() {
-    const checks = document.querySelectorAll('#checklistItems input');
-    const done = Array.from(checks).filter(c => c.checked).length;
-    document.getElementById('progressFill').style.width = `${(done / checks.length) * 100}%`;
-}
-function finishGrooming() {
-    if (!currentAppointment) return;
-    const checks = document.querySelectorAll('#checklistItems input');
-    if (Array.from(checks).some(c => !c.checked)) { alert('Please complete all checklist items!'); return; }
-    currentAppointment.status = 'completed';
-    currentAppointment.completedAt = new Date().toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
-    currentAppointment.duration = document.getElementById('timerDisplay').textContent;
-    clearInterval(timerInterval);
-    closeModal('progressModal');
-    renderAppointments();
-}
-function viewDetails(id) {
-    const a = appointments.find(x => x.id === id);
-    if (!a) return;
-    document.getElementById('viewDetails').innerHTML = `
+        seconds = 0; updateTimer();
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => { seconds++; updateTimer(); }, 1000);
+        document.getElementById('progressModal').classList.add('active');
+    }
+
+    function updateTimer() {
+        const m = Math.floor(seconds / 60), s = seconds % 60;
+        document.getElementById('timerDisplay').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }
+
+    function updateProgress() {
+        const checks = document.querySelectorAll('#checklistItems input');
+        const done = Array.from(checks).filter(c => c.checked).length;
+        document.getElementById('progressFill').style.width = `${(done / checks.length) * 100}%`;
+    }
+
+    // --- FUNGSI UPDATE STATUS: SELESAI GROOMING ---
+    function finishGrooming() {
+        if (!currentAppointment) return;
+        const checks = document.querySelectorAll('#checklistItems input');
+        if (Array.from(checks).some(c => !c.checked)) { alert('Please complete all checklist items!'); return; }
+
+        const id = currentAppointment.id;
+        const duration = document.getElementById('timerDisplay').textContent;
+
+        // AJAX Request ke Server
+        fetch(`/groomer/appointment/${id}/update`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                status: 'completed',
+                duration: duration
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentAppointment.status = 'completed';
+                    currentAppointment.completedAt = new Date().toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
+                    currentAppointment.duration = duration;
+
+                    clearInterval(timerInterval);
+                    closeModal('progressModal');
+                    renderAppointments();
+                } else {
+                    alert('Failed to complete task.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Connection error.');
+            });
+    }
+
+    function viewDetails(id) {
+        const a = appointments.find(x => x.id === id);
+        if (!a) return;
+        document.getElementById('viewDetails').innerHTML = `
         <div class="info-row"><span class="info-label">Time</span><span class="info-value">${a.time}</span></div>
         <div class="info-row"><span class="info-label">Customer</span><span class="info-value">${a.customer}</span></div>
-        <div class="info-row"><span class="info-label">Payment</span><span class="info-value">${a.payment}</span></div>
+        <div class="info-row"><span class="info-label">Payment</span><span class="info-value">${a.payment || '-'}</span></div>
         <div class="info-row"><span class="info-label">Pet Name</span><span class="info-value">${a.petName} ${a.petIcon}</span></div>
         <div class="info-row"><span class="info-label">Pet Type</span><span class="info-value">${a.petType}</span></div>
         <div class="info-row"><span class="info-label">Weight</span><span class="info-value">${a.weight}</span></div>
@@ -445,11 +526,12 @@ function viewDetails(id) {
         ${a.completedAt ? `<div class="info-row"><span class="info-label">Completed At</span><span class="info-value">${a.completedAt}</span></div>` : ''}
         ${a.duration ? `<div class="info-row"><span class="info-label">Duration</span><span class="info-value">${a.duration}</span></div>` : ''}
     `;
-    document.getElementById('viewModal').classList.add('active');
-}
-function closeModal(id) { document.getElementById(id).classList.remove('active'); if (id === 'progressModal') clearInterval(timerInterval); }
-function logout() { alert('Logging out...'); }
-renderAppointments();
+        document.getElementById('viewModal').classList.add('active');
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); if (id === 'progressModal') clearInterval(timerInterval); }
+
+    renderAppointments();
 </script>
 </body>
 </html>
